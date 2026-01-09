@@ -21,6 +21,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'innovator_id',
     ];
 
     /**
@@ -42,4 +44,23 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    /* ================= RELATIONS ================= */
+
+    public function innovator()
+    {
+        return $this->belongsTo(Innovator::class);
+    }
+
+    /* ================= HELPERS ================= */
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isInnovator(): bool
+    {
+        return $this->role === 'innovator';
+    }
 }
