@@ -21,6 +21,9 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/selengkapnya', [HomeController::class, 'about'])->name('about');
 
+Route::get('/innovations/create', [InnovationController::class, 'create'])->name('innovations.create');
+Route::post('/innovations', [InnovationController::class, 'store'])->name('innovations.store');
+
 Route::get('/innovations', [InnovationController::class, 'index'])->name('innovations.index');
 Route::get('/innovations/{innovation}', [InnovationController::class, 'show'])->name('innovations.show');
 
@@ -32,3 +35,5 @@ Route::get('/inovator-of-the-month', [InnovatorOfMonthController::class, 'show']
 
 // placeholder admin login route (biar navbar gak error)
 Route::get('/admin/login', fn () => 'Admin login page (handled by admin team)')->name('admin.login');
+
+
