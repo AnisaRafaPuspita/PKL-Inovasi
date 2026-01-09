@@ -22,6 +22,7 @@ class Innovation extends Model
         'is_impact',
         'status',
         'views_count',
+        'image_url',
     ];
 
     /* ================= RELATIONS ================= */

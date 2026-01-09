@@ -23,5 +23,7 @@ class InnovatorOfMonthController extends Controller
             ->first();
 
         return view('pages.innovator-month.show', compact('iom', 'featuredInnovation'));
+
+
     }
 }
