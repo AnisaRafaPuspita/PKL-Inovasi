@@ -19,6 +19,6 @@ class InnovationRanking extends Model
 
     public function innovation()
     {
-        return $this->belongsTo(Innovation::class);
+        return $this->belongsTo(Innovation::class, 'innovation_id');
     }
 }

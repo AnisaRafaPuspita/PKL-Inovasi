@@ -37,8 +37,11 @@ class HomeController extends Controller
             ->orderByDesc('month')
             ->first();
 
-        $rankings = InnovationRanking::orderBy('rank')->take(3)->get();
-
+        $rankings = InnovationRanking::with('innovation')
+            ->where('status', 'active')
+            ->orderBy('rank')
+            ->get();
+            
         return view('pages.home', compact('impactInnovations','innovations', 'mostVisited', 'innovatorMonth', 'rankings'));
     }
 
