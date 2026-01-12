@@ -5,11 +5,22 @@
         </a>
 
         <a href="{{ route('admin.login') }}"
-           class="inline-flex items-center gap-3 rounded-[10px] border-2 border-white px-6 py-3 text-white font-semibold text-[18px] md:text-[26px]"
-           style="font-family: Inter, sans-serif;">
-            <img src="{{ asset('images/in.png') }}" alt="Login Icon" class="h-[26px] w-auto">
+            class="inline-flex items-center gap-2
+                    rounded-[10px]
+                    border-2 border-white
+                    px-5 py-2.5
+                    text-white font-semibold
+                    text-[14px] md:text-[15px]
+                    hover:bg-white/10 transition"
+            style="font-family: Inter, sans-serif;">
 
-            Login sebagai Admin
-        </a>
+                <img src="{{ asset('images/in.png') }}"
+                    alt="Login Icon"
+                    class="h-[18px] w-auto">
+
+                Login Admin
+            </a>
+
+
     </div>
 </header>
