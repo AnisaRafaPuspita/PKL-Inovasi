@@ -75,28 +75,63 @@
             </div>
 
             {{-- Nama Innovator --}}
+            <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] items-start gap-4">
+                <label class="text-[#001349] text-[18px] font-bold pt-2">
+                    Nama Innovator
+                </label>
+
+                <div class="space-y-3">
+                    {{-- Input ketik nama --}}
+                    <input
+                        name="new_innovator_name"
+                        placeholder="Ketik nama innovator (jika belum ada)"
+                        class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 outline-none"
+                    >
+
+                    {{-- Dropdown pilih --}}
+                    <select
+                        name="innovator_id"
+                        class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 bg-white outline-none">
+                        <option value="">
+                            Atau pilih innovator yang sudah ada
+                        </option>
+                        @foreach ($innovators as $innovator)
+                            <option value="{{ $innovator->id }}">
+                                {{ $innovator->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            {{-- Fakultas --}}
             <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] items-center gap-4">
-                <label class="text-[#001349] text-[18px] font-bold">Nama Innovator</label>
+                <label class="text-[#001349] text-[18px] font-bold">
+                    Fakultas
+                </label>
+
                 <select
-                    name="innovator_id"
-                    class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 outline-none bg-white"
-                    required
-                >
-                    <option value="">Pilih innovator</option>
-                    @foreach($innovators as $innovator)
-                        <option value="{{ $innovator->id }}" @selected(old('innovator_id') == $innovator->id)>
-                            {{ $innovator->name }}{{ $innovator->faculty?->name ? ' - ' . $innovator->faculty->name : '' }}
+                    name="faculty_id"
+                    class="h-[46px] w-full rounded-[30px]
+                        border border-[#001349]
+                        px-6 bg-white outline-none">
+                    <option value="">Pilih Fakultas</option>
+                    @foreach($faculties as $faculty)
+                        <option value="{{ $faculty->id }}" @selected(old('faculty_id') == $faculty->id)>
+                            {{ $faculty->name }}
                         </option>
                     @endforeach
                 </select>
             </div>
 
+
+
             {{-- Mitra --}}
             <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] items-center gap-4">
                 <label class="text-[#001349] text-[18px] font-bold">Mitra</label>
                 <input
-                    name="partners"
-                    value="{{ old('partners') }}"
+                    name="partner"
+                    value="{{ old('partner') }}"
                     class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 outline-none"
                     placeholder="Contoh: PT ABC, UNDIP, dll"
                 >
@@ -106,8 +141,8 @@
             <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] items-center gap-4">
                 <label class="text-[#001349] text-[18px] font-bold">Status HKI</label>
                 <input
-                    name="ip_status"
-                    value="{{ old('ip_status') }}"
+                    name="hki_status"
+                    value="{{ old('hki_status') }}"
                     class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 outline-none"
                     placeholder="Contoh: Paten Granted"
                 >
@@ -187,21 +222,28 @@
 </section>
 
 <script>
-document.getElementById('image').addEventListener('change', function (e) {
-    const file = e.target.files[0];
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('image');
+  const previewImg = document.getElementById('preview-img');
+  const placeholder = document.getElementById('image-placeholder');
+
+  if (!input || !previewImg || !placeholder) return;
+
+  input.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
     if (!file) return;
 
-    const previewImg = document.getElementById('preview-img');
-    const placeholder = document.getElementById('image-placeholder');
-
     const reader = new FileReader();
-    reader.onload = function (e) {
-        previewImg.src = e.target.result;
-        previewImg.classList.remove('hidden');
-        placeholder.classList.add('hidden');
+    reader.onload = (evt) => {
+      previewImg.src = evt.target.result;
+      previewImg.classList.remove('hidden');
+      placeholder.classList.add('hidden');
     };
     reader.readAsDataURL(file);
+  });
 });
 </script>
+
+
 
 @endsection

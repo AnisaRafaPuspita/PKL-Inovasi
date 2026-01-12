@@ -31,7 +31,7 @@
             <div class="h-[240px] md:h-[320px] rounded-[20px] bg-gray-100 grid place-content-center overflow-hidden">
                 {{-- Kalau nanti ada image_url / foto, tinggal tampilkan di sini --}}
                 @if(!empty($innovation->image_url))
-                    <img src="{{ $innovation->image_url }}" class="w-full h-full object-cover" alt="Foto Inovasi">
+                    <img src="{{ asset('storage/' . $innovation->image_url) }}" alt="Foto Inovasi">
                 @else
                     <span class="text-[18px] md:text-[20px] font-light text-gray-500"
                           style="font-family: Inter, sans-serif;">Foto</span>
