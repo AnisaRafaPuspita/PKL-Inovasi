@@ -102,7 +102,7 @@ class InnovationController extends Controller
             'category'    => $validated['category'] ?? null,
             'partner'    => $validated['partner'] ?? null,
             'hki_status'   => $validated['hki_status'] ?? null,
-            'is_impact' => false,
+            'is_impact' => !empty($validated['impact']),
             'video_url'   => $validated['video_url'] ?? null,
 
             'description' => $validated['description'] ?? null,

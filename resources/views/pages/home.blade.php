@@ -92,7 +92,15 @@
             <div class="rounded-[30px] border-2 border-[#8D8585] bg-white overflow-hidden
                         transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-lg">
                 <div class="h-[215px] md:h-[235px] bg-gray-200">
-                    <img src="{{ $inv->image_url ?? 'https://placehold.co/450x300' }}" class="h-full w-full object-cover" alt="">
+                    @if ($inv->image_url)
+                        <img
+                            src="{{ asset('storage/' . $inv->image_url) }}"
+                            class="h-full w-full object-cover"
+                            alt="Foto Inovasi"
+                        >
+                    @else
+                        <img src="https://placehold.co/450x300" class="h-full w-full object-cover">
+                    @endif
                 </div>
 
                 <div class="p-5 md:p-6">
@@ -246,8 +254,16 @@
             <div class="rounded-[30px] border-2 border-[#8D8585] bg-white overflow-hidden
                         transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-lg">
                 <div class="h-[215px] md:h-[235px] bg-gray-200">
-                    <img src="{{ $inv->image_url ?? 'https://placehold.co/450x300' }}"
-                         class="h-full w-full object-cover" alt="">
+                    @if ($inv->image_url)
+                        <img
+                            src="{{ asset('storage/' . $inv->image_url) }}"
+                            class="h-full w-full object-cover"
+                            alt="Foto Produk Inovasi"
+                        >
+                    @else
+                        <img src="https://placehold.co/450x300" class="h-full w-full object-cover">
+                    @endif
+                         
                 </div>
 
                 <div class="p-5 md:p-6">
