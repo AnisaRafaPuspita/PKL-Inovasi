@@ -78,63 +78,68 @@
                 flex items-center justify-center gap-5">
 
         <img src="{{ asset('images/Logo Undip Universitas Diponegoro.png') }}"
-             class="h-[56px] md:h-[64px]"
-             alt="">
+             class="h-[56px] md:h-[64px]" alt="">
 
-        <h2 class="text-[22px] md:text-[26px] font-semibold text-[#001349]"
-            style="font-family: Inter, sans-serif;">
+        <h2 class="text-[22px] md:text-[26px] font-semibold text-[#001349]">
             Inovasi Berdampak
         </h2>
     </div>
 
     <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-        @foreach($impactInnovations as $inv)
-            <div class="rounded-[30px] border-2 border-[#8D8585] bg-white overflow-hidden
-                        transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-lg">
-                <div class="h-[215px] md:h-[235px] bg-gray-200">
-                    @if ($inv->image_url)
-                        <img
-                            src="{{ asset('storage/' . $inv->image_url) }}"
-                            class="h-full w-full object-cover"
-                            alt="Foto Inovasi"
-                        >
-                    @else
-                        <img src="https://placehold.co/450x300" class="h-full w-full object-cover">
-                    @endif
-                </div>
+        @foreach ($impactInnovations as $index => $inv)
+            <div class="impact-item {{ $index >= 6 ? 'hidden' : '' }}">
+                <div class="rounded-[30px] border-2 border-[#8D8585] bg-white overflow-hidden
+                            transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
 
-                <div class="p-5 md:p-6">
-                    <div class="text-[18px] md:text-[20px] font-semibold text-[#001349] leading-snug"
-                         style="font-family: Inter, sans-serif;">
-                        {{ $inv->title }}
+                    <div class="h-[215px] md:h-[235px] bg-gray-200">
+                        @if ($inv->image_url)
+                            <img src="{{ asset('storage/' . $inv->image_url) }}"
+                                 class="h-full w-full object-cover"
+                                 alt="Foto Inovasi">
+                        @else
+                            <img src="https://placehold.co/450x300" class="h-full w-full object-cover">
+                        @endif
                     </div>
 
-                    <div class="mt-1 text-[13px] md:text-[14px] font-semibold text-gray-800"
-                         style="font-family: Inter, sans-serif;">
-                        {{ $inv->category }}
-                    </div>
+                    <div class="p-5 md:p-6">
+                        <div class="text-[18px] md:text-[20px] font-semibold text-[#001349]">
+                            {{ $inv->title }}
+                        </div>
 
-                    <p class="mt-2 text-[13px] md:text-[14px] text-gray-700 leading-relaxed"
-                       style="font-family: Inter, sans-serif;">
-                        {{ \Illuminate\Support\Str::limit($inv->description, 100) }}
-                    </p>
+                        <div class="mt-1 text-[13px] font-semibold text-gray-800">
+                            {{ $inv->category }}
+                        </div>
 
-                    <div class="mt-4 flex items-center justify-between">
-                        <span class="rounded-full bg-[#1A6ECE]/50 px-3 py-1.5 text-[12px] font-semibold text-[#1A6ECE]">
-                            {{ ucfirst($inv->status) }}
-                        </span>
+                        <p class="mt-2 text-[13px] text-gray-700">
+                            {{ \Illuminate\Support\Str::limit($inv->description, 100) }}
+                        </p>
 
-                        <a class="text-[#1A6ECE] font-semibold text-[14px] hover:underline"
-                           style="font-family: Inter, sans-serif;"
-                           href="{{ route('innovations.show', $inv->id) }}">
-                            Lihat Detail
-                        </a>
+                        <div class="mt-4 flex items-center justify-between">
+                            <span class="rounded-full bg-[#1A6ECE]/50 px-3 py-1.5 text-[12px] font-semibold text-[#1A6ECE]">
+                                {{ ucfirst($inv->status) }}
+                            </span>
+
+                            <a href="{{ route('innovations.show', $inv->id) }}"
+                               class="text-[#1A6ECE] font-semibold text-[14px] hover:underline">
+                                Lihat Detail
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
         @endforeach
     </div>
+
+    @if ($impactInnovations->count() > 6)
+        <div class="mt-8 text-center">
+            <button onclick="showMoreImpact()"
+                class="rounded-full bg-[#001349] px-8 py-2 text-white font-semibold">
+                Selengkapnya
+            </button>
+        </div>
+    @endif
 </section>
+
 
 {{-- INNOVATOR OF THE MONTH --}}
 <section class="mx-auto max-w-[1320px] px-3 md:px-4 mt-14 md:mt-16">
@@ -242,63 +247,71 @@
 
 {{-- INNOVATION PRODUCTS --}}
 <section class="mx-auto max-w-[1320px] px-3 md:px-4 mt-14 md:mt-16">
-    <div class="inline-flex items-center gap-3 md:gap-4 rounded-[30px] bg-white shadow-[0px_4px_8px_rgba(0,0,0,0.25)] px-6 md:px-10 py-4 md:py-6">
-        <img src="{{ asset('images/Box.png') }}" alt="Icon" class="h-[38px] md:h-[50px] w-auto">
-        <h2 class="text-[#001349] text-[20px] md:text-[24px] font-bold" style="font-family: Inter, sans-serif;">
+    <div class="inline-flex items-center gap-3 rounded-[30px] bg-white
+                shadow-[0px_4px_8px_rgba(0,0,0,0.25)]
+                px-6 md:px-10 py-4 md:py-6">
+
+        <img src="{{ asset('images/Box.png') }}" class="h-[38px] md:h-[50px]" alt="">
+        <h2 class="text-[#001349] text-[20px] md:text-[24px] font-bold">
             Innovation Products
         </h2>
     </div>
 
     <div class="mt-7 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-        @forelse($innovations as $inv)
-            <div class="rounded-[30px] border-2 border-[#8D8585] bg-white overflow-hidden
-                        transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-lg">
-                <div class="h-[215px] md:h-[235px] bg-gray-200">
-                    @if ($inv->image_url)
-                        <img
-                            src="{{ asset('storage/' . $inv->image_url) }}"
-                            class="h-full w-full object-cover"
-                            alt="Foto Produk Inovasi"
-                        >
-                    @else
-                        <img src="https://placehold.co/450x300" class="h-full w-full object-cover">
-                    @endif
-                         
-                </div>
+        @foreach ($innovations as $index => $inv)
+            <div class="product-item {{ $index >= 6 ? 'hidden' : '' }}">
+                <div class="rounded-[30px] border-2 border-[#8D8585] bg-white overflow-hidden
+                            transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
 
-                <div class="p-5 md:p-6">
-                    <div class="text-[18px] md:text-[20px] font-semibold text-[#001349] leading-snug" style="font-family: Inter, sans-serif;">
-                        {{ $inv->title }}
+                    <div class="h-[215px] md:h-[235px] bg-gray-200">
+                        @if ($inv->image_url)
+                            <img src="{{ asset('storage/' . $inv->image_url) }}"
+                                 class="h-full w-full object-cover"
+                                 alt="Foto Produk Inovasi">
+                        @else
+                            <img src="https://placehold.co/450x300" class="h-full w-full object-cover">
+                        @endif
                     </div>
 
-                    <div class="mt-1 text-[13px] md:text-[14px] font-semibold text-gray-800" style="font-family: Inter, sans-serif;">
-                        {{ $inv->category }}
-                    </div>
+                    <div class="p-5 md:p-6">
+                        <div class="text-[18px] md:text-[20px] font-semibold text-[#001349]">
+                            {{ $inv->title }}
+                        </div>
 
-                    <p class="mt-2 text-[13px] md:text-[14px] text-gray-700 leading-relaxed" style="font-family: Inter, sans-serif;">
-                        {{ \Illuminate\Support\Str::limit($inv->description, 100) }}
-                    </p>
+                        <div class="mt-1 text-[13px] font-semibold text-gray-800">
+                            {{ $inv->category }}
+                        </div>
 
-                    <div class="mt-4 flex items-center justify-between">
-                        <span class="rounded-full bg-[#1A6ECE]/50 px-3 py-1.5 text-[12px] font-semibold text-[#1A6ECE]">
-                            {{ ucfirst($inv->status) }}
-                        </span>
+                        <p class="mt-2 text-[13px] text-gray-700">
+                            {{ \Illuminate\Support\Str::limit($inv->description, 100) }}
+                        </p>
 
-                        <a class="text-[#1A6ECE] font-semibold text-[14px] hover:underline"
-                           style="font-family: Inter, sans-serif;"
-                           href="{{ route('innovations.show', $inv->id) }}">
-                            Lihat Detail
-                        </a>
+                        <div class="mt-4 flex items-center justify-between">
+                            <span class="rounded-full bg-[#1A6ECE]/50 px-3 py-1.5 text-[12px] font-semibold text-[#1A6ECE]">
+                                {{ ucfirst($inv->status) }}
+                            </span>
+
+                            <a href="{{ route('innovations.show', $inv->id) }}"
+                               class="text-[#1A6ECE] font-semibold text-[14px] hover:underline">
+                                Lihat Detail
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
-        @empty
-            <div class="text-gray-600" style="font-family: Inter, sans-serif;">
-                Belum ada produk inovasi.
-            </div>
-        @endforelse
+        @endforeach
     </div>
+
+    @if ($innovations->count() > 6)
+        <div class="mt-8 text-center">
+            <button onclick="showMoreProduct()"
+                class="rounded-full bg-[#001349] px-8 py-2 text-white font-semibold">
+                Selengkapnya
+            </button>
+        </div>
+    @endif
 </section>
+
 
 {{-- MOST VISITED --}}
 <section class="mx-auto max-w-[1320px] px-3 md:px-4 mt-14 md:mt-16">
@@ -345,5 +358,18 @@
         @endforeach
     </div>
 </section>
+
+<script>
+function showMoreImpact() {
+    document.querySelectorAll('.impact-item.hidden')
+        .forEach(el => el.classList.remove('hidden'));
+}
+
+function showMoreProduct() {
+    document.querySelectorAll('.product-item.hidden')
+        .forEach(el => el.classList.remove('hidden'));
+}
+</script>
+
 
 @endsection

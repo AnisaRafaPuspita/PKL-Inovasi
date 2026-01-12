@@ -18,10 +18,9 @@ class HomeController extends Controller
             ->where('status', 'published')
             ->where('is_impact', true)
             ->latest()
-            ->take(6)
             ->get();
 
-        $innovations = Innovation::where('is_impact', false)->latest()->take(6)->get();
+        $innovations = Innovation::where('is_impact', false)->latest()->get();
 
         // most visited
         $mostVisited = Innovation::query()
@@ -41,7 +40,7 @@ class HomeController extends Controller
             ->where('status', 'active')
             ->orderBy('rank')
             ->get();
-            
+
         return view('pages.home', compact('impactInnovations','innovations', 'mostVisited', 'innovatorMonth', 'rankings'));
     }
 
