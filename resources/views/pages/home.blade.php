@@ -16,32 +16,46 @@
             </h1>
 
             <div class="mt-6 flex flex-wrap items-center justify-center gap-5 md:gap-6">
+
                 {{-- Upload Produk --}}
                 <a href="{{ route('innovations.create') }}"
-                   class="group inline-flex items-center justify-center gap-2
-                          rounded-[10px] border-2 border-white bg-[#001349]/60
-                          px-8 py-2.5 text-white font-semibold text-[14px] md:text-[15px]
-                          transition duration-200 hover:bg-[#001349]/80 hover:-translate-y-[1px]"
-                   style="font-family: Inter, sans-serif;">
+                class="group inline-flex items-center justify-center gap-2
+                        rounded-[10px] border-2 border-white bg-[#001349]/60
+                        px-8 py-2.5
+                        text-white font-bold
+                        text-[16px] md:text-[17px]
+                        transition duration-200
+                        hover:bg-[#001349]/80 hover:-translate-y-[1px]"
+                style="font-family: Inter, sans-serif;">
                     <span>Upload Produk</span>
                     <img src="{{ asset('images/add_circle.png') }}"
-                         alt="Add Icon"
-                         class="h-[18px] w-[18px] shrink-0 transition-transform duration-200 group-hover:translate-x-1">
+                        alt="Add Icon"
+                        class="h-[18px] w-[18px] shrink-0
+                                transition-transform duration-200
+                                group-hover:translate-x-1">
                 </a>
 
                 {{-- Selengkapnya --}}
                 <a href="{{ route('about') }}"
-                   class="group inline-flex items-center justify-center gap-2
-                          rounded-[10px] border-2 border-white bg-[#001349]/60
-                          px-8 py-2.5 text-white font-semibold text-[14px] md:text-[15px]
-                          transition duration-200 hover:bg-[#001349]/80 hover:-translate-y-[1px]"
-                   style="font-family: Inter, sans-serif;">
+                class="group inline-flex items-center justify-center gap-2
+                        rounded-[10px] border-2 border-white bg-[#001349]/60
+                        px-8 py-2.5
+                        text-white font-bold
+                        text-[16px] md:text-[17px]
+                        transition duration-200
+                        hover:bg-[#001349]/80 hover:-translate-y-[1px]"
+                style="font-family: Inter, sans-serif;">
                     <span>Selengkapnya</span>
                     <img src="{{ asset('images/Arrow 4.png') }}"
-                         alt="Arrow Icon"
-                         class="h-[14px] w-[14px] shrink-0 transition-transform duration-200 group-hover:translate-x-1">
+                        alt="Arrow Icon"
+                        class="h-[14px] w-[14px] shrink-0
+                                transition-transform duration-200
+                                group-hover:translate-x-1">
                 </a>
+
             </div>
+
+
         </div>
     </div>
 </section>
