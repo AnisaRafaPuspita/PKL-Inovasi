@@ -13,25 +13,48 @@ class InnovationController extends Controller
     public function index(Request $request)
     {
         $q = $request->query('q');
+        $category = $request->query('category');
+        $facultyId = $request->query('faculty_id');
 
         $innovations = Innovation::query()
             ->where('status', 'published')
+
+            // 🔍 search bebas
             ->when($q, function ($query) use ($q) {
                 $query->where(function ($sub) use ($q) {
                     $sub->where('title', 'like', "%{$q}%")
-                        ->orWhere('category', 'like', "%{$q}%")
-                        ->orWhere('description', 'like', "%{$q}%");
+                        ->orWhere('description', 'like', "%{$q}%")
+                        ->orWhere('category', 'like', "%{$q}%");
                 });
             })
-            ->latest()
-            ->paginate(9); 
-            
-        $innovations->appends(request()->query());
 
-        // kamu bisa bikin view listing sendiri, atau sementara reuse page home.
-        // saran: bikin resources/views/pages/innovations/index.blade.php
-        return view('pages.innovations.index', compact('innovations', 'q'));
+            // 🏷️ filter kategori
+            ->when($category, function ($query) use ($category) {
+                $query->where('category', $category);
+            })
+
+            // 🏫 filter fakultas
+            ->when($facultyId, function ($query) use ($facultyId) {
+                $query->whereHas('innovators.faculty', function ($q) use ($facultyId) {
+                    $q->where('faculties.id', $facultyId);
+                });
+            })
+
+            ->latest()
+            ->paginate(9);
+
+        $innovations->appends($request->query());
+
+        return view('pages.innovations.index', [
+            'innovations' => $innovations,
+            'q' => $q,
+            'category' => $category,
+            'facultyId' => $facultyId,
+            'categories' => config('innovation.categories'),
+            'faculties' => Faculty::orderBy('name')->get(),
+        ]);
     }
+
 
     public function show(Innovation $innovation)
     {
@@ -47,8 +70,10 @@ class InnovationController extends Controller
     {
         $innovators = Innovator::with('faculty')->orderBy('name')->get();
         $faculties = Faculty::orderBy('name')->get();
+        $categories = config('innovation.categories');
 
-        return view('pages.innovations.create', compact('innovators', 'faculties'));
+
+        return view('pages.innovations.create', compact('innovators', 'faculties', 'categories'));
     }
 
     public function store(Request $request)
