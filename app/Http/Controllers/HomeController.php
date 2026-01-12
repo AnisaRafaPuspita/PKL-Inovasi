@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Innovation;
 use App\Models\InnovatorOfTheMonth;
 use App\Models\InnovationRanking;
+use App\Models\Faculty;
+
 
 
 
@@ -41,7 +43,9 @@ class HomeController extends Controller
             ->orderBy('rank')
             ->get();
 
-        return view('pages.home', compact('impactInnovations','innovations', 'mostVisited', 'innovatorMonth', 'rankings'));
+        $faculties = Faculty::orderBy('name')->get();
+
+        return view('pages.home', compact('impactInnovations','innovations', 'mostVisited', 'innovatorMonth', 'rankings', 'faculties'));
     }
 
     public function about()

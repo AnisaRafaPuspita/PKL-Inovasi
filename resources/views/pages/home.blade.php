@@ -46,28 +46,101 @@
     </div>
 </section>
 
-{{-- SEARCH --}}
+{{-- SEARCH HOME --}}
 <section class="mx-auto max-w-[1320px] px-3 md:px-4 -mt-10 relative z-10">
-    <form action="{{ route('innovations.index') }}" method="GET"
-          class="flex items-center gap-4 rounded-[30px] bg-[#D9D9D9]/40 px-5 md:px-6 py-3.5 md:py-4">
+    <form id="homeSearchForm"
+          action="{{ route('innovations.index') }}"
+          method="GET"
+          class="rounded-[30px] bg-[#D9D9D9]/40 px-5 md:px-6 py-3.5 md:py-4">
 
-        <img src="{{ asset('images/search.png') }}" alt="Search" class="h-5 w-5 md:h-6 md:w-6 shrink-0">
+        {{-- BAR SEARCH --}}
+        <div class="flex items-center gap-4">
 
-        <input name="q" value="{{ request('q') }}"
-               placeholder="Cari"
-               class="flex-1 bg-transparent outline-none text-[15px] md:text-[16px] font-semibold
-                      placeholder:text-black/60"
-               style="font-family: Inter, sans-serif;">
+            {{-- icon search --}}
+            <img src="{{ asset('images/search.png') }}"
+                 alt="Search"
+                 class="h-5 w-5 md:h-6 md:w-6 shrink-0">
 
-        <button type="button"
-                class="inline-flex items-center justify-center h-9 w-9 rounded-full hover:bg-black/10 transition"
-                aria-label="Filter">
-            <img src="{{ asset('images/Filter.png') }}" alt="Filter" class="h-5 w-5">
-        </button>
+            {{-- input --}}
+            <input
+                name="q"
+                placeholder="Cari inovasi..."
+                class="flex-1 bg-transparent outline-none
+                       text-[15px] md:text-[16px] font-semibold
+                       placeholder:text-black/60"
+                style="font-family: Inter, sans-serif;"
+            >
 
-        <button type="submit" class="sr-only" aria-label="Submit search"></button>
+            {{-- tombol filter --}}
+            <button type="button"
+                    onclick="toggleHomeFilter()"
+                    class="inline-flex items-center justify-center
+                           h-9 w-9 rounded-full
+                           hover:bg-black/10 transition"
+                    aria-label="Filter">
+                <img src="{{ asset('images/Filter.png') }}"
+                     alt="Filter"
+                     class="h-5 w-5">
+            </button>
+
+            {{-- submit (hidden, enter tetap bisa) --}}
+            <button type="submit" class="sr-only">Cari</button>
+        </div>
+
+        {{-- FILTER ADVANCED (HIDDEN) --}}
+        <div id="homeFilter"
+             class="mt-4 hidden
+                    rounded-[20px] bg-white
+                    px-4 md:px-6 py-4
+                    shadow">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                {{-- kategori --}}
+                <select name="category"
+                        class="h-[42px] rounded-full px-5
+                               border border-[#001349]/30
+                               outline-none">
+                    <option value="">Semua Kategori</option>
+                    @foreach (config('innovation.categories') as $cat)
+                        <option value="{{ $cat }}">{{ $cat }}</option>
+                    @endforeach
+                </select>
+
+                {{-- fakultas --}}
+                <select name="faculty_id"
+                        class="h-[42px] rounded-full px-5
+                               border border-[#001349]/30
+                               outline-none">
+                    <option value="">Semua Fakultas</option>
+                    @foreach ($faculties as $faculty)
+                        <option value="{{ $faculty->id }}">
+                            {{ $faculty->name }}
+                        </option>
+                    @endforeach
+                </select>
+
+            </div>
+
+            {{-- tombol cari --}}
+            <button type="submit"
+                    class="mt-4 w-full rounded-full
+                           bg-[#001349] py-2.5
+                           text-white font-semibold">
+                Cari
+            </button>
+        </div>
     </form>
 </section>
+
+{{-- JS --}}
+<script>
+function toggleHomeFilter() {
+    document.getElementById('homeFilter')
+        .classList.toggle('hidden');
+}
+</script>
+
 
 {{-- INOVASI BERDAMPAK --}}
 <section class="mx-auto max-w-[1320px] px-3 md:px-4 mt-12 md:mt-14">

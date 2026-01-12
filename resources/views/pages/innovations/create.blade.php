@@ -159,16 +159,26 @@
                 >
             </div>
 
-            {{-- (Opsional) Kategori --}}
+            {{-- Kategori --}}
             <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] items-center gap-4">
-                <label class="text-[#001349] text-[18px] font-bold">Kategori</label>
-                <input
+                <label class="text-[#001349] text-[18px] font-bold">
+                    Kategori
+                </label>
+
+                <select
                     name="category"
-                    value="{{ old('category') }}"
-                    class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 outline-none"
-                    placeholder="Contoh: Energi, Pertanian, IoT"
-                >
+                    class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 bg-white outline-none">
+
+                    <option value="">Pilih Kategori</option>
+
+                    @foreach ($categories as $cat)
+                        <option value="{{ $cat }}" @selected(old('category') == $cat)>
+                            {{ $cat }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
+
 
             {{-- Deskripsi --}}
             <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] items-start gap-4">
