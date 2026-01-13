@@ -196,15 +196,61 @@
                 <div class="rounded-[30px] border-2 border-[#8D8585] bg-white overflow-hidden
                             transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
 
-                    <div class="h-[215px] md:h-[235px] bg-gray-200">
-                        @if ($inv->image_url)
-                            <img src="{{ asset('storage/' . $inv->image_url) }}"
-                                 class="h-full w-full object-cover"
-                                 alt="Foto Inovasi">
-                        @else
-                            <img src="https://placehold.co/450x300" class="h-full w-full object-cover">
+                    {{-- IMAGE CARD SLIDER --}}
+                    <div class="relative h-[215px] overflow-hidden rounded-t-[30px]">
+
+                        @php
+                            // kumpulin gambar: prioritas images(), fallback image_url
+                            $images = $inv->images->count()
+                                ? $inv->images
+                                : ($inv->image_url
+                                    ? collect([(object)['image_path' => $inv->image_url]])
+                                    : collect());
+                        @endphp
+
+                        {{-- SLIDER --}}
+                        <div
+                            id="slider-{{ $inv->id }}"
+                            class="flex h-full transition-transform duration-300 ease-in-out"
+                            data-index="0"
+                        >
+                            @foreach ($images as $img)
+                                <img
+                                    src="{{ asset('storage/' . $img->image_path) }}"
+                                    class="min-w-full h-full object-cover"
+                                    alt="Foto Inovasi"
+                                >
+                            @endforeach
+                        </div>
+
+                        {{-- PANAH (MUNCUL HANYA JIKA FOTO > 1) --}}
+                        @if ($images->count() > 1)
+                            {{-- kiri --}}
+                            <button
+                                type="button"
+                                class="slide-btn absolute left-2 top-1/2 -translate-y-1/2
+                                    bg-black/50 text-white w-8 h-8 rounded-full
+                                    flex items-center justify-center"
+                                data-id="{{ $inv->id }}"
+                                data-dir="-1"
+                            >
+                                &lsaquo;
+                            </button>
+
+                            {{-- kanan --}}
+                            <button
+                                type="button"
+                                class="slide-btn absolute right-2 top-1/2 -translate-y-1/2
+                                    bg-black/50 text-white w-8 h-8 rounded-full
+                                    flex items-center justify-center"
+                                data-id="{{ $inv->id }}"
+                                data-dir="1"
+                            >
+                                &rsaquo;
+                            </button>
                         @endif
                     </div>
+
 
                     <div class="p-5 md:p-6">
                         <div class="text-[18px] md:text-[20px] font-semibold text-[#001349]">
@@ -368,15 +414,63 @@
                 <div class="rounded-[30px] border-2 border-[#8D8585] bg-white overflow-hidden
                             transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
 
-                    <div class="h-[215px] md:h-[235px] bg-gray-200">
-                        @if ($inv->image_url)
-                            <img src="{{ asset('storage/' . $inv->image_url) }}"
-                                 class="h-full w-full object-cover"
-                                 alt="Foto Produk Inovasi">
-                        @else
-                            <img src="https://placehold.co/450x300" class="h-full w-full object-cover">
+                    {{-- IMAGE CARD SLIDER --}}
+                    <div class="relative h-[215px] overflow-hidden rounded-t-[30px]">
+
+                        @php
+                            // kumpulin gambar: prioritas images(), fallback image_url
+                            $images = $inv->images->count()
+                                ? $inv->images
+                                : ($inv->image_url
+                                    ? collect([(object)['image_path' => $inv->image_url]])
+                                    : collect());
+                        @endphp
+
+                        {{-- SLIDER --}}
+                        <div
+                            id="slider-{{ $inv->id }}"
+                            class="flex h-full transition-transform duration-300 ease-in-out"
+                            data-index="0"
+                        >
+                            @foreach ($images as $img)
+                                <img
+                                    src="{{ asset('storage/' . $img->image_path) }}"
+                                    class="min-w-full h-full object-cover"
+                                    alt="Foto Inovasi"
+                                >
+                            @endforeach
+                        </div>
+
+                        {{-- PANAH (MUNCUL HANYA JIKA FOTO > 1) --}}
+                        @if ($images->count() > 1)
+                            {{-- kiri --}}
+                            <button
+                                type="button"
+                                class="slide-btn absolute left-2 top-1/2 -translate-y-1/2
+                                    bg-black/50 text-white w-8 h-8 rounded-full
+                                    flex items-center justify-center"
+                                data-id="{{ $inv->id }}"
+                                data-dir="-1"
+                            >
+                                &lsaquo;
+                            </button>
+
+                            {{-- kanan --}}
+                            <button
+                                type="button"
+                                class="slide-btn absolute right-2 top-1/2 -translate-y-1/2
+                                    bg-black/50 text-white w-8 h-8 rounded-full
+                                    flex items-center justify-center"
+                                data-id="{{ $inv->id }}"
+                                data-dir="1"
+                            >
+                                &rsaquo;
+                            </button>
                         @endif
                     </div>
+
+
+
 
                     <div class="p-5 md:p-6">
                         <div class="text-[18px] md:text-[20px] font-semibold text-[#001349]">
@@ -475,6 +569,32 @@ function showMoreProduct() {
         .forEach(el => el.classList.remove('hidden'));
 }
 </script>
+
+<script>
+document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.slide-btn');
+    if (!btn) return;
+
+    const id = btn.dataset.id;
+    const direction = parseInt(btn.dataset.dir);
+
+    slideCard(id, direction);
+});
+
+function slideCard(id, direction) {
+    const slider = document.getElementById('slider-' + id);
+    if (!slider) return;
+
+    const total = slider.children.length;
+    let index = parseInt(slider.dataset.index || 0);
+
+    index = (index + direction + total) % total;
+    slider.dataset.index = index;
+
+    slider.style.transform = `translateX(-${index * 100}%)`;
+}
+</script>
+
 
 
 @endsection
