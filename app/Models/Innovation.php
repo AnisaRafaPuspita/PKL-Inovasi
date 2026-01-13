@@ -36,4 +36,16 @@ class Innovation extends Model
     {
         return $this->hasOne(InnovationRanking::class);
     }
+
+    public function images()
+    {
+        return $this->hasMany(InnovationImage::class);
+    }
+
+    public function primaryImage()
+    {
+        return $this->hasOne(InnovationImage::class)
+                    ->where('is_primary', true);
+    }
+
 }

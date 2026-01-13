@@ -28,15 +28,59 @@
 
         {{-- Image card --}}
         <div class="rounded-[30px] border border-[#8D8585] bg-white p-6 md:p-8">
-            <div class="h-[240px] md:h-[320px] rounded-[20px] bg-gray-100 grid place-content-center overflow-hidden">
-                {{-- Kalau nanti ada image_url / foto, tinggal tampilkan di sini --}}
-                @if(!empty($innovation->image_url))
-                    <img src="{{ asset('storage/' . $innovation->image_url) }}" alt="Foto Inovasi">
-                @else
-                    <span class="text-[18px] md:text-[20px] font-light text-gray-500"
-                          style="font-family: Inter, sans-serif;">Foto</span>
+            {{-- IMAGE CARD SLIDER --}}
+            <div class="relative h-[215px] overflow-hidden rounded-[20px]">
+
+                @php
+                    $images = $innovation->images->count()
+                        ? $innovation->images
+                        : ($innovation->image_url
+                            ? collect([(object)['image_path' => $innovation->image_url]])
+                            : collect());
+                @endphp
+
+                <div
+                    id="slider-{{ $innovation->id }}"
+                    class="flex h-full transition-transform duration-300 ease-in-out"
+                    data-index="0"
+                >
+                    @foreach ($images as $img)
+                        <img
+                            src="{{ asset('storage/' . $img->image_path) }}"
+                            class="min-w-full h-full object-cover"
+                            alt="Foto Inovasi"
+                        >
+                    @endforeach
+                </div>
+
+                @if ($images->count() > 1)
+                    <button
+                        type="button"
+                        class="slide-btn absolute left-2 top-1/2 -translate-y-1/2
+                            bg-black/50 text-white w-8 h-8 rounded-full
+                            flex items-center justify-center
+                            z-10 pointer-events-auto"
+                        data-id="{{ $innovation->id }}"
+                        data-dir="-1"
+                    >
+                        &lsaquo;
+                    </button>
+
+                    <button
+                        type="button"
+                        class="slide-btn absolute right-2 top-1/2 -translate-y-1/2
+                            bg-black/50 text-white w-8 h-8 rounded-full
+                            flex items-center justify-center
+                            z-10 pointer-events-auto"
+                        data-id="{{ $innovation->id }}"
+                        data-dir="1"
+                    >
+                        &rsaquo;
+                    </button>
                 @endif
             </div>
+
+
         </div>
 
         {{-- Detail card --}}
@@ -113,6 +157,19 @@
         </div>
     </div>
 
+    {{-- KEBERDAMPAKAN (HANYA JIKA ADA) --}}
+    @if ($innovation->is_impact)
+        <div class="mt-6 rounded-[30px] border border-[#8D8585] bg-white p-6 md:p-8">
+            <div class="text-[#001349] text-[18px] md:text-[22px] font-semibold"
+            style="font-family: Inter, sans-serif;">
+                Keberdampakan
+            </div>
+            <div class="mt-3 text-[14px] md:text-[16px] font-light text-gray-800 leading-relaxed">
+                {{ $innovation->impact ?? '-' }}
+            </div>
+        </div>
+    @endif
+
     {{-- Stats --}}
     <div class="mt-6 rounded-[30px] border border-[#8D8585] bg-white p-6 md:p-8">
         <div class="text-[#001349] text-[18px] md:text-[22px] font-semibold"
@@ -126,4 +183,30 @@
     </div>
 
 </section>
+
+<script>
+document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.slide-btn');
+    if (!btn) return;
+
+    const id = btn.dataset.id;
+    const direction = parseInt(btn.dataset.dir);
+
+    slideCard(id, direction);
+});
+
+function slideCard(id, direction) {
+    const slider = document.getElementById('slider-' + id);
+    if (!slider) return;
+
+    const total = slider.children.length;
+    let index = parseInt(slider.dataset.index || 0);
+
+    index = (index + direction + total) % total;
+    slider.dataset.index = index;
+
+    slider.style.transform = `translateX(-${index * 100}%)`;
+}
+</script>
+
 @endsection

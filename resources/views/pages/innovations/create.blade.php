@@ -21,42 +21,53 @@
     <form action="{{ route('innovations.store') }}" method="POST" enctype="multipart/form-data" class="mt-8">
         @csrf
 
-        {{-- FOTO UPLOAD CARD --}}
+        {{-- UPLOAD MULTIPLE FOTO --}}
         <div class="mx-auto w-full max-w-[420px]
-            rounded-[32px]
-            bg-[#1A6ECE]/10
-            border-2 border-dashed border-[#1A6ECE]
-            p-6 text-center">
+                    rounded-[32px]
+                    bg-[#1A6ECE]/10
+                    border-2 border-dashed border-[#1A6ECE]
+                    px-6 py-10 text-center">
 
-            <label for="image" class="cursor-pointer block">
-                <div id="image-preview"
-                    class="mx-auto h-[240px] w-[260px]
-                            rounded-[24px]
-                            bg-white
-                            overflow-hidden
-                            grid place-items-center">
-
-                    <span id="image-placeholder"
-                        class="text-[#5B5B5B] text-[16px] font-medium">
-                        Tambah Foto
-                    </span>
-
-                    <img id="preview-img"
-                        class="hidden h-full w-full object-cover"
-                        alt="Preview">
-                </div>
-
-                <p class="mt-3 text-[#5B5B5B] text-[15px] font-medium">
-                    Klik untuk pilih gambar
-                </p>
-            </label>
-
-            <input id="image"
-                name="image"
+            {{-- input trigger (hidden) --}}
+            <input
                 type="file"
+                id="imageInput"
                 accept="image/*"
-                class="hidden">
+                class="hidden"
+            >
+
+            {{-- input FINAL --}}
+            <input
+                type="file"
+                name="images[]"
+                id="finalInput"
+                multiple
+                class="hidden"
+            >
+
+            {{-- PREVIEW --}}
+            <div id="preview"
+                class="flex flex-wrap gap-3 justify-center">
+            </div>
+
+            {{-- TOMBOL TAMBAH FOTO --}}
+            <div class="mt-6 flex justify-center">
+                <button
+                    type="button"
+                    onclick="addImages()"
+                    class="mt-6 inline-flex items-center gap-2
+                        rounded-full bg-[#001349]
+                        px-4 py-2
+                        text-white text-sm font-semibold
+                        hover:bg-[#001349]/90 transition">
+                    <span>Tambah Foto</span>
+                    <img src="{{ asset('images/add_circle.png') }}"
+                        class="h-3.5 w-3.5">
+                </button>
+            </div>
         </div>
+
+
 
 
         {{-- FORM FIELDS --}}
@@ -231,34 +242,40 @@
     </form>
 </section>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const input = document.getElementById('image');
-  const previewImg = document.getElementById('preview-img');
-  const placeholder = document.getElementById('image-placeholder');
 
-  if (!input || !previewImg || !placeholder) return;
 
-  input.addEventListener('change', (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      previewImg.src = evt.target.result;
-      previewImg.classList.remove('hidden');
-      placeholder.classList.add('hidden');
-    };
-    reader.readAsDataURL(file);
-  });
-});
-</script>
 
 <script>
 if (window.performance && performance.navigation.type === 2) {
     location.reload();
 }
 </script>
+
+<script>
+let filesBuffer = [];
+
+function addImages() {
+    document.getElementById('imageInput').click();
+}
+
+document.getElementById('imageInput').addEventListener('change', function (e) {
+    const newFiles = Array.from(e.target.files);
+
+    newFiles.forEach(file => {
+        filesBuffer.push(file);
+
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(file);
+        img.className = 'h-24 w-24 object-cover rounded-lg';
+        document.getElementById('preview').appendChild(img);
+    });
+
+    const dataTransfer = new DataTransfer();
+    filesBuffer.forEach(file => dataTransfer.items.add(file));
+    document.getElementById('finalInput').files = dataTransfer.files;
+});
+</script>
+
 
 
 

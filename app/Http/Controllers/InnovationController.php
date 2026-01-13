@@ -93,7 +93,9 @@ class InnovationController extends Controller
             'advantages'   => ['nullable', 'string'],
             'impact'       => ['nullable', 'string'],
 
-            'image'        => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'images' => ['nullable', 'array'],
+            'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+
         ]);
 
         /** 1️⃣ Tentukan innovator */
@@ -113,14 +115,6 @@ class InnovationController extends Controller
             $innovatorId = $validated['innovator_id'];
         }
 
-        /** 2️⃣ Upload 1 foto (kalau ada) */
-        $imageUrl = null;
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('innovations', 'public');
-            $imageUrl = $path;
-
-        }
-
         /** 3️⃣ Create innovation (HANYA SEKALI) */
         $innovation = Innovation::create([
             'title'       => $validated['title'],
@@ -134,10 +128,24 @@ class InnovationController extends Controller
             'advantages'  => $validated['advantages'] ?? null,
             'impact'      => $validated['impact'] ?? null,
 
-            'image_url'   => $imageUrl,
+            
             'status'      => 'published', // nanti bisa 'pending'
             'views_count' => 0,
         ]);
+
+        if ($request->hasFile('images')) {
+
+            foreach ($request->file('images') as $index => $file) {
+
+                $path = $file->store('innovations', 'public');
+
+                $innovation->images()->create([
+                    'image_path' => $path,
+                    'is_primary' => $index === 0, // foto pertama = utama
+                ]);
+            }
+        }
+
 
         /** 4️⃣ Hubungkan ke innovator */
         if ($innovatorId) {
