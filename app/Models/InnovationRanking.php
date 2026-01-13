@@ -8,7 +8,17 @@ class InnovationRanking extends Model
 {
     protected $table = 'innovation_rankings';
 
-    protected $fillable = ['rank','innovation_id','achievement','status','image'];
+    protected $fillable = [
+        'innovation_id',
+        'rank',
+        'achievement',
+        'status',
+        'image',
+    ];
+
+    protected $casts = [
+        'rank' => 'integer',
+    ];
 
     public function innovation()
     {

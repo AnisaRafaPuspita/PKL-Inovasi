@@ -12,10 +12,7 @@ class AdminInnovationController extends Controller
 {
     public function index()
     {
-        $innovations = Innovation::with('innovators.faculty')
-            ->orderByDesc('created_at')
-            ->get();
-
+        $innovations = Innovation::where('source', 'admin')->latest()->get();
         return view('admin.innovations.index', compact('innovations'));
     }
 
@@ -39,32 +36,26 @@ class AdminInnovationController extends Controller
             'photo'          => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        // Buat / ambil Innovator
+        $data['source'] = 'admin';
+
         $innovator = Innovator::firstOrCreate(
             ['name' => $request->innovator_name],
             ['faculty_id' => $request->faculty_id]
         );
 
-        // Kalau innovator sudah ada, pastikan faculty_id-nya ikut diupdate
         if ($innovator->faculty_id != $request->faculty_id) {
             $innovator->update(['faculty_id' => $request->faculty_id]);
         }
 
-        // Upload foto (kalau ada)
         if ($request->hasFile('photo')) {
-            // hapus foto lama kalau ada
-            if (!empty($innovator->photo)) {
+            if ($innovator->photo) {
                 Storage::disk('public')->delete($innovator->photo);
             }
-
             $path = $request->file('photo')->store('innovators', 'public');
             $innovator->update(['photo' => $path]);
         }
 
-        // Simpan innovation
         $innovation = Innovation::create($data);
-
-        // Pivot innovation_innovator
         $innovation->innovators()->sync([$innovator->id]);
 
         return redirect()
@@ -74,6 +65,8 @@ class AdminInnovationController extends Controller
 
     public function edit(Innovation $innovation)
     {
+        abort_if($innovation->source !== 'admin', 404);
+
         $innovation->load('innovators.faculty');
         $firstInnovator = $innovation->innovators->first();
 
@@ -87,6 +80,8 @@ class AdminInnovationController extends Controller
 
     public function update(Request $request, Innovation $innovation)
     {
+        abort_if($innovation->source !== 'admin', 404);
+
         $data = $this->validateInnovation($request);
 
         $request->validate([
@@ -95,29 +90,28 @@ class AdminInnovationController extends Controller
             'photo'          => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
+        $data['source'] = 'admin';
         $innovation->update($data);
 
         $innovator = $innovation->innovators()->first();
 
         if (!$innovator) {
             $innovator = Innovator::create([
-                'name'       => $request->innovator_name,
+                'name' => $request->innovator_name,
                 'faculty_id' => $request->faculty_id,
             ]);
             $innovation->innovators()->sync([$innovator->id]);
         } else {
             $innovator->update([
-                'name'       => $request->innovator_name,
+                'name' => $request->innovator_name,
                 'faculty_id' => $request->faculty_id,
             ]);
         }
 
-        // Upload foto baru (kalau ada)
         if ($request->hasFile('photo')) {
-            if (!empty($innovator->photo)) {
+            if ($innovator->photo) {
                 Storage::disk('public')->delete($innovator->photo);
             }
-
             $path = $request->file('photo')->store('innovators', 'public');
             $innovator->update(['photo' => $path]);
         }
@@ -129,6 +123,8 @@ class AdminInnovationController extends Controller
 
     public function show(Innovation $innovation)
     {
+        abort_if($innovation->source !== 'admin', 404);
+
         $innovation->load('innovators.faculty');
         $firstInnovator = $innovation->innovators->first();
 

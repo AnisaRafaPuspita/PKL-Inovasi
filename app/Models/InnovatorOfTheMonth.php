@@ -7,10 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 class InnovatorOfTheMonth extends Model
 {
     protected $table = 'innovator_of_the_month';
-    protected $fillable = ['innovator_id','month','year'];
 
-    public function innovator()
+    protected $fillable = [
+        'innovator_id',
+        'innovator_name',
+        'faculty',
+        'description',
+        'innovation_id',
+        'photo',
+        'month',
+        'year',
+    ];
+
+    public function innovation()
     {
-        return $this->belongsTo(Innovator::class, 'innovator_id');
+        return $this->belongsTo(\App\Models\Innovation::class, 'innovation_id');
     }
 }

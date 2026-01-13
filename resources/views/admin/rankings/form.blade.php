@@ -54,23 +54,29 @@
 
       <div class="col-12 col-md-4">
         <label class="fw-bold">Status</label>
-        <input name="status" class="form-control"
-               value="{{ old('status', $ranking->status) }}"
-               placeholder="contoh: Top 10 National Innovation">
+        @php
+          $statusVal = old('status', $ranking->status ?? 'active');
+        @endphp
+        <select name="status" class="form-select" required>
+          <option value="active" {{ $statusVal === 'active' ? 'selected' : '' }}>Active (Tampil)</option>
+          <option value="inactive" {{ $statusVal === 'inactive' ? 'selected' : '' }}>Inactive (Sembunyi)</option>
+        </select>
         @error('status') <small class="text-danger">{{ $message }}</small> @enderror
       </div>
 
-      <div class="col-12 col-md-6">
+      <div class="col-12 col-md-8">
         <label class="fw-bold">Image</label>
         <input type="file" name="image" class="form-control" accept="image/*">
         @error('image') <small class="text-danger">{{ $message }}</small> @enderror
 
         @if(!empty($ranking->image))
-          <div class="mt-2 d-flex align-items-center gap-2 flex-wrap">
+          <div class="mt-2 d-flex align-items-center gap-3">
             <img src="{{ asset('storage/'.$ranking->image) }}"
-                 alt="image"
-                 style="height:80px;border-radius:8px;border:1px solid #e5e7eb;">
-            <small class="text-muted">{{ $ranking->image }}</small>
+                 alt="ranking image"
+                 style="height:90px;border-radius:10px;border:1px solid #e5e7eb;">
+            <div style="font-size:12px;color:#6b7280;">
+              {{ $ranking->image }}
+            </div>
           </div>
         @endif
       </div>

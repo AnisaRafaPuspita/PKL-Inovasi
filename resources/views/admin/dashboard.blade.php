@@ -42,10 +42,9 @@
     <div class="panel mb-4">
         <div class="section-title">Innovations Views Over Time</div>
         <div style="height:360px;">
-            <canvas id="viewsChart">
+            <canvas id="viewsChart"
                 data-labels='@json($chartLabels)'
-                data-values='@json($chartData)'>
-            </canvas>
+                data-values='@json($chartData)'></canvas>
         </div>
     </div>
 
@@ -55,8 +54,8 @@
 
         <div class="iom-wrap">
             <div class="iom-photo">
-                @if($innovatorOfMonth['photo'])
-                    <img src="{{ $innovatorOfMonth['photo'] }}" alt="photo">
+                @if(!empty($innovatorOfMonth?->photo))
+                    <img src="{{ asset('storage/'.$innovatorOfMonth->photo) }}" alt="photo">
                 @else
                     Photo
                 @endif
@@ -64,35 +63,36 @@
 
             <div class="d-flex justify-content-between align-items-end gap-3 flex-wrap">
                 <div>
-                    <p class="iom-text">Nama: {{ $innovatorOfMonth['name'] }}</p>
-                    <p class="iom-text">Fakultas: {{ $innovatorOfMonth['faculty'] }}</p>
-                    <p class="iom-text">Nama Inovasi: {{ $innovatorOfMonth['innovation'] }}</p>
+                    <p class="iom-text">Nama: {{ $innovatorOfMonth?->innovator_name ?? '-' }}</p>
+                    <p class="iom-text">Fakultas: {{ $innovatorOfMonth?->faculty ?? '-' }}</p>
+
+                    {{-- inovasi ditampilin dari relasi (kalau kamu bikin relasi innovation()) --}}
+                    @if(!empty($innovatorOfMonth?->innovation?->title))
+                        <p class="iom-text">Nama Inovasi: {{ $innovatorOfMonth->innovation->title }}</p>
+                    @else
+                        <p class="iom-text">Nama Inovasi: -</p>
+                    @endif
                 </div>
 
-                <a href="#" class="btn btn-navy">Edit</a>
+                <a href="{{ route('admin.innovator_of_month.edit') }}" class="btn btn-navy">Edit</a>
             </div>
         </div>
     </div>
 @endsection
 
 @push('scripts')
-@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('viewsChart');
+    if (!canvas) return;
 
-    // cek Chart.js ke-load
     if (typeof Chart === 'undefined') {
         console.error('Chart.js belum ke-load. Cek script CDN di layout.');
         return;
     }
 
-    // ambil data dari atribut
     const labels = JSON.parse(canvas.dataset.labels || '[]');
     const values = JSON.parse(canvas.dataset.values || '[]');
-
-    console.log('labels:', labels);
-    console.log('values:', values);
 
     if (!labels.length || !values.length) {
         console.error('Data chart kosong. Cek $chartLabels / $chartData dari controller.');
@@ -121,5 +121,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
-
 @endpush

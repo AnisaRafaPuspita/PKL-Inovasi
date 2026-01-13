@@ -21,6 +21,7 @@ class Innovation extends Model
         'is_impact',
         'status',
         'views_count',
+        'source',
     ];
 
     protected $casts = [
@@ -42,5 +43,4 @@ class Innovation extends Model
     {
         return $this->hasOne(\App\Models\InnovationPermission::class);
     }
-
 }

@@ -283,26 +283,30 @@
 
 
             {{-- Innovator of The Month --}}
-            <a class="menu-item"
-               href="#"
-               data-icon-blue="{{ asset('images/innovatorofthemonth-biru.png') }}"
-               data-icon-white="{{ asset('images/innovatorofthemonth-putih.png') }}">
+            @php $isIotm = request()->routeIs('admin.innovator_of_month.*'); @endphp
+            <a class="menu-item {{ $isIotm ? 'active' : '' }}"
+            href="{{ route('admin.innovator_of_month.edit') }}"
+            data-icon-blue="{{ asset('images/innovatorofthemonth-biru.png') }}"
+            data-icon-white="{{ asset('images/innovatorofthemonth-putih.png') }}">
                 <img class="menu-icon"
-                     src="{{ asset('images/innovatorofthemonth-biru.png') }}"
-                     alt="">
+                    src="{{ $isIotm ? asset('images/innovatorofthemonth-biru.png') : asset('images/innovatorofthemonth-putih.png') }}"
+                    alt="">
                 <span>Innovator of The Month</span>
             </a>
 
+
             {{-- Innovation ranking --}}
-            <a class="menu-item"
-               href="#"
-               data-icon-blue="{{ asset('images/ranking-biru.png') }}"
-               data-icon-white="{{ asset('images/ranking-putih.png') }}">
+            @php $isRanking = request()->routeIs('admin.innovation_rankings.*'); @endphp
+            <a class="menu-item {{ $isRanking ? 'active' : '' }}"
+            href="{{ route('admin.innovation_rankings.index') }}"
+            data-icon-blue="{{ asset('images/ranking-biru.png') }}"
+            data-icon-white="{{ asset('images/ranking-putih.png') }}">
                 <img class="menu-icon"
-                     src="{{ asset('images/ranking-biru.png') }}"
-                     alt="">
+                    src="{{ $isRanking ? asset('images/ranking-biru.png') : asset('images/ranking-putih.png') }}"
+                    alt="">
                 <span>Innovation Ranking</span>
             </a>
+
 
         </nav>
 
