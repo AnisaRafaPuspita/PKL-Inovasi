@@ -146,7 +146,9 @@ class InnovationController extends Controller
 
         return redirect()
             ->route('innovations.show', $innovation->id)
-            ->with('success', 'Produk/Inovasi berhasil diupload.');
+            ->with('success', 'Produk berhasil diupload')
+            ->withInput([]); // 🔥 clear old input
+
     }
 
 }

@@ -62,9 +62,11 @@
 
 {{-- SEARCH HOME --}}
 <section class="mx-auto max-w-[1320px] px-3 md:px-4 -mt-10 relative z-10">
+
     <form id="homeSearchForm"
           action="{{ route('innovations.index') }}"
           method="GET"
+          autocomplete="off"
           class="rounded-[30px] bg-[#D9D9D9]/40 px-5 md:px-6 py-3.5 md:py-4">
 
         {{-- BAR SEARCH --}}
@@ -77,7 +79,9 @@
 
             {{-- input --}}
             <input
+                type="search"
                 name="q"
+                autocomplete="off"
                 placeholder="Cari inovasi..."
                 class="flex-1 bg-transparent outline-none
                        text-[15px] md:text-[16px] font-semibold
@@ -87,7 +91,7 @@
 
             {{-- tombol filter --}}
             <button type="button"
-                    onclick="toggleHomeFilter()"
+                    id="homeFilterToggle"
                     class="inline-flex items-center justify-center
                            h-9 w-9 rounded-full
                            hover:bg-black/10 transition"
@@ -97,11 +101,11 @@
                      class="h-5 w-5">
             </button>
 
-            {{-- submit (hidden, enter tetap bisa) --}}
+            {{-- submit (hidden) --}}
             <button type="submit" class="sr-only">Cari</button>
         </div>
 
-        {{-- FILTER ADVANCED (HIDDEN) --}}
+        {{-- FILTER ADVANCED --}}
         <div id="homeFilter"
              class="mt-4 hidden
                     rounded-[20px] bg-white
@@ -112,6 +116,7 @@
 
                 {{-- kategori --}}
                 <select name="category"
+                        autocomplete="off"
                         class="h-[42px] rounded-full px-5
                                border border-[#001349]/30
                                outline-none">
@@ -123,6 +128,7 @@
 
                 {{-- fakultas --}}
                 <select name="faculty_id"
+                        autocomplete="off"
                         class="h-[42px] rounded-full px-5
                                border border-[#001349]/30
                                outline-none">
@@ -136,7 +142,6 @@
 
             </div>
 
-            {{-- tombol cari --}}
             <button type="submit"
                     class="mt-4 w-full rounded-full
                            bg-[#001349] py-2.5
@@ -147,13 +152,26 @@
     </form>
 </section>
 
-{{-- JS --}}
+{{-- JS FINAL --}}
 <script>
-function toggleHomeFilter() {
-    document.getElementById('homeFilter')
-        .classList.toggle('hidden');
-}
+(function () {
+    const form = document.getElementById('homeSearchForm');
+    const filter = document.getElementById('homeFilter');
+    const toggle = document.getElementById('homeFilterToggle');
+
+    // toggle filter
+    toggle.addEventListener('click', function () {
+        filter.classList.toggle('hidden');
+    });
+
+    // PAKSA RESET SETIAP HALAMAN HOME DIBUKA
+    window.addEventListener('pageshow', function () {
+        if (form) form.reset();
+        if (filter) filter.classList.add('hidden');
+    });
+})();
 </script>
+
 
 
 {{-- INOVASI BERDAMPAK --}}
