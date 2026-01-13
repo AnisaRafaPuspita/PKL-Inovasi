@@ -254,6 +254,13 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+<script>
+if (window.performance && performance.navigation.type === 2) {
+    location.reload();
+}
+</script>
+
+
 
 
 @endsection
