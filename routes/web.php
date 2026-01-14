@@ -1,39 +1,43 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
-
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InnovationController;
 use App\Http\Controllers\InnovatorOfMonthController;
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
+/*
+|--------------------------------------------------------------------------
+| Web Routes (Public)
+|--------------------------------------------------------------------------
+*/
 
-Route::get('/selengkapnya', [HomeController::class, 'about'])->name('about');
+Route::get('/', [HomeController::class, 'index'])
+    ->name('home');
 
-Route::get('/innovations/create', [InnovationController::class, 'create'])->name('innovations.create');
-Route::post('/innovations', [InnovationController::class, 'store'])->name('innovations.store');
+Route::get('/selengkapnya', [HomeController::class, 'about'])
+    ->name('about');
 
-Route::get('/innovations', [InnovationController::class, 'index'])->name('innovations.index');
-Route::get('/innovations/{innovation}', [InnovationController::class, 'show'])->name('innovations.show');
+/* ================= INNOVATIONS ================= */
 
-// upload page nanti untuk innovator (kalau belum ada bisa return view placeholder)
-Route::get('/innovations-upload', [InnovationController::class, 'create'])->name('innovations.create');
+Route::get('/innovations', [InnovationController::class, 'index'])
+    ->name('innovations.index');
 
-// inovator of the month detail
-Route::get('/inovator-of-the-month', [InnovatorOfMonthController::class, 'show'])->name('innovator-month.show');
+Route::get('/innovations/create', [InnovationController::class, 'create'])
+    ->name('innovations.create');
 
-// placeholder admin login route (biar navbar gak error)
-Route::get('/admin/login', fn () => 'Admin login page (handled by admin team)')->name('admin.login');
+Route::post('/innovations', [InnovationController::class, 'store'])
+    ->name('innovations.store');
 
+Route::get('/innovations/{innovation}', [InnovationController::class, 'show'])
+    ->name('innovations.show');
 
+/* ================= INNOVATOR OF THE MONTH ================= */
+
+Route::get('/inovator-of-the-month', [InnovatorOfMonthController::class, 'show'])
+    ->name('innovator-month.show');
+
+/* ================= ADMIN PLACEHOLDER ================= */
+
+// biar navbar gak error (login dihandle admin team)
+Route::get('/admin/login', fn () => 'Admin login page')
+    ->name('admin.login');

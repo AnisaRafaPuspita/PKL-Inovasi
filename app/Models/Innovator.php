@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Faculty;
+use App\Models\Innovation;
+use App\Models\User;
 
 class Innovator extends Model
 {
@@ -25,7 +28,10 @@ class Innovator extends Model
 
     public function innovations()
     {
-        return $this->belongsToMany(Innovation::class);
+        return $this->belongsToMany(
+            Innovation::class,
+            'innovation_innovator'
+        );
     }
 
     public function user()

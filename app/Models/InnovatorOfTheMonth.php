@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Innovator;
+use App\Models\Innovation;
 
 class InnovatorOfTheMonth extends Model
 {
@@ -13,12 +15,26 @@ class InnovatorOfTheMonth extends Model
 
     protected $fillable = [
         'innovator_id',
+
+        // legacy / snapshot fields (jangan dibuang)
+        
+        'photo',
+
         'month',
         'year',
     ];
 
+    /* ================= RELATIONS ================= */
+
+    // relasi utama (dipakai di home & admin)
     public function innovator()
     {
         return $this->belongsTo(Innovator::class);
+    }
+
+    // relasi ke inovasi (opsional / legacy)
+    public function innovation()
+    {
+        return $this->belongsTo(Innovation::class, 'innovation_id');
     }
 }
