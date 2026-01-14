@@ -20,10 +20,14 @@
       {{-- FOTO --}}
       <div class="rounded-[20px] border border-[#8D8585] p-6">
         <div class="h-[220px] md:h-[260px] rounded-[16px] bg-gray-100 overflow-hidden grid place-items-center">
-          @if($iom->innovator?->photo)
-            <img src="{{ asset('storage/' . $iom->innovator->photo) }}" class="w-full h-full object-cover" alt="Foto Inovator">
+          @if($iom->photo)
+            <img
+              src="{{ asset('storage/' . $iom->photo) }}"
+              class="w-full h-full object-cover"
+              alt="Foto Innovator of the Month"
+            >
           @else
-            <span class="text-gray-500" style="font-family: Inter, sans-serif;">Foto</span>
+            <span class="text-gray-500">Foto</span>
           @endif
         </div>
       </div>
@@ -81,7 +85,7 @@
 
           <div class="mt-6 text-[14px] md:text-[16px] text-gray-700 leading-relaxed" style="font-family: Inter, sans-serif;">
             <div class="font-medium text-gray-900">Description</div>
-            <div class="mt-1">{{ $featuredInnovation->description ?? '-' }}</div>
+            <div class="mt-1">{{ $iom->description ?? '-' }}</div>
 
             <div class="mt-4 font-medium text-gray-900">Achievements</div>
             <div class="mt-1">{{ $featuredInnovation->advantages ?? '-' }}</div>
@@ -106,12 +110,71 @@
 
         {{-- KANAN: foto innovation --}}
         <div class="rounded-[20px] border border-[#8D8585] p-6">
-          <div class="h-[220px] md:h-[260px] rounded-[16px] bg-gray-100 overflow-hidden grid place-items-center">
-            @if($featuredInnovation->image ?? null)
-              <img src="{{ asset('storage/' . $featuredInnovation->image) }}" class="w-full h-full object-cover" alt="Foto Inovasi">
-            @else
-              <span class="text-gray-500">Foto</span>
-            @endif
+          <div class="relative h-[220px] md:h-[260px] overflow-hidden rounded-[16px]">
+
+            {{-- FEATURED INNOVATION IMAGE SLIDER --}}
+            @if($featuredInnovation)
+              @php
+                  $images = $featuredInnovation->images->count()
+                      ? $featuredInnovation->images
+                      : ($featuredInnovation->image_url
+                          ? collect([(object)['image_path' => $featuredInnovation->image_url]])
+                          : collect());
+              @endphp
+
+              <div class="relative h-[300px] overflow-hidden rounded-[20px] border">
+
+                  @if($images->count())
+                      <div
+                          id="slider-featured-{{ $featuredInnovation->id }}"
+                          class="flex h-full transition-transform duration-300 ease-in-out"
+                          data-index="0"
+                      >
+                          @foreach ($images as $img)
+                              <img
+                                  src="{{ asset('storage/'.$img->image_path) }}"
+                                  class="min-w-full h-full object-cover"
+                                  alt="Featured Innovation"
+                              >
+                          @endforeach
+                      </div>
+
+                      @if ($images->count() > 1)
+                          <button
+                              type="button"
+                              class="slide-btn absolute left-3 top-1/2 -translate-y-1/2
+                                    bg-black/50 text-white w-8 h-8 rounded-full z-10"
+                              data-id="featured-{{ $featuredInnovation->id }}"
+                              data-dir="-1"
+                          >
+                              &lsaquo;
+                          </button>
+
+                          <button
+                              type="button"
+                              class="slide-btn absolute right-3 top-1/2 -translate-y-1/2
+                                    bg-black/50 text-white w-8 h-8 rounded-full z-10"
+                              data-id="featured-{{ $featuredInnovation->id }}"
+                              data-dir="1"
+                          >
+                              &rsaquo;
+                          </button>
+                      @endif
+                  @else
+                      <div class="h-full flex items-center justify-center text-gray-400">
+                          Gambar inovasi belum tersedia
+                      </div>
+                  @endif
+
+              </div>
+          @else
+              <div class="h-[300px] flex items-center justify-center text-gray-400">
+                  Inovasi unggulan belum dipilih
+              </div>
+          @endif
+
+
+                
           </div>
         </div>
       </div>
