@@ -10,7 +10,7 @@ class InnovatorOfMonthController extends Controller
     public function show()
     {
         $iom = InnovatorOfTheMonth::query()
-            ->with(['innovator.faculty'])
+            ->with(['innovator.faculty', 'innovation.images'])
             ->orderByDesc('year')
             ->orderByDesc('month')
             ->firstOrFail();
