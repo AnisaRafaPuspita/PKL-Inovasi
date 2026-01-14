@@ -1,103 +1,150 @@
 @extends('layouts.admin')
-@section('title','Innovation Ranking')
+@section('title','Manage Innovations')
 
 @section('content')
 <h1 style="font-weight:900;color:#061a4d;">
-  {{ $mode === 'create' ? 'Tambah Innovation Ranking' : 'Edit Innovation Ranking' }}
+    Manage Innovations
 </h1>
+<p style="font-weight:700;color:#061a4d;">
+    {{ $mode === 'create' ? 'Tambah Inovasi' : 'Edit Inovasi' }}
+</p>
 
 @if(session('success'))
-  <div class="alert alert-success">{{ session('success') }}</div>
+    <div class="alert alert-success">{{ session('success') }}</div>
 @endif
 
-<form method="POST"
-      enctype="multipart/form-data"
-      action="{{ $mode === 'create'
-          ? route('admin.innovation_rankings.store')
-          : route('admin.innovation_rankings.update', $ranking->id) }}">
-  @csrf
-  @if($mode === 'edit')
-    @method('PUT')
-  @endif
+@if($errors->any())
+    <div class="alert alert-danger">
+        <div class="fw-bold mb-1">Gagal menyimpan:</div>
+        <ul class="mb-0">
+            @foreach($errors->all() as $e)
+                <li>{{ $e }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
 
-  <div class="panel">
-    <div class="row g-3">
+@php
+    $firstInnovator = $innovation->relationLoaded('innovators')
+        ? $innovation->innovators->first()
+        : null;
 
-      <div class="col-12 col-md-2">
-        <label class="fw-bold">Rank</label>
-        <input type="number" name="rank" class="form-control"
-               value="{{ old('rank', $ranking->rank) }}" min="1" max="100" required>
-        @error('rank') <small class="text-danger">{{ $message }}</small> @enderror
-      </div>
+    $existingPhotos = $innovation->relationLoaded('photos')
+        ? $innovation->photos
+        : collect();
+@endphp
 
-      <div class="col-12 col-md-6">
-        <label class="fw-bold">Pilih Inovasi</label>
-        <select class="form-select js-innovation-select" name="innovation_id" required>
-          <option value="">-- pilih inovasi --</option>
-          @foreach($innovations as $inv)
-            <option value="{{ $inv->id }}"
-              @selected((int)old('innovation_id', $ranking->innovation_id) === (int)$inv->id)>
-              {{ $inv->title }}
-            </option>
-          @endforeach
-        </select>
-        @error('innovation_id') <small class="text-danger">{{ $message }}</small> @enderror
-      </div>
+<div class="panel">
+<form
+    method="POST"
+    action="{{ $mode === 'create'
+        ? route('admin.innovations.store')
+        : route('admin.innovations.update', $innovation->id) }}"
+    enctype="multipart/form-data"
+>
+    @csrf
+    @if($mode === 'edit')
+        @method('PUT')
+    @endif
 
-      <div class="col-12 col-md-4">
-        <label class="fw-bold">Achievement</label>
-        <input name="achievement" class="form-control"
-               value="{{ old('achievement', $ranking->achievement) }}"
-               placeholder="contoh: Best Innovation Award 2025">
-        @error('achievement') <small class="text-danger">{{ $message }}</small> @enderror
-      </div>
+    <div class="row g-4">
 
-      <div class="col-12 col-md-4">
-        <label class="fw-bold">Status</label>
-        <input name="status" class="form-control"
-               value="{{ old('status', $ranking->status) }}"
-               placeholder="contoh: Top 10 National Innovation">
-        @error('status') <small class="text-danger">{{ $message }}</small> @enderror
-      </div>
+        {{-- LEFT: FOTO --}}
+        <div class="col-12 col-lg-4">
+            <div style="background:#7c879f;border-radius:24px;padding:20px;">
 
-      <div class="col-12 col-md-6">
-        <label class="fw-bold">Image</label>
-        <input type="file" name="image" class="form-control" accept="image/*">
-        @error('image') <small class="text-danger">{{ $message }}</small> @enderror
+                <div style="background:#fff;border-radius:16px;min-height:200px;padding:12px;">
+                    <div class="fw-bold mb-2">Foto Inovasi</div>
 
-        @if(!empty($ranking->image))
-          <div class="mt-2 d-flex align-items-center gap-2 flex-wrap">
-            <img src="{{ asset('storage/'.$ranking->image) }}"
-                 alt="image"
-                 style="height:80px;border-radius:8px;border:1px solid #e5e7eb;">
-            <small class="text-muted">{{ $ranking->image }}</small>
-          </div>
-        @endif
-      </div>
+                    @if($mode === 'edit' && $existingPhotos->count())
+                        <div class="d-grid" style="grid-template-columns:repeat(2,1fr);gap:10px;">
+                            @foreach($existingPhotos as $p)
+                                <div style="border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;height:110px;">
+                                    <img
+                                        src="{{ asset('storage/'.$p->path) }}"
+                                        alt="photo"
+                                        style="width:100%;height:100%;object-fit:cover;"
+                                    >
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div style="height:160px;display:flex;align-items:center;justify-content:center;border:2px dashed #cbd5e1;border-radius:12px;">
+                            <span class="text-muted fw-bold">Belum ada foto</span>
+                        </div>
+                    @endif
+                </div>
+
+                <label class="btn btn-outline-dark w-100 mt-3">
+                    Upload Foto
+                    <input type="file" name="photos[]" hidden multiple accept="image/*">
+                </label>
+            </div>
+        </div>
+
+        {{-- RIGHT: FORM --}}
+        <div class="col-12 col-lg-8">
+            <label class="fw-bold">Judul Inovasi</label>
+            <input type="text" class="form-control mb-3" name="title" required
+                   value="{{ old('title', $innovation->title) }}">
+
+            <label class="fw-bold">Nama Innovator</label>
+            <input type="text" class="form-control mb-3" name="innovator_name" required
+                   value="{{ old('innovator_name', $firstInnovator?->name) }}">
+
+            <label class="fw-bold">Fakultas</label>
+            <select name="faculty_id" class="form-select mb-3" required>
+                <option value="">-- Pilih Fakultas --</option>
+                @foreach($faculties as $f)
+                    <option value="{{ $f->id }}"
+                        @selected(old('faculty_id', $firstInnovator?->faculty_id) == $f->id)>
+                        {{ $f->name }}
+                    </option>
+                @endforeach
+            </select>
+
+            <label class="fw-bold">Kategori</label>
+            <input type="text" class="form-control mb-3" name="category"
+                   value="{{ old('category', $innovation->category) }}">
+
+            <label class="fw-bold">Mitra</label>
+            <input type="text" class="form-control mb-3" name="partner"
+                   value="{{ old('partner', $innovation->partner) }}">
+
+            <label class="fw-bold">Status HKI</label>
+            <input type="text" class="form-control mb-3" name="hki_status"
+                   value="{{ old('hki_status', $innovation->hki_status) }}">
+
+            <label class="fw-bold">Video URL</label>
+            <input type="text" class="form-control mb-3" name="video_url"
+                   value="{{ old('video_url', $innovation->video_url) }}">
+
+            <label class="fw-bold">Deskripsi</label>
+            <textarea class="form-control mb-3" rows="4"
+                      name="description">{{ old('description', $innovation->description) }}</textarea>
+
+            <label class="fw-bold">Keunggulan</label>
+            <textarea class="form-control mb-3" rows="3"
+                      name="advantages">{{ old('advantages', $innovation->advantages) }}</textarea>
+
+            <label class="fw-bold">Keberdampakan</label>
+            <input type="text" class="form-control mb-4" name="impact"
+                   value="{{ old('impact', $innovation->impact) }}">
+
+            <div class="text-end">
+                <button type="submit" class="btn btn-navy px-4">
+                    {{ $mode === 'create' ? 'Simpan Inovasi' : 'Simpan Perubahan' }}
+                </button>
+            </div>
+        </div>
 
     </div>
-
-    <div class="d-flex justify-content-end mt-4 gap-2">
-      <a href="{{ route('admin.innovation_rankings.index') }}"
-         class="btn btn-outline-secondary">Kembali</a>
-      <button class="btn btn-navy">Simpan</button>
-    </div>
-  </div>
 </form>
+</div>
+
+<style>
+.panel{ background:#fff; border:2px solid #061a4d; border-radius:18px; padding:20px; }
+.btn-navy{ background:#061a4d; color:#fff; font-weight:700; border-radius:10px; border:1px solid #061a4d; }
+.btn-navy:hover{ background:#04133a; border-color:#04133a; color:#fff; }
+</style>
 @endsection
-
-@push('scripts')
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
-<script>
-$(function(){
-  $('.js-innovation-select').select2({
-    width: '100%',
-    placeholder: '-- pilih inovasi --',
-    allowClear: true
-  });
-});
-</script>
-@endpush

@@ -11,10 +11,7 @@ class AdminInnovationRankingController extends Controller
 {
     public function index()
     {
-        $rankings = InnovationRanking::with('innovation')
-            ->orderBy('rank')
-            ->get();
-
+        $rankings = InnovationRanking::with('innovation')->orderBy('rank')->get();
         return view('admin.rankings.index', compact('rankings'));
     }
 
@@ -35,7 +32,7 @@ class AdminInnovationRankingController extends Controller
             'rank' => 'required|integer|min:1|max:100',
             'innovation_id' => 'required|exists:innovations,id',
             'achievement' => 'nullable|string|max:255',
-            'status' => 'nullable|string|max:50',
+            'status' => 'required|in:active,inactive',
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
@@ -67,7 +64,7 @@ class AdminInnovationRankingController extends Controller
             'rank' => 'required|integer|min:1|max:100',
             'innovation_id' => 'required|exists:innovations,id',
             'achievement' => 'nullable|string|max:255',
-            'status' => 'nullable|string|max:50',
+            'status' => 'required|in:active,inactive',
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
@@ -75,7 +72,6 @@ class AdminInnovationRankingController extends Controller
             if (!empty($ranking->image)) {
                 Storage::disk('public')->delete($ranking->image);
             }
-
             $data['image'] = $request->file('image')->store('rankings', 'public');
         }
 

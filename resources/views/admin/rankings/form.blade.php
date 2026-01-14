@@ -6,10 +6,6 @@
   {{ $mode === 'create' ? 'Tambah Innovation Ranking' : 'Edit Innovation Ranking' }}
 </h1>
 
-@if(session('success'))
-  <div class="alert alert-success">{{ session('success') }}</div>
-@endif
-
 <form method="POST"
       enctype="multipart/form-data"
       action="{{ $mode === 'create'
@@ -26,13 +22,13 @@
       <div class="col-12 col-md-2">
         <label class="fw-bold">Rank</label>
         <input type="number" name="rank" class="form-control"
-               value="{{ old('rank', $ranking->rank) }}" min="1" max="100" required>
+               value="{{ old('rank', $ranking->rank) }}" min="1" max="100">
         @error('rank') <small class="text-danger">{{ $message }}</small> @enderror
       </div>
 
       <div class="col-12 col-md-6">
         <label class="fw-bold">Pilih Inovasi</label>
-        <select class="form-select js-innovation-select" name="innovation_id" required>
+        <select class="form-select js-innovation-select" name="innovation_id">
           <option value="">-- pilih inovasi --</option>
           @foreach($innovations as $inv)
             <option value="{{ $inv->id }}"
@@ -54,29 +50,23 @@
 
       <div class="col-12 col-md-4">
         <label class="fw-bold">Status</label>
-        @php
-          $statusVal = old('status', $ranking->status ?? 'active');
-        @endphp
-        <select name="status" class="form-select" required>
-          <option value="active" {{ $statusVal === 'active' ? 'selected' : '' }}>Active (Tampil)</option>
-          <option value="inactive" {{ $statusVal === 'inactive' ? 'selected' : '' }}>Inactive (Sembunyi)</option>
+        <select name="status" class="form-select">
+          @php $st = old('status', $ranking->status ?? 'active'); @endphp
+          <option value="active" {{ $st === 'active' ? 'selected' : '' }}>active</option>
+          <option value="inactive" {{ $st === 'inactive' ? 'selected' : '' }}>inactive</option>
         </select>
         @error('status') <small class="text-danger">{{ $message }}</small> @enderror
       </div>
 
       <div class="col-12 col-md-8">
         <label class="fw-bold">Image</label>
-        <input type="file" name="image" class="form-control" accept="image/*">
+        <input type="file" name="image" class="form-control">
         @error('image') <small class="text-danger">{{ $message }}</small> @enderror
 
         @if(!empty($ranking->image))
-          <div class="mt-2 d-flex align-items-center gap-3">
+          <div class="mt-2">
             <img src="{{ asset('storage/'.$ranking->image) }}"
-                 alt="ranking image"
-                 style="height:90px;border-radius:10px;border:1px solid #e5e7eb;">
-            <div style="font-size:12px;color:#6b7280;">
-              {{ $ranking->image }}
-            </div>
+                 style="height:80px;border-radius:8px;">
           </div>
         @endif
       </div>

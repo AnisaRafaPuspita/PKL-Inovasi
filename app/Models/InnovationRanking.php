@@ -9,8 +9,8 @@ class InnovationRanking extends Model
     protected $table = 'innovation_rankings';
 
     protected $fillable = [
-        'innovation_id',
         'rank',
+        'innovation_id',
         'achievement',
         'status',
         'image',
