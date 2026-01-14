@@ -2,10 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Innovator;
+use App\Models\InnovationImage;
+use App\Models\InnovationRanking;
+use App\Models\InnovationPermission;
 
 class Innovation extends Model
 {
+    use HasFactory;
+
     protected $table = 'innovations';
 
     protected $fillable = [
@@ -21,6 +28,7 @@ class Innovation extends Model
         'is_impact',
         'status',
         'views_count',
+        'image_url', // legacy / fallback foto lama
         'source',
     ];
 
@@ -29,6 +37,9 @@ class Innovation extends Model
         'views_count' => 'integer',
     ];
 
+    /* ================= RELATIONS ================= */
+
+    // many-to-many ke innovator (pivot custom)
     public function innovators()
     {
         return $this->belongsToMany(
@@ -39,8 +50,28 @@ class Innovation extends Model
         );
     }
 
+    // multiple images (slider)
+    public function images()
+    {
+        return $this->hasMany(InnovationImage::class);
+    }
+
+    // primary image (opsional)
+    public function primaryImage()
+    {
+        return $this->hasOne(InnovationImage::class)
+                    ->where('is_primary', true);
+    }
+
+    // ranking inovasi (admin)
+    public function ranking()
+    {
+        return $this->hasOne(InnovationRanking::class);
+    }
+
+    // permission inovasi (admin)
     public function permission()
     {
-        return $this->hasOne(\App\Models\InnovationPermission::class);
+        return $this->hasOne(InnovationPermission::class);
     }
 }

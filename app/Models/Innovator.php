@@ -2,16 +2,24 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Faculty;
+use App\Models\Innovation;
+use App\Models\User;
 
 class Innovator extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'name',
         'faculty_id',
         'photo',
-        'bio'
+        'bio',
     ];
+
+    /* ================= RELATIONS ================= */
 
     public function faculty()
     {
@@ -24,5 +32,10 @@ class Innovator extends Model
             Innovation::class,
             'innovation_innovator'
         );
+    }
+
+    public function user()
+    {
+        return $this->hasOne(User::class);
     }
 }

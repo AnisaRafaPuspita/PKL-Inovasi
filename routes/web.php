@@ -1,77 +1,43 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AdminDashboardController;
-use App\Http\Controllers\AdminInnovationController;
-use App\Http\Controllers\AdminPermissionController;
-use App\Http\Controllers\AdminInnovatorOfTheMonthController;
-use App\Http\Controllers\AdminInnovationRankingController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\InnovationController;
+use App\Http\Controllers\InnovatorOfMonthController;
 
-Route::get('/', fn () => redirect()->route('admin.dashboard'));
+/*
+|--------------------------------------------------------------------------
+| Web Routes (Public)
+|--------------------------------------------------------------------------
+*/
 
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::get('/', [HomeController::class, 'index'])
+    ->name('home');
 
-    // ================= DASHBOARD =================
-    Route::get('/dashboard', [AdminDashboardController::class, 'index'])
-        ->name('dashboard');
+Route::get('/selengkapnya', [HomeController::class, 'about'])
+    ->name('about');
 
-    // ================= MANAGE INNOVATIONS (ADMIN ONLY) =================
-    Route::get('/innovations', [AdminInnovationController::class, 'index'])
-        ->name('innovations.index');
+/* ================= INNOVATIONS ================= */
 
-    Route::get('/innovations/create', [AdminInnovationController::class, 'create'])
-        ->name('innovations.create');
+Route::get('/innovations', [InnovationController::class, 'index'])
+    ->name('innovations.index');
 
-    Route::post('/innovations', [AdminInnovationController::class, 'store'])
-        ->name('innovations.store');
+Route::get('/innovations/create', [InnovationController::class, 'create'])
+    ->name('innovations.create');
 
-    Route::get('/innovations/{innovation}', [AdminInnovationController::class, 'show'])
-        ->name('innovations.show');
+Route::post('/innovations', [InnovationController::class, 'store'])
+    ->name('innovations.store');
 
-    Route::get('/innovations/{innovation}/edit', [AdminInnovationController::class, 'edit'])
-        ->name('innovations.edit');
+Route::get('/innovations/{innovation}', [InnovationController::class, 'show'])
+    ->name('innovations.show');
 
-    Route::put('/innovations/{innovation}', [AdminInnovationController::class, 'update'])
-        ->name('innovations.update');
+/* ================= INNOVATOR OF THE MONTH ================= */
 
-    // ================= PERMISSION INNOVATIONS (FROM INNOVATOR) =================
-    Route::get('/permissions', [AdminPermissionController::class, 'index'])
-        ->name('permissions.index');
+Route::get('/inovator-of-the-month', [InnovatorOfMonthController::class, 'show'])
+    ->name('innovator-month.show');
 
-    Route::get('/permissions/{innovation}', [AdminPermissionController::class, 'show'])
-        ->name('permissions.show');
+/* ================= ADMIN PLACEHOLDER ================= */
 
-    Route::post('/permissions/{innovation}/accept', [AdminPermissionController::class, 'accept'])
-        ->name('permissions.accept');
-
-    Route::post('/permissions/{innovation}/decline', [AdminPermissionController::class, 'decline'])
-        ->name('permissions.decline');
-
-    // ================= INNOVATOR OF THE MONTH =================
-    Route::get('/innovator-of-the-month', [AdminInnovatorOfTheMonthController::class, 'edit'])
-        ->name('innovator_of_month.edit');
-
-    Route::post('/innovator-of-the-month', [AdminInnovatorOfTheMonthController::class, 'update'])
-        ->name('innovator_of_month.update');
-
-    // ================= INNOVATION RANKINGS =================
-    Route::get('/innovation-rankings', [AdminInnovationRankingController::class, 'index'])
-        ->name('innovation_rankings.index');
-
-    Route::get('/innovation-rankings/create', [AdminInnovationRankingController::class, 'create'])
-        ->name('innovation_rankings.create');
-
-    Route::post('/innovation-rankings', [AdminInnovationRankingController::class, 'store'])
-        ->name('innovation_rankings.store');
-
-    Route::get('/innovation-rankings/{ranking}/edit', [AdminInnovationRankingController::class, 'edit'])
-        ->name('innovation_rankings.edit');
-
-    Route::put('/innovation-rankings/{ranking}', [AdminInnovationRankingController::class, 'update'])
-        ->name('innovation_rankings.update');
-
-    Route::delete('/innovation-rankings/{ranking}', [AdminInnovationRankingController::class, 'destroy'])
-        ->name('innovation_rankings.destroy');
-
-
-});
+// biar navbar gak error (login dihandle admin team)
+Route::get('/admin/login', fn () => 'Admin login page')
+    ->name('admin.login');

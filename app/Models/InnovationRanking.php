@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Innovation;
 
 class InnovationRanking extends Model
 {
+    use HasFactory;
+
     protected $table = 'innovation_rankings';
 
     protected $fillable = [
