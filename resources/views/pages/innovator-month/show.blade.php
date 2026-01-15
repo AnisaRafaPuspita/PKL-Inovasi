@@ -19,18 +19,19 @@
     <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
       {{-- FOTO --}}
       <div class="rounded-[20px] border border-[#8D8585] p-6">
-        <div class="h-[220px] md:h-[260px] rounded-[16px] bg-gray-100 overflow-hidden grid place-items-center">
+        <div class="h-[220px] md:h-[260px] rounded-[16px] bg-gray-100 overflow-hidden flex items-center justify-center">
           @if($iom->photo)
             <img
               src="{{ asset('storage/' . $iom->photo) }}"
-              class="w-full h-full object-cover"
               alt="Foto Innovator of the Month"
+              class="max-w-full max-h-full object-contain"
             >
           @else
             <span class="text-gray-500">Foto</span>
           @endif
         </div>
       </div>
+
 
       {{-- INFO --}}
       <div class="rounded-[20px] border border-[#8D8585] p-6">

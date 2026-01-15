@@ -303,17 +303,19 @@
 
     <div class="mt-7 rounded-[30px] border-2 border-[#8D8585] bg-white p-6 md:p-8 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-center
                 transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-lg">
-        <div class="h-[230px] md:h-[270px] w-full rounded-[30px] border-2 border-[#8D8585] grid place-content-center overflow-hidden">
+        <div class="h-[230px] md:h-[270px] w-full rounded-[30px] border-2 border-[#8D8585] flex items-center justify-center overflow-hidden">
             @if($innovatorMonth?->photo)
                 <img
-                    src="{{ asset('storage/'.$innovatorMonth->photo) }}"
-                    class="w-full h-full object-cover rounded-xl"
-                    alt="Innovator of the Month"
+                src="{{ asset('storage/'.$innovatorMonth->photo) }}"
+                alt="Innovator of the Month"
+                class="max-w-full max-h-full object-contain"
                 >
             @else
                 <div class="text-gray-400">No photo</div>
             @endif
         </div>
+
+
 
         <div class="md:col-span-2 text-[15px] md:text-[16px] font-light text-gray-800 leading-relaxed" style="font-family: Inter, sans-serif;">
             <div class="font-semibold text-[#001349] text-[18px] md:text-[20px]">
