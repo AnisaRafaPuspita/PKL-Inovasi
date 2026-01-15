@@ -1,8 +1,16 @@
 <header class="bg-[#001349]">
     <div class="mx-auto max-w-[1512px] px-6 py-5 flex items-center justify-between">
-        <a href="{{ route('home') }}" class="flex items-center gap-3">
-            <img src="{{ asset('images/Logo 2.png') }}" alt="UNDIP" class="h-[71px] w-auto">
+        <a href="{{ route('home') }}" class="flex items-center">
+            <div class="h-[76px] px-4 py-1 bg-white rounded-full overflow-hidden flex items-center shadow-sm">
+                <img 
+                    src="{{ asset('images/LogoDirinovBaru.jpg') }}" 
+                    alt="UNDIP"
+                    class="h-full w-auto object-contain"
+                >
+            </div>
         </a>
+
+
 
         <a href="{{ route('admin.login') }}"
             class="inline-flex items-center gap-2
