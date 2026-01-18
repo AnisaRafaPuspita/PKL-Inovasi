@@ -13,19 +13,17 @@ class AdminInnovatorOfTheMonthController extends Controller
 {
     public function edit()
     {
-        $innovators = Innovator::with('faculty')
-            ->orderBy('name')
-            ->get();
+        $innovators = Innovator::with('faculty')->orderBy('name')->get();
+        $innovations = Innovation::where('status', 'published')->orderBy('title')->get();
 
-        $innovations = Innovation::where('status', 'published')
-            ->orderBy('title')
-            ->get();
-
-        $iotm = InnovatorOfTheMonth::first();
+        $now = now();
+        $iotm = InnovatorOfTheMonth::where('month', $now->month)
+            ->where('year', $now->year)
+            ->first();
 
         return view('admin.innovator_of_the_month.edit', compact('innovators', 'innovations', 'iotm'));
-
     }
+
 
 
     public function update(Request $request)

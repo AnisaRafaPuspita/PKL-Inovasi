@@ -11,33 +11,35 @@ class AdminPermissionController extends Controller
     {
         $innovations = Innovation::with(['innovators.faculty', 'permission'])
             ->where('source', 'innovator')
+            ->where('status', 'pending')
             ->orderByDesc('created_at')
             ->get();
 
         return view('admin.permissions.index', compact('innovations'));
     }
 
-
     public function show(Innovation $innovation)
     {
         abort_if($innovation->source !== 'innovator', 404);
 
-        $innovation->load(['innovators.faculty', 'permission']);
+        $innovation->load(['innovators.faculty', 'permission', 'images', 'primaryImage']);
         return view('admin.permissions.show', compact('innovation'));
     }
 
     public function accept(Innovation $innovation)
     {
+        abort_if($innovation->source !== 'innovator', 404);
+
         InnovationPermission::updateOrCreate(
             ['innovation_id' => $innovation->id],
             ['status' => 'accepted', 'reviewed_at' => now()]
         );
 
-        $innovation->forceFill(['source' => 'admin'])->save();
+        $innovation->update(['status' => 'published']);
 
         return redirect()
-            ->route('admin.innovations.index')
-            ->with('success', 'Inovasi di-accept dan dipindahkan ke Manage Innovations.');
+            ->route('admin.permissions.index')
+            ->with('success', 'Inovasi berhasil di-accept dan dipublish.');
     }
 
     public function decline(Innovation $innovation)
@@ -49,8 +51,10 @@ class AdminPermissionController extends Controller
             ['status' => 'declined', 'reviewed_at' => now()]
         );
 
+        $innovation->update(['status' => 'draft']);
+
         return redirect()
-            ->route('admin.permissions.show', $innovation->id)
-            ->with('success', 'Inovasi berhasil di-decline.');
+            ->route('admin.permissions.index')
+            ->with('success', 'Inovasi berhasil di-decline dan dikembalikan ke draft.');
     }
 }
