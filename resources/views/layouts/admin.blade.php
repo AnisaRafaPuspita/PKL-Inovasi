@@ -309,7 +309,26 @@
 
 
         </nav>
+        <form id="adminLogoutForm"
+            method="POST"
+            action="{{ route('admin.logout') }}"
+            style="padding:10px;">
+            @csrf
 
+            <button type="button"
+                    id="btnAdminLogout"
+                    class="btn w-100"
+                    style="
+                        background: rgba(255,255,255,.12);
+                        color: #fff;
+                        font-weight: 800;
+                        border-radius: 12px;
+                        padding: 12px;
+                        border: 1px solid rgba(255,255,255,.25);
+                    ">
+                Logout
+            </button>
+        </form>
     </aside>
 
     <main class="content">
@@ -321,6 +340,9 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+/* =========================
+   SIDEBAR MENU ANIMATION
+   ========================= */
 (function(){
   const menu = document.querySelector('.js-sidebar-menu');
   if(!menu) return;
@@ -380,8 +402,23 @@
     moveHighlightTo(active);
   });
 })();
-</script>
 
+/* =========================
+   ADMIN LOGOUT CONFIRMATION
+   ========================= */
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('btnAdminLogout');
+  const form = document.getElementById('adminLogoutForm');
+
+  if (!btn || !form) return;
+
+  btn.addEventListener('click', () => {
+    if (confirm('Apakah kamu yakin ingin logout?')) {
+      form.submit();
+    }
+  });
+});
+</script>
 
 @stack('scripts')
 </body>

@@ -15,14 +15,13 @@ class InnovatorOfTheMonth extends Model
 
     protected $fillable = [
         'innovator_id',
-
-        // legacy / snapshot fields (jangan dibuang)
-        
+        'innovation_id',
+        'description',
         'photo',
-
         'month',
         'year',
     ];
+
 
     /* ================= RELATIONS ================= */
 

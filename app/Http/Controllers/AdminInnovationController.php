@@ -12,9 +12,14 @@ class AdminInnovationController extends Controller
 {
     public function index()
     {
-        $innovations = Innovation::where('source', 'admin')->latest()->get();
+        $innovations = Innovation::with(['innovators.faculty', 'images', 'primaryImage'])
+            ->where('status', 'published')
+            ->orderByDesc('created_at')
+            ->get();
+
         return view('admin.innovations.index', compact('innovations'));
     }
+
 
     public function create()
     {
@@ -22,7 +27,8 @@ class AdminInnovationController extends Controller
             'mode' => 'create',
             'innovation' => new Innovation(),
             'faculties' => Faculty::orderBy('name')->get(),
-            'firstInnovator' => null,
+            'innovators' => Innovator::with('faculty')->orderBy('name')->get(),
+            'categories' => config('innovation.categories'),
         ]);
     }
 
@@ -31,32 +37,49 @@ class AdminInnovationController extends Controller
         $data = $this->validateInnovation($request);
 
         $request->validate([
-            'innovator_name' => 'required|string|max:255',
-            'faculty_id'     => 'required|exists:faculties,id',
-            'photo'          => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'innovator_id' => ['nullable', 'exists:innovators,id'],
+            'new_innovator_name' => ['nullable', 'string', 'max:255'],
+            'faculty_id' => ['required', 'exists:faculties,id'],
+            'images' => ['nullable', 'array'],
+            'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
         $data['source'] = 'admin';
+        $data['status'] = $data['status'] ?? 'published';
 
-        $innovator = Innovator::firstOrCreate(
-            ['name' => $request->innovator_name],
-            ['faculty_id' => $request->faculty_id]
-        );
+        $innovatorId = null;
 
-        if ($innovator->faculty_id != $request->faculty_id) {
-            $innovator->update(['faculty_id' => $request->faculty_id]);
-        }
+        if ($request->filled('new_innovator_name')) {
+            $innovator = Innovator::firstOrCreate(
+                ['name' => $request->input('new_innovator_name')],
+                ['faculty_id' => $request->input('faculty_id'), 'status' => 'pending']
+            );
 
-        if ($request->hasFile('photo')) {
-            if ($innovator->photo) {
-                Storage::disk('public')->delete($innovator->photo);
+            if ((int) $innovator->faculty_id !== (int) $request->input('faculty_id')) {
+                $innovator->update(['faculty_id' => $request->input('faculty_id')]);
             }
-            $path = $request->file('photo')->store('innovators', 'public');
-            $innovator->update(['photo' => $path]);
+
+            $innovatorId = $innovator->id;
+        } else {
+            $innovatorId = $request->input('innovator_id');
         }
 
         $innovation = Innovation::create($data);
-        $innovation->innovators()->sync([$innovator->id]);
+
+        if ($innovatorId) {
+            $innovation->innovators()->syncWithoutDetaching([$innovatorId]);
+        }
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $index => $file) {
+                $path = $file->store('innovations', 'public');
+
+                $innovation->images()->create([
+                    'image_path' => $path,
+                    'is_primary' => $index === 0,
+                ]);
+            }
+        }
 
         return redirect()
             ->route('admin.innovations.index')
@@ -67,14 +90,14 @@ class AdminInnovationController extends Controller
     {
         abort_if($innovation->source !== 'admin', 404);
 
-        $innovation->load('innovators.faculty');
-        $firstInnovator = $innovation->innovators->first();
+        $innovation->load(['innovators.faculty', 'images']);
 
         return view('admin.innovations.form', [
             'mode' => 'edit',
             'innovation' => $innovation,
             'faculties' => Faculty::orderBy('name')->get(),
-            'firstInnovator' => $firstInnovator,
+            'innovators' => Innovator::with('faculty')->orderBy('name')->get(),
+            'categories' => config('innovation.categories'),
         ]);
     }
 
@@ -85,39 +108,66 @@ class AdminInnovationController extends Controller
         $data = $this->validateInnovation($request);
 
         $request->validate([
-            'innovator_name' => 'required|string|max:255',
-            'faculty_id'     => 'required|exists:faculties,id',
-            'photo'          => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'innovator_id' => ['nullable', 'exists:innovators,id'],
+            'new_innovator_name' => ['nullable', 'string', 'max:255'],
+            'faculty_id' => ['required', 'exists:faculties,id'],
+            'images' => ['nullable', 'array'],
+            'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'delete_image_ids' => ['nullable', 'array'],
+            'delete_image_ids.*' => ['integer'],
         ]);
 
         $data['source'] = 'admin';
+        $data['status'] = $data['status'] ?? 'published';
+
         $innovation->update($data);
 
-        $innovator = $innovation->innovators()->first();
+        $innovatorId = null;
 
-        if (!$innovator) {
-            $innovator = Innovator::create([
-                'name' => $request->innovator_name,
-                'faculty_id' => $request->faculty_id,
-            ]);
-            $innovation->innovators()->sync([$innovator->id]);
+        if ($request->filled('new_innovator_name')) {
+            $innovator = Innovator::firstOrCreate(
+                ['name' => $request->input('new_innovator_name')],
+                ['faculty_id' => $request->input('faculty_id'), 'status' => 'pending']
+            );
+
+            if ((int) $innovator->faculty_id !== (int) $request->input('faculty_id')) {
+                $innovator->update(['faculty_id' => $request->input('faculty_id')]);
+            }
+
+            $innovatorId = $innovator->id;
         } else {
-            $innovator->update([
-                'name' => $request->innovator_name,
-                'faculty_id' => $request->faculty_id,
-            ]);
+            $innovatorId = $request->input('innovator_id');
         }
 
-        if ($request->hasFile('photo')) {
-            if ($innovator->photo) {
-                Storage::disk('public')->delete($innovator->photo);
+        if ($innovatorId) {
+            $innovation->innovators()->sync([$innovatorId]);
+        }
+
+        if ($request->filled('delete_image_ids')) {
+            $innovation->images()
+                ->whereIn('id', $request->input('delete_image_ids', []))
+                ->get()
+                ->each(function ($img) {
+                    Storage::disk('public')->delete($img->image_path);
+                    $img->delete();
+                });
+        }
+
+        if ($request->hasFile('images')) {
+            $hasPrimary = $innovation->images()->where('is_primary', true)->exists();
+
+            foreach ($request->file('images') as $index => $file) {
+                $path = $file->store('innovations', 'public');
+
+                $innovation->images()->create([
+                    'image_path' => $path,
+                    'is_primary' => (!$hasPrimary && $index === 0),
+                ]);
             }
-            $path = $request->file('photo')->store('innovators', 'public');
-            $innovator->update(['photo' => $path]);
         }
 
         return redirect()
-            ->route('admin.innovations.index')
+            ->route('admin.innovations.show', $innovation->id)
             ->with('success', 'Inovasi berhasil diperbarui.');
     }
 
@@ -125,26 +175,29 @@ class AdminInnovationController extends Controller
     {
         abort_if($innovation->source !== 'admin', 404);
 
-        $innovation->load('innovators.faculty');
-        $firstInnovator = $innovation->innovators->first();
+        $innovation->load(['innovators.faculty', 'images', 'primaryImage']);
 
-        return view('admin.innovations.show', compact('innovation', 'firstInnovator'));
+        return view('admin.innovations.show', [
+            'innovation' => $innovation,
+            'faculties' => Faculty::orderBy('name')->get(),
+            'innovators' => Innovator::with('faculty')->orderBy('name')->get(),
+            'categories' => config('innovation.categories'),
+        ]);
     }
 
     private function validateInnovation(Request $request): array
     {
         return $request->validate([
-            'title'       => 'required|string|max:255',
-            'category'    => 'nullable|string|max:255',
-            'partner'     => 'nullable|string|max:255',
-            'hki_status'  => 'nullable|string|max:255',
-            'video_url'   => 'nullable|string|max:255',
+            'title' => 'required|string|max:255',
+            'category' => 'nullable|string|max:255',
+            'partner' => 'nullable|string|max:255',
+            'hki_status' => 'nullable|string|max:255',
+            'video_url' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'review'      => 'nullable|string',
-            'advantages'  => 'nullable|string',
-            'impact'      => 'nullable|string|max:255',
-            'is_impact'   => 'nullable|boolean',
-            'status'      => 'nullable|string|max:255',
+            'review' => 'nullable|string',
+            'advantages' => 'nullable|string',
+            'impact' => 'nullable|string|max:255',
+            'status' => 'nullable|in:published,draft',
         ]);
     }
 }

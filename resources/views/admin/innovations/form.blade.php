@@ -29,9 +29,7 @@
         ? $innovation->innovators->first()
         : null;
 
-    $existingPhotos = $innovation->relationLoaded('photos')
-        ? $innovation->photos
-        : collect();
+    $categories = $categories ?? config('innovation.categories');
 @endphp
 
 <div class="panel">
@@ -49,48 +47,50 @@
 
     <div class="row g-4">
 
-        {{-- LEFT: FOTO --}}
         <div class="col-12 col-lg-4">
             <div style="background:#7c879f;border-radius:24px;padding:20px;">
 
                 <div style="background:#fff;border-radius:16px;min-height:200px;padding:12px;">
                     <div class="fw-bold mb-2">Foto Inovasi</div>
 
-                    @if($mode === 'edit' && $existingPhotos->count())
-                        <div class="d-grid" style="grid-template-columns:repeat(2,1fr);gap:10px;">
-                            @foreach($existingPhotos as $p)
-                                <div style="border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;height:110px;">
-                                    <img
-                                        src="{{ asset('storage/'.$p->path) }}"
-                                        alt="photo"
-                                        style="width:100%;height:100%;object-fit:cover;"
-                                    >
-                                </div>
-                            @endforeach
-                        </div>
-                    @else
-                        <div style="height:160px;display:flex;align-items:center;justify-content:center;border:2px dashed #cbd5e1;border-radius:12px;">
-                            <span class="text-muted fw-bold">Belum ada foto</span>
-                        </div>
-                    @endif
+                    <div id="photoEmpty" style="height:160px;display:flex;align-items:center;justify-content:center;border:2px dashed #cbd5e1;border-radius:12px;">
+                        <span class="text-muted fw-bold">Belum ada foto</span>
+                    </div>
+
+                    <div id="photoPreview" class="d-grid mt-2" style="display:none;grid-template-columns:repeat(2,1fr);gap:10px;"></div>
                 </div>
 
-                <label class="btn btn-outline-dark w-100 mt-3">
-                    Upload Foto
-                    <input type="file" name="photos[]" hidden multiple accept="image/*">
-                </label>
+                <div class="d-flex gap-2 mt-3">
+                    <label class="btn btn-outline-dark w-100 mb-0">
+                        Tambah Foto
+                        <input id="photosInput" type="file" name="images[]" accept="image/*" multiple hidden>
+                    </label>
+
+                    <button type="button" id="clearPhotosBtn" class="btn btn-outline-secondary">Clear</button>
+                </div>
             </div>
         </div>
 
-        {{-- RIGHT: FORM --}}
         <div class="col-12 col-lg-8">
             <label class="fw-bold">Judul Inovasi</label>
             <input type="text" class="form-control mb-3" name="title" required
                    value="{{ old('title', $innovation->title) }}">
 
-            <label class="fw-bold">Nama Innovator</label>
-            <input type="text" class="form-control mb-3" name="innovator_name" required
-                   value="{{ old('innovator_name', $firstInnovator?->name) }}">
+            <label class="fw-bold">Nama Innovator (jika belum ada)</label>
+            <input type="text" class="form-control mb-3" name="new_innovator_name"
+                   placeholder="Ketik nama innovator (jika belum ada)"
+                   value="{{ old('new_innovator_name', '') }}">
+
+            <label class="fw-bold">Atau pilih innovator yang sudah ada</label>
+            <select name="innovator_id" class="form-select mb-3">
+                <option value="">-- Pilih Innovator --</option>
+                @foreach($innovators as $inv)
+                    <option value="{{ $inv->id }}"
+                        @selected(old('innovator_id', $firstInnovator?->id) == $inv->id)>
+                        {{ $inv->name }} ({{ $inv->faculty?->name ?? '-' }})
+                    </option>
+                @endforeach
+            </select>
 
             <label class="fw-bold">Fakultas</label>
             <select name="faculty_id" class="form-select mb-3" required>
@@ -104,8 +104,14 @@
             </select>
 
             <label class="fw-bold">Kategori</label>
-            <input type="text" class="form-control mb-3" name="category"
-                   value="{{ old('category', $innovation->category) }}">
+            <select name="category" class="form-select mb-3">
+                <option value="">-- Pilih Kategori --</option>
+                @foreach($categories as $cat)
+                    <option value="{{ $cat }}" @selected(old('category', $innovation->category) == $cat)>
+                        {{ $cat }}
+                    </option>
+                @endforeach
+            </select>
 
             <label class="fw-bold">Mitra</label>
             <input type="text" class="form-control mb-3" name="partner"
@@ -129,7 +135,8 @@
 
             <label class="fw-bold">Keberdampakan</label>
             <input type="text" class="form-control mb-4" name="impact"
-                   value="{{ old('impact', $innovation->impact) }}">
+                   value="{{ old('impact', $innovation->impact) }}"
+                   placeholder="Isi agar masuk Inovasi Berdampak">
 
             <div class="text-end">
                 <button type="submit" class="btn btn-navy px-4">
@@ -147,4 +154,103 @@
 .btn-navy{ background:#061a4d; color:#fff; font-weight:700; border-radius:10px; border:1px solid #061a4d; }
 .btn-navy:hover{ background:#04133a; border-color:#04133a; color:#fff; }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('photosInput');
+  const preview = document.getElementById('photoPreview');
+  const empty = document.getElementById('photoEmpty');
+  const clearBtn = document.getElementById('clearPhotosBtn');
+
+  if (!input || !preview || !empty || !clearBtn) return;
+
+  let selectedFiles = [];
+
+  function syncInputFiles() {
+    const dt = new DataTransfer();
+    selectedFiles.forEach(f => dt.items.add(f));
+    input.files = dt.files;
+  }
+
+  function render() {
+    preview.innerHTML = '';
+
+    if (!selectedFiles.length) {
+      preview.style.display = 'none';
+      empty.style.display = 'flex';
+      return;
+    }
+
+    empty.style.display = 'none';
+    preview.style.display = 'grid';
+
+    selectedFiles.forEach((file, idx) => {
+      const url = URL.createObjectURL(file);
+
+      const wrap = document.createElement('div');
+      wrap.style.position = 'relative';
+      wrap.style.border = '1px solid #e5e7eb';
+      wrap.style.borderRadius = '12px';
+      wrap.style.overflow = 'hidden';
+      wrap.style.height = '110px';
+
+      const img = document.createElement('img');
+      img.src = url;
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.objectFit = 'cover';
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = '×';
+      btn.style.position = 'absolute';
+      btn.style.top = '6px';
+      btn.style.right = '6px';
+      btn.style.width = '26px';
+      btn.style.height = '26px';
+      btn.style.borderRadius = '999px';
+      btn.style.border = '0';
+      btn.style.fontWeight = '900';
+      btn.style.cursor = 'pointer';
+      btn.style.background = 'rgba(0,0,0,0.6)';
+      btn.style.color = '#fff';
+      btn.addEventListener('click', () => {
+        selectedFiles.splice(idx, 1);
+        syncInputFiles();
+        render();
+      });
+
+      wrap.appendChild(img);
+      wrap.appendChild(btn);
+      preview.appendChild(wrap);
+
+      img.addEventListener('load', () => URL.revokeObjectURL(url));
+    });
+  }
+
+  input.addEventListener('change', () => {
+    const files = Array.from(input.files || []);
+    if (!files.length) return;
+
+    files.forEach(f => {
+      if (!f.type || !f.type.startsWith('image/')) return;
+      selectedFiles.push(f);
+    });
+
+    syncInputFiles();
+    render();
+    input.value = '';
+  });
+
+  clearBtn.addEventListener('click', () => {
+    selectedFiles = [];
+    syncInputFiles();
+    render();
+    input.value = '';
+  });
+
+  render();
+});
+</script>
+
 @endsection

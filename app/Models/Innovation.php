@@ -28,7 +28,7 @@ class Innovation extends Model
         'is_impact',
         'status',
         'views_count',
-        'image_url', // legacy / fallback foto lama
+        'image_url',
         'source',
     ];
 
@@ -37,9 +37,6 @@ class Innovation extends Model
         'views_count' => 'integer',
     ];
 
-    /* ================= RELATIONS ================= */
-
-    // many-to-many ke innovator (pivot custom)
     public function innovators()
     {
         return $this->belongsToMany(
@@ -50,28 +47,51 @@ class Innovation extends Model
         );
     }
 
-    // multiple images (slider)
     public function images()
     {
         return $this->hasMany(InnovationImage::class);
     }
 
-    // primary image (opsional)
     public function primaryImage()
     {
         return $this->hasOne(InnovationImage::class)
-                    ->where('is_primary', true);
+            ->where('is_primary', true);
     }
 
-    // ranking inovasi (admin)
     public function ranking()
     {
         return $this->hasOne(InnovationRanking::class);
     }
 
-    // permission inovasi (admin)
     public function permission()
     {
         return $this->hasOne(InnovationPermission::class);
+    }
+
+    public function scopeImpact($query)
+    {
+        return $query->whereNotNull('impact')
+            ->where('impact', '!=', '');
+    }
+
+    public function scopeProduct($query)
+    {
+        return $query->where(function ($q) {
+            $q->whereNull('impact')
+                ->orWhere('impact', '');
+        });
+    }
+
+    public function getIsImpactfulAttribute(): bool
+    {
+        return trim((string) ($this->impact ?? '')) !== '';
+    }
+
+    public function setImpactAttribute($value)
+    {
+        $impact = trim((string) $value);
+
+        $this->attributes['impact'] = $impact !== '' ? $impact : null;
+        $this->attributes['is_impact'] = $impact !== '' ? 1 : 0;
     }
 }

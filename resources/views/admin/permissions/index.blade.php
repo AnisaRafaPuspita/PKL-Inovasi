@@ -20,9 +20,7 @@
         <tbody>
         @forelse($innovations as $inv)
             @php
-                // ambil status dari tabel innovation_permissions lewat relasi
-                // kalau belum ada row permission -> "unreviewed"
-                $permStatus = optional($inv->permission)->status; // 'pending'|'accepted'|'declined'|null
+                $permStatus = optional($inv->permission)->status;
             @endphp
 
             <tr>

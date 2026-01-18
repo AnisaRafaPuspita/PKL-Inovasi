@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InnovationController;
 use App\Http\Controllers\InnovatorOfMonthController;
+use App\Http\Controllers\AdminAuthController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -41,3 +43,11 @@ Route::get('/inovator-of-the-month', [InnovatorOfMonthController::class, 'show']
 // biar navbar gak error (login dihandle admin team)
 Route::get('/admin/login', fn () => 'Admin login page')
     ->name('admin.login');
+
+/* ================= ADMIN LOGIN ================= */
+
+Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
+Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login.submit');
+Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
+
+

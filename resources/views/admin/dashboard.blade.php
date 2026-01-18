@@ -63,8 +63,9 @@
 
             <div class="d-flex justify-content-between align-items-end gap-3 flex-wrap">
                 <div>
-                    <p class="iom-text">Nama: {{ $innovatorOfMonth?->innovator_name ?? '-' }}</p>
-                    <p class="iom-text">Fakultas: {{ $innovatorOfMonth?->faculty ?? '-' }}</p>
+                    <p class="iom-text">Nama: {{ $innovatorOfMonth?->innovator?->name ?? '-' }}</p>
+                    <p class="iom-text">Fakultas: {{ $innovatorOfMonth?->innovator?->faculty?->name ?? '-' }}</p>
+
 
                     {{-- inovasi ditampilin dari relasi (kalau kamu bikin relasi innovation()) --}}
                     @if(!empty($innovatorOfMonth?->innovation?->title))

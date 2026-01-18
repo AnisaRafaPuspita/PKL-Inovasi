@@ -54,8 +54,6 @@
                 </a>
 
             </div>
-
-
         </div>
     </div>
 </section>
@@ -81,6 +79,7 @@
             <input
                 type="search"
                 name="q"
+                value="{{ request('q') }}"
                 autocomplete="off"
                 placeholder="Cari inovasi..."
                 class="flex-1 bg-transparent outline-none
@@ -122,7 +121,9 @@
                                outline-none">
                     <option value="">Semua Kategori</option>
                     @foreach (config('innovation.categories') as $cat)
-                        <option value="{{ $cat }}">{{ $cat }}</option>
+                        <option value="{{ $cat }}" {{ request('category') == $cat ? 'selected' : '' }}>
+                            {{ $cat }}
+                        </option>
                     @endforeach
                 </select>
 
@@ -134,7 +135,7 @@
                                outline-none">
                     <option value="">Semua Fakultas</option>
                     @foreach ($faculties as $faculty)
-                        <option value="{{ $faculty->id }}">
+                        <option value="{{ $faculty->id }}" {{ request('faculty_id') == $faculty->id ? 'selected' : '' }}>
                             {{ $faculty->name }}
                         </option>
                     @endforeach
@@ -142,12 +143,21 @@
 
             </div>
 
-            <button type="submit"
-                    class="mt-4 w-full rounded-full
-                           bg-[#001349] py-2.5
-                           text-white font-semibold">
-                Cari
-            </button>
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+                <button type="submit"
+                        class="w-full rounded-full
+                               bg-[#001349] py-2.5
+                               text-white font-semibold">
+                    Cari
+                </button>
+
+                <a href="{{ route('innovations.index') }}"
+                   class="w-full rounded-full
+                          bg-gray-200 py-2.5
+                          text-gray-800 font-semibold text-center">
+                    Reset
+                </a>
+            </div>
         </div>
     </form>
 </section>
@@ -155,7 +165,6 @@
 {{-- JS FINAL --}}
 <script>
 (function () {
-    const form = document.getElementById('homeSearchForm');
     const filter = document.getElementById('homeFilter');
     const toggle = document.getElementById('homeFilterToggle');
 
@@ -164,15 +173,32 @@
         filter.classList.toggle('hidden');
     });
 
-    // PAKSA RESET SETIAP HALAMAN HOME DIBUKA
-    window.addEventListener('pageshow', function () {
-        if (form) form.reset();
-        if (filter) filter.classList.add('hidden');
-    });
+    // auto-open filter jika ada filter aktif
+    const hasActiveFilter =
+        new URLSearchParams(window.location.search).get('category') ||
+        new URLSearchParams(window.location.search).get('faculty_id');
+
+    if (hasActiveFilter && filter) {
+        filter.classList.remove('hidden');
+    }
 })();
 </script>
 
+@php
+    // helper untuk path gambar: bisa dari relasi images atau legacy image_url
+    $resolveImageSrc = function ($imgPathOrUrl) {
+        if (!$imgPathOrUrl) return null;
 
+        // kalau sudah URL lengkap
+        if (preg_match('/^https?:\/\//i', $imgPathOrUrl)) return $imgPathOrUrl;
+
+        // kalau sudah diawali storage/
+        if (str_starts_with($imgPathOrUrl, 'storage/')) return asset($imgPathOrUrl);
+
+        // normal case: simpan di storage disk public
+        return asset('storage/' . ltrim($imgPathOrUrl, '/'));
+    };
+@endphp
 
 {{-- INOVASI BERDAMPAK --}}
 <section class="mx-auto max-w-[1320px] px-3 md:px-4 mt-12 md:mt-14">
@@ -191,7 +217,7 @@
     </div>
 
     <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-        @foreach ($impactInnovations as $index => $inv)
+        @forelse ($impactInnovations as $index => $inv)
             <div class="impact-item {{ $index >= 6 ? 'hidden' : '' }}">
                 <div class="rounded-[30px] border-2 border-[#8D8585] bg-white overflow-hidden
                             transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
@@ -200,57 +226,59 @@
                     <div class="relative h-[215px] overflow-hidden rounded-t-[30px]">
 
                         @php
-                            // kumpulin gambar: prioritas images(), fallback image_url
                             $images = $inv->images->count()
-                                ? $inv->images
+                                ? $inv->images->map(fn($i) => (object)['image_path' => $i->image_path])
                                 : ($inv->image_url
                                     ? collect([(object)['image_path' => $inv->image_url]])
                                     : collect());
+
+                            $hasImages = $images->count() > 0;
                         @endphp
 
-                        {{-- SLIDER --}}
-                        <div
-                            id="slider-{{ $inv->id }}"
-                            class="flex h-full transition-transform duration-300 ease-in-out"
-                            data-index="0"
-                        >
-                            @foreach ($images as $img)
-                                <img
-                                    src="{{ asset('storage/' . $img->image_path) }}"
-                                    class="min-w-full h-full object-cover"
-                                    alt="Foto Inovasi"
-                                >
-                            @endforeach
-                        </div>
-
-                        {{-- PANAH (MUNCUL HANYA JIKA FOTO > 1) --}}
-                        @if ($images->count() > 1)
-                            {{-- kiri --}}
-                            <button
-                                type="button"
-                                class="slide-btn absolute left-2 top-1/2 -translate-y-1/2
-                                    bg-black/50 text-white w-8 h-8 rounded-full
-                                    flex items-center justify-center"
-                                data-id="{{ $inv->id }}"
-                                data-dir="-1"
+                        @if($hasImages)
+                            {{-- SLIDER --}}
+                            <div
+                                id="slider-{{ $inv->id }}"
+                                class="flex h-full transition-transform duration-300 ease-in-out"
+                                data-index="0"
                             >
-                                &lsaquo;
-                            </button>
+                                @foreach ($images as $img)
+                                    @php $src = $resolveImageSrc($img->image_path); @endphp
+                                    <img
+                                        src="{{ $src }}"
+                                        class="min-w-full h-full object-cover"
+                                        alt="Foto Inovasi"
+                                    >
+                                @endforeach
+                            </div>
 
-                            {{-- kanan --}}
-                            <button
-                                type="button"
-                                class="slide-btn absolute right-2 top-1/2 -translate-y-1/2
-                                    bg-black/50 text-white w-8 h-8 rounded-full
-                                    flex items-center justify-center"
-                                data-id="{{ $inv->id }}"
-                                data-dir="1"
-                            >
-                                &rsaquo;
-                            </button>
+                            {{-- PANAH (MUNCUL HANYA JIKA FOTO > 1) --}}
+                            @if ($images->count() > 1)
+                                <button type="button"
+                                    class="slide-btn absolute left-2 top-1/2 -translate-y-1/2
+                                        bg-black/50 text-white w-8 h-8 rounded-full
+                                        flex items-center justify-center"
+                                    data-id="{{ $inv->id }}"
+                                    data-dir="-1">
+                                    &lsaquo;
+                                </button>
+
+                                <button type="button"
+                                    class="slide-btn absolute right-2 top-1/2 -translate-y-1/2
+                                        bg-black/50 text-white w-8 h-8 rounded-full
+                                        flex items-center justify-center"
+                                    data-id="{{ $inv->id }}"
+                                    data-dir="1">
+                                    &rsaquo;
+                                </button>
+                            @endif
+                        @else
+                            {{-- Placeholder kalau tidak ada gambar --}}
+                            <div class="h-full w-full bg-gray-100 flex items-center justify-center text-gray-400 text-sm">
+                                No Image
+                            </div>
                         @endif
                     </div>
-
 
                     <div class="p-5 md:p-6">
                         <div class="text-[18px] md:text-[20px] font-semibold text-[#001349]">
@@ -278,19 +306,22 @@
                     </div>
                 </div>
             </div>
-        @endforeach
+        @empty
+            <div class="text-gray-600 col-span-1 md:col-span-3">
+                Belum ada inovasi berdampak.
+            </div>
+        @endforelse
     </div>
 
-    @if ($impactInnovations->count() > 6)
+    @if (isset($impactInnovations) && $impactInnovations->count() > 6)
         <div class="mt-8 text-center">
-            <button onclick="showMoreImpact()"
+            <button type="button" onclick="showMoreImpact()"
                 class="rounded-full bg-[#001349] px-8 py-2 text-white font-semibold">
                 Selengkapnya
             </button>
         </div>
     @endif
 </section>
-
 
 {{-- INNOVATOR OF THE MONTH --}}
 <section class="mx-auto max-w-[1320px] px-3 md:px-4 mt-14 md:mt-16">
@@ -340,7 +371,6 @@
 
 {{-- NATIONAL INNOVATION RANKING --}}
 <section class="mx-auto max-w-[1320px] px-3 md:px-4 mt-14 md:mt-16">
-    {{-- Section Title --}}
     <div class="inline-flex items-center gap-3 md:gap-4 rounded-[30px] bg-white
                 shadow-[0px_4px_8px_rgba(0,0,0,0.25)]
                 px-6 md:px-10 py-4 md:py-6">
@@ -351,7 +381,6 @@
         </h2>
     </div>
 
-    {{-- Ranking Cards --}}
     <div class="mt-7 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
         @forelse($rankings as $rank)
             <div class="rounded-[30px] border-2 border-[#8D8585] bg-white
@@ -359,7 +388,6 @@
                         transition-all duration-200 ease-out
                         hover:-translate-y-1 hover:shadow-lg">
 
-                {{-- Rank + Title --}}
                 <div class="flex items-start gap-4">
                     <div class="text-[22px] md:text-[24px] font-bold text-[#001349]">
                         #{{ $rank->rank }}
@@ -376,12 +404,10 @@
                     </div>
                 </div>
 
-                {{-- Achievement --}}
                 <div class="mt-3 text-[13px] md:text-[14px] text-gray-700 leading-relaxed">
                     {{ \Illuminate\Support\Str::limit($rank->achievement ?? 'Deskripsi', 100) }}
                 </div>
 
-                {{-- Action Button --}}
                 <div class="mt-5">
                     <a href="{{ route('innovations.show', $rank->innovation_id ?? 1) }}"
                        class="inline-flex items-center justify-center
@@ -401,7 +427,6 @@
     </div>
 </section>
 
-
 {{-- INNOVATION PRODUCTS --}}
 <section class="mx-auto max-w-[1320px] px-3 md:px-4 mt-14 md:mt-16">
     <div class="inline-flex items-center gap-3 rounded-[30px] bg-white
@@ -415,68 +440,64 @@
     </div>
 
     <div class="mt-7 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-        @foreach ($innovations as $index => $inv)
+        @forelse ($innovations as $index => $inv)
             <div class="product-item {{ $index >= 6 ? 'hidden' : '' }}">
                 <div class="rounded-[30px] border-2 border-[#8D8585] bg-white overflow-hidden
                             transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
 
-                    {{-- IMAGE CARD SLIDER --}}
                     <div class="relative h-[215px] overflow-hidden rounded-t-[30px]">
 
                         @php
-                            // kumpulin gambar: prioritas images(), fallback image_url
                             $images = $inv->images->count()
-                                ? $inv->images
+                                ? $inv->images->map(fn($i) => (object)['image_path' => $i->image_path])
                                 : ($inv->image_url
                                     ? collect([(object)['image_path' => $inv->image_url]])
                                     : collect());
+
+                            $hasImages = $images->count() > 0;
                         @endphp
 
-                        {{-- SLIDER --}}
-                        <div
-                            id="slider-{{ $inv->id }}"
-                            class="flex h-full transition-transform duration-300 ease-in-out"
-                            data-index="0"
-                        >
-                            @foreach ($images as $img)
-                                <img
-                                    src="{{ asset('storage/' . $img->image_path) }}"
-                                    class="min-w-full h-full object-cover"
-                                    alt="Foto Inovasi"
-                                >
-                            @endforeach
-                        </div>
-
-                        {{-- PANAH (MUNCUL HANYA JIKA FOTO > 1) --}}
-                        @if ($images->count() > 1)
-                            {{-- kiri --}}
-                            <button
-                                type="button"
-                                class="slide-btn absolute left-2 top-1/2 -translate-y-1/2
-                                    bg-black/50 text-white w-8 h-8 rounded-full
-                                    flex items-center justify-center"
-                                data-id="{{ $inv->id }}"
-                                data-dir="-1"
+                        @if($hasImages)
+                            <div
+                                id="slider-{{ $inv->id }}"
+                                class="flex h-full transition-transform duration-300 ease-in-out"
+                                data-index="0"
                             >
-                                &lsaquo;
-                            </button>
+                                @foreach ($images as $img)
+                                    @php $src = $resolveImageSrc($img->image_path); @endphp
+                                    <img
+                                        src="{{ $src }}"
+                                        class="min-w-full h-full object-cover"
+                                        alt="Foto Inovasi"
+                                    >
+                                @endforeach
+                            </div>
 
-                            {{-- kanan --}}
-                            <button
-                                type="button"
-                                class="slide-btn absolute right-2 top-1/2 -translate-y-1/2
-                                    bg-black/50 text-white w-8 h-8 rounded-full
-                                    flex items-center justify-center"
-                                data-id="{{ $inv->id }}"
-                                data-dir="1"
-                            >
-                                &rsaquo;
-                            </button>
+                            @if ($images->count() > 1)
+                                <button type="button"
+                                    class="slide-btn absolute left-2 top-1/2 -translate-y-1/2
+                                        bg-black/50 text-white w-8 h-8 rounded-full
+                                        flex items-center justify-center"
+                                    data-id="{{ $inv->id }}"
+                                    data-dir="-1">
+                                    &lsaquo;
+                                </button>
+
+                                <button type="button"
+                                    class="slide-btn absolute right-2 top-1/2 -translate-y-1/2
+                                        bg-black/50 text-white w-8 h-8 rounded-full
+                                        flex items-center justify-center"
+                                    data-id="{{ $inv->id }}"
+                                    data-dir="1">
+                                    &rsaquo;
+                                </button>
+                            @endif
+                        @else
+                            <div class="h-full w-full bg-gray-100 flex items-center justify-center text-gray-400 text-sm">
+                                No Image
+                            </div>
                         @endif
                     </div>
-
-
-
 
                     <div class="p-5 md:p-6">
                         <div class="text-[18px] md:text-[20px] font-semibold text-[#001349]">
@@ -504,19 +525,28 @@
                     </div>
                 </div>
             </div>
-        @endforeach
+        @empty
+            <div class="text-gray-600 col-span-1 md:col-span-3">
+                Belum ada innovation products.
+            </div>
+        @endforelse
     </div>
 
-    @if ($innovations->count() > 6)
+    @if (method_exists($innovations, 'count') && $innovations->count() > 6)
         <div class="mt-8 text-center">
-            <button onclick="showMoreProduct()"
+            <button type="button" onclick="showMoreProduct()"
                 class="rounded-full bg-[#001349] px-8 py-2 text-white font-semibold">
                 Selengkapnya
             </button>
         </div>
     @endif
-</section>
 
+    {{-- kalau kamu mau pagination beneran, tinggal buka ini:
+    <div class="mt-8">
+        {{ $innovations->links() }}
+    </div>
+    --}}
+</section>
 
 {{-- MOST VISITED --}}
 <section class="mx-auto max-w-[1320px] px-3 md:px-4 mt-14 md:mt-16">
@@ -528,7 +558,7 @@
     </div>
 
     <div class="mt-7 space-y-4 md:space-y-5">
-        @foreach($mostVisited as $inv)
+        @forelse($mostVisited as $inv)
             <div class="rounded-[30px] border-2 border-[#8D8585] bg-white p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-5
                         transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-lg">
 
@@ -560,7 +590,9 @@
                         Lihat Detail Inovasi
                 </a>
             </div>
-        @endforeach
+        @empty
+            <div class="text-gray-600">Belum ada data most visited.</div>
+        @endforelse
     </div>
 </section>
 
@@ -600,7 +632,5 @@ function slideCard(id, direction) {
     slider.style.transform = `translateX(-${index * 100}%)`;
 }
 </script>
-
-
 
 @endsection
