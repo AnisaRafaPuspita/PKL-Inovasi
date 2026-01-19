@@ -14,12 +14,13 @@ class AdminInnovationController extends Controller
     {
         $innovations = Innovation::with(['innovators.faculty', 'images', 'primaryImage'])
             ->where('status', 'published')
+            // BIAR INOVASI DARI USER (innovator) JUGA MASUK MANAGE
+            ->whereIn('source', ['admin', 'innovator'])
             ->orderByDesc('created_at')
             ->get();
 
         return view('admin.innovations.index', compact('innovations'));
     }
-
 
     public function create()
     {
@@ -42,6 +43,7 @@ class AdminInnovationController extends Controller
             'faculty_id' => ['required', 'exists:faculties,id'],
             'images' => ['nullable', 'array'],
             'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
         $data['source'] = 'admin';
@@ -70,16 +72,7 @@ class AdminInnovationController extends Controller
             $innovation->innovators()->syncWithoutDetaching([$innovatorId]);
         }
 
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $index => $file) {
-                $path = $file->store('innovations', 'public');
-
-                $innovation->images()->create([
-                    'image_path' => $path,
-                    'is_primary' => $index === 0,
-                ]);
-            }
-        }
+        $this->storeImagesFromRequest($request, $innovation);
 
         return redirect()
             ->route('admin.innovations.index')
@@ -88,9 +81,10 @@ class AdminInnovationController extends Controller
 
     public function edit(Innovation $innovation)
     {
+        // EDIT TETAP KHUSUS INOVASI ADMIN
         abort_if($innovation->source !== 'admin', 404);
 
-        $innovation->load(['innovators.faculty', 'images']);
+        $innovation->load(['innovators.faculty', 'images', 'primaryImage']);
 
         return view('admin.innovations.form', [
             'mode' => 'edit',
@@ -103,6 +97,7 @@ class AdminInnovationController extends Controller
 
     public function update(Request $request, Innovation $innovation)
     {
+        // UPDATE TETAP KHUSUS INOVASI ADMIN
         abort_if($innovation->source !== 'admin', 404);
 
         $data = $this->validateInnovation($request);
@@ -113,6 +108,7 @@ class AdminInnovationController extends Controller
             'faculty_id' => ['required', 'exists:faculties,id'],
             'images' => ['nullable', 'array'],
             'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'delete_image_ids' => ['nullable', 'array'],
             'delete_image_ids.*' => ['integer'],
         ]);
@@ -153,18 +149,8 @@ class AdminInnovationController extends Controller
                 });
         }
 
-        if ($request->hasFile('images')) {
-            $hasPrimary = $innovation->images()->where('is_primary', true)->exists();
-
-            foreach ($request->file('images') as $index => $file) {
-                $path = $file->store('innovations', 'public');
-
-                $innovation->images()->create([
-                    'image_path' => $path,
-                    'is_primary' => (!$hasPrimary && $index === 0),
-                ]);
-            }
-        }
+        $this->storeImagesFromRequest($request, $innovation);
+        $this->ensurePrimaryImage($innovation);
 
         return redirect()
             ->route('admin.innovations.show', $innovation->id)
@@ -173,7 +159,8 @@ class AdminInnovationController extends Controller
 
     public function show(Innovation $innovation)
     {
-        abort_if($innovation->source !== 'admin', 404);
+        // SHOW BOLEH ADMIN + INNOVATOR (biar published dari user gak 404)
+        abort_if(!in_array($innovation->source, ['admin', 'innovator']), 404);
 
         $innovation->load(['innovators.faculty', 'images', 'primaryImage']);
 
@@ -199,5 +186,42 @@ class AdminInnovationController extends Controller
             'impact' => 'nullable|string|max:255',
             'status' => 'nullable|in:published,draft',
         ]);
+    }
+
+    private function storeImagesFromRequest(Request $request, Innovation $innovation): void
+    {
+        $files = [];
+
+        if ($request->hasFile('images')) {
+            $files = array_merge($files, $request->file('images'));
+        }
+
+        if ($request->hasFile('photo')) {
+            $files[] = $request->file('photo');
+        }
+
+        if (!count($files)) {
+            return;
+        }
+
+        $hasPrimary = $innovation->images()->where('is_primary', true)->exists();
+
+        foreach (array_values($files) as $index => $file) {
+            $path = $file->store('innovations', 'public');
+
+            $innovation->images()->create([
+                'image_path' => $path,
+                'is_primary' => (!$hasPrimary && $index === 0),
+            ]);
+        }
+    }
+
+    private function ensurePrimaryImage(Innovation $innovation): void
+    {
+        $hasPrimary = $innovation->images()->where('is_primary', true)->exists();
+        if ($hasPrimary) return;
+
+        $first = $innovation->images()->orderBy('id')->first();
+        if ($first) $first->update(['is_primary' => true]);
     }
 }

@@ -228,25 +228,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // IMPORTANT: JANGAN set input.value = '' karena itu bisa mengosongkan input.files sebelum submit
   input.addEventListener('change', () => {
     const files = Array.from(input.files || []);
     if (!files.length) return;
 
+    // (Optional) Hindari duplikasi: kalau nama+size sama, skip
     files.forEach(f => {
       if (!f.type || !f.type.startsWith('image/')) return;
-      selectedFiles.push(f);
+      const exists = selectedFiles.some(x => x.name === f.name && x.size === f.size && x.lastModified === f.lastModified);
+      if (!exists) selectedFiles.push(f);
     });
 
     syncInputFiles();
     render();
-    input.value = '';
   });
 
   clearBtn.addEventListener('click', () => {
     selectedFiles = [];
     syncInputFiles();
     render();
-    input.value = '';
   });
 
   render();

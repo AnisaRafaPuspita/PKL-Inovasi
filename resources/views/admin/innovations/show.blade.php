@@ -21,8 +21,8 @@
 @endif
 
 @php
-  $primary = $innovation->primaryImage ?? null;
   $photos = $innovation->images ?? collect();
+  $primary = $innovation->primaryImage ?? ($photos->firstWhere('is_primary', true) ?? $photos->first());
 
   $firstInnovator = $innovation->relationLoaded('innovators')
       ? $innovation->innovators->first()
@@ -51,8 +51,6 @@
       <div style="border:2px solid #061a4d;border-radius:14px;overflow:hidden;background:#fff;">
         @if($primary)
           <img src="{{ asset('storage/'.$primary->image_path) }}" style="width:100%;height:180px;object-fit:cover;">
-        @elseif($photos->count())
-          <img src="{{ asset('storage/'.$photos->first()->image_path) }}" style="width:100%;height:180px;object-fit:cover;">
         @else
           <div style="height:180px;display:flex;align-items:center;justify-content:center;font-weight:800;">
             No Photo
@@ -61,6 +59,20 @@
       </div>
     </div>
   </div>
+
+  @if($photos->count())
+    <div class="mt-3">
+      <div class="fw-bold mb-2" style="color:#061a4d;">Semua Foto</div>
+      <div class="d-grid" style="grid-template-columns:repeat(6,1fr);gap:10px;">
+        @foreach($photos as $img)
+          <a href="{{ asset('storage/'.$img->image_path) }}" target="_blank"
+             style="border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;background:#fff;display:block;">
+            <img src="{{ asset('storage/'.$img->image_path) }}" style="width:100%;height:90px;object-fit:cover;">
+          </a>
+        @endforeach
+      </div>
+    </div>
+  @endif
 
   <div class="mt-3 d-flex gap-2">
     <a href="{{ route('admin.innovations.index') }}" class="btn btn-outline-secondary">Kembali</a>
