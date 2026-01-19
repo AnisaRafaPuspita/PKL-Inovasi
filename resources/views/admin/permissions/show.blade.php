@@ -12,7 +12,6 @@
 @php
     $first = $innovation->innovators->first();
     $permStatus = optional($innovation->permission)->status;
-    $primary = $innovation->primaryImage ?? null;
     $photos = $innovation->images ?? collect();
 @endphp
 
@@ -84,18 +83,42 @@
             </div>
         </div>
 
-        <div style="width:220px;">
-            <div style="border:2px solid #061a4d;border-radius:18px;overflow:hidden;background:#fff;">
-                @if($primary)
-                    <img src="{{ asset('storage/'.$primary->image_path) }}" style="width:100%;height:220px;object-fit:cover;">
-                @elseif($photos->count())
-                    <img src="{{ asset('storage/'.$photos->first()->image_path) }}" style="width:100%;height:220px;object-fit:cover;">
-                @else
-                    <div style="height:220px;display:flex;align-items:center;justify-content:center;font-weight:800;">
-                        No Photo
-                    </div>
-                @endif
-            </div>
+        {{-- GRID FOTO --}}
+        <div style="width:360px;">
+            @if($photos->count())
+                <div style="
+                    display:grid;
+                    grid-template-columns:repeat(2, 1fr);
+                    gap:10px;
+                ">
+                    @foreach($photos as $p)
+                        <a href="{{ asset('storage/'.$p->image_path) }}"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           style="
+                             border:2px solid #061a4d;
+                             border-radius:14px;
+                             overflow:hidden;
+                             background:#fff;
+                           ">
+                            <img src="{{ asset('storage/'.$p->image_path) }}"
+                                 style="width:100%;height:150px;object-fit:cover;display:block;">
+                        </a>
+                    @endforeach
+                </div>
+            @else
+                <div style="
+                    height:220px;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    font-weight:800;
+                    border:2px solid #061a4d;
+                    border-radius:18px;
+                ">
+                    No Photo
+                </div>
+            @endif
         </div>
     </div>
 </div>
