@@ -37,7 +37,7 @@
 
       <div class="mb-3">
         <label class="fw-bold">Pilih Innovator</label>
-        <select class="form-select js-innovator-select" name="innovator_id" required>
+        <select name="innovator_id" id="innovator-select" class="form-select" required>
           <option value="">-- pilih innovator --</option>
           @foreach($innovators as $innovator)
             <option value="{{ $innovator->id }}"
@@ -52,9 +52,8 @@
       {{-- PILIH INOVASI (SATU SAJA) --}}
       <div class="mb-3">
         <label class="fw-bold">Pilih Inovasi Unggulan</label>
-        <select class="form-select js-innovation-select" name="innovation_id">
-          <option value="">-- pilih inovasi --</option>
-          
+        <select name="innovation_id" id="innovation-select" class="form-select">
+            <option value="">-- pilih inovasi unggulan --</option>
         </select>
         <small class="text-muted">
           * Satu inovasi yang ditampilkan sebagai highlight
