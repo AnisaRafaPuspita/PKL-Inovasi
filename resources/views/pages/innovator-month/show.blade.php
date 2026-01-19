@@ -53,7 +53,7 @@
           <div>
             <div class="text-gray-700">Deskripsi</div>
             <div class="mt-1 text-[18px] md:text-[20px] font-semibold text-[#001349]">
-              {{ $iom->innovator?->bio ?? '-' }}
+              {{ $iom->description ?? '-' }}
             </div>
           </div>
         </div>
@@ -86,7 +86,7 @@
 
           <div class="mt-6 text-[14px] md:text-[16px] text-gray-700 leading-relaxed" style="font-family: Inter, sans-serif;">
             <div class="font-medium text-gray-900">Description</div>
-            <div class="mt-1">{{ $iom->description ?? '-' }}</div>
+            <div class="mt-1">{{ $featuredInnovation?->description ?? '-'  }}</div>
 
             <div class="mt-4 font-medium text-gray-900">Achievements</div>
             <div class="mt-1">{{ $featuredInnovation->advantages ?? '-' }}</div>

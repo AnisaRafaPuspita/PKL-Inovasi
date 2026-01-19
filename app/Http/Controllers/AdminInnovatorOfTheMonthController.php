@@ -13,7 +13,9 @@ class AdminInnovatorOfTheMonthController extends Controller
 {
     public function edit()
     {
-        $innovators = Innovator::with('faculty')->orderBy('name')->get();
+        $innovators = Innovator::with(['faculty', 'innovations' => function ($q) {
+            $q->where('status', 'published');
+        }])->orderBy('name')->get();
         $innovations = Innovation::where('status', 'published')->orderBy('title')->get();
 
         $now = now();
