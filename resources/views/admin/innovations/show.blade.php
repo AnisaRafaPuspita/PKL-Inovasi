@@ -81,7 +81,7 @@
 </div>
 
 <div id="editBox" class="panel" style="display:none;">
-  <form method="POST"
+  <form id="editInnovationForm" method="POST"
         action="{{ route('admin.innovations.update', $innovation->id) }}"
         enctype="multipart/form-data">
     @csrf
@@ -220,8 +220,9 @@
     const preview = document.getElementById('photoPreview');
     const empty = document.getElementById('photoEmpty');
     const clearBtn = document.getElementById('clearPhotosBtn');
+    const form = document.getElementById('editInnovationForm');
 
-    if (!input || !preview || !empty || !clearBtn) return;
+    if (!input || !preview || !empty || !clearBtn || !form) return;
 
     let selectedFiles = [];
 
@@ -293,19 +294,26 @@
 
       files.forEach(f => {
         if (!f.type || !f.type.startsWith('image/')) return;
-        selectedFiles.push(f);
+
+        const exists = selectedFiles.some(x =>
+          x.name === f.name && x.size === f.size && x.lastModified === f.lastModified
+        );
+        if (!exists) selectedFiles.push(f);
       });
 
       syncInputFiles();
       render();
-      input.value = '';
+
     });
 
     clearBtn.addEventListener('click', () => {
       selectedFiles = [];
       syncInputFiles();
       render();
-      input.value = '';
+    });
+
+    form.addEventListener('submit', () => {
+      syncInputFiles();
     });
 
     render();
