@@ -371,45 +371,77 @@
 
 {{-- NATIONAL INNOVATION RANKING --}}
 <section class="mx-auto max-w-[1320px] px-3 md:px-4 mt-14 md:mt-16">
+
+    {{-- HEADER --}}
     <div class="inline-flex items-center gap-3 md:gap-4 rounded-[30px] bg-white
                 shadow-[0px_4px_8px_rgba(0,0,0,0.25)]
                 px-6 md:px-10 py-4 md:py-6">
-        <img src="{{ asset('images/Group 28.png') }}" alt="Icon" class="h-[38px] md:h-[50px] w-auto">
+        <img src="{{ asset('images/Group 28.png') }}"
+             alt="Icon"
+             class="h-[38px] md:h-[50px] w-auto">
         <h2 class="text-[#001349] text-[20px] md:text-[24px] font-bold"
             style="font-family: Inter, sans-serif;">
             National Innovation Ranking
         </h2>
     </div>
 
+    {{-- CONTENT --}}
     <div class="mt-7 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+
         @forelse($rankings as $rank)
             <div class="rounded-[30px] border-2 border-[#8D8585] bg-white
                         p-5 md:p-6
                         transition-all duration-200 ease-out
                         hover:-translate-y-1 hover:shadow-lg">
 
-                <div class="flex items-start gap-4">
-                    <div class="text-[22px] md:text-[24px] font-bold text-[#001349]">
-                        #{{ $rank->rank }}
+                {{-- TOP ROW --}}
+                <div class="flex items-start justify-between gap-4">
+
+                    {{-- LEFT: RANK + TITLE --}}
+                    <div class="flex items-start gap-4">
+                        <div class="text-[22px] md:text-[24px] font-bold text-[#001349]">
+                            #{{ $rank->rank }}
+                        </div>
+
+                        <div>
+                            <div class="text-[18px] md:text-[20px] font-semibold text-[#001349] leading-snug">
+                                {{ $rank->innovation->title ?? '-' }}
+                            </div>
+
+                            <div class="mt-1 text-[13px] md:text-[14px] text-gray-700">
+                                {{ $rank->innovation->category ?? 'Kategori' }}
+                            </div>
+                        </div>
                     </div>
 
-                    <div>
-                        <div class="text-[18px] md:text-[20px] font-semibold text-[#001349] leading-snug">
-                            {{ $rank->innovation->title ?? '-' }}
-                        </div>
+                    {{-- RIGHT: LOGO --}}
+                    <div class="w-[64px] h-[64px] md:w-[72px] md:h-[72px]
+                                rounded-full border border-gray-300
+                                overflow-hidden flex-shrink-0
+                                bg-gray-100 flex items-center justify-center">
 
-                        <div class="mt-1 text-[13px] md:text-[14px] text-gray-700">
-                            {{ $rank->innovation->category ?? 'Kategori' }}
-                        </div>
+                        @if(!empty($rank->image))
+                            <img
+                                src="{{ asset('storage/' . $rank->image) }}"
+                                alt="Logo Institusi"
+                                class="w-full h-full object-cover"
+                            >
+                        @else
+                            <span class="text-[11px] text-gray-400 text-center px-2">
+                                No Logo
+                            </span>
+                        @endif
                     </div>
                 </div>
 
-                <div class="mt-3 text-[13px] md:text-[14px] text-gray-700 leading-relaxed">
+                {{-- ACHIEVEMENT --}}
+                <div class="mt-4 text-[13px] md:text-[14px] text-gray-700 leading-relaxed">
                     {{ \Illuminate\Support\Str::limit($rank->achievement ?? 'Deskripsi', 100) }}
                 </div>
 
+                {{-- BUTTON --}}
                 <div class="mt-5">
-                    <a href="{{ route('innovations.show', $rank->innovation_id ?? 1) }}"
+                    <a href="{{ route('innovations.show', $rank->innovation_id) }}"
                        class="inline-flex items-center justify-center
                               rounded-[30px] bg-[#001349]
                               px-6 py-2
@@ -419,13 +451,16 @@
                     </a>
                 </div>
             </div>
+
         @empty
-            <div class="text-gray-600" style="font-family: Inter, sans-serif;">
-                Data ranking belum ada.
+            <div class="col-span-full text-center text-gray-500 py-10">
+                Data ranking belum tersedia.
             </div>
         @endforelse
+
     </div>
 </section>
+
 
 {{-- INNOVATION PRODUCTS --}}
 <section class="mx-auto max-w-[1320px] px-3 md:px-4 mt-14 md:mt-16">
