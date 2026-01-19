@@ -37,36 +37,33 @@
 
       <div class="mb-3">
         <label class="fw-bold">Pilih Innovator</label>
-        <select class="form-select js-innovator-select" name="innovator_id" required>
+        <select name="innovator_id" id="innovator-select" class="form-select" required>
           <option value="">-- pilih innovator --</option>
           @foreach($innovators as $innovator)
-            <option value="{{ $innovator->id }}"
-              @selected(old('innovator_id', $iotm?->innovator_id) == $innovator->id)>
-              {{ $innovator->name }} — {{ $innovator->faculty->name ?? '-' }}
-            </option>
+              <option value="{{ $innovator->id }}"
+                  @selected(old('innovator_id', $iotm?->innovator_id) == $innovator->id)>
+                  {{ $innovator->name }} — {{ $innovator->faculty->name ?? '-' }}
+              </option>
           @endforeach
-        </select>
+      </select>
+
         @error('innovator_id') <small class="text-danger">{{ $message }}</small> @enderror
       </div>
 
       {{-- PILIH INOVASI (SATU SAJA) --}}
       <div class="mb-3">
         <label class="fw-bold">Pilih Inovasi Unggulan</label>
-        <select class="form-select js-innovation-select" name="innovation_id">
-          <option value="">-- pilih inovasi --</option>
-          @foreach($innovations as $inv)
-            <option
-              value="{{ $inv->id }}"
-              @selected(old('innovation_id', $iotm?->innovation_id) == $inv->id)
-            >
-              {{ $inv->title }}
-            </option>
-          @endforeach
+        <select name="innovation_id" id="innovation-select" class="form-select">
+            <option value="">-- pilih inovasi unggulan --</option>
         </select>
+
+        
+
         <small class="text-muted">
           * Satu inovasi yang ditampilkan sebagai highlight
         </small>
       </div>
+      
 
       {{-- DESKRIPSI --}}
       <div class="mb-3">
@@ -112,12 +109,40 @@
 </div>
 
 </form>
+
+<div
+    id="innovator-data"
+    data-innovations='@json(
+        $innovators->mapWithKeys(function ($i) {
+            return [
+                $i->id => $i->innovations->map(function ($inv) {
+                    return [
+                        "id" => $inv->id,
+                        "title" => $inv->title
+                    ];
+                })
+            ];
+        })
+    )'
+    data-selected="{{ old('innovation_id', $iotm?->innovation_id) }}"
+></div>
+
+<script>
+    const el = document.getElementById('innovator-data');
+    window.innovatorInnovations = JSON.parse(el.dataset.innovations);
+    window.selectedInnovationId = el.dataset.selected;
+</script>
+
 @endsection
 
 @push('scripts')
+
+
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
 
 <script>
 $(document).ready(function () {
@@ -128,4 +153,41 @@ $(document).ready(function () {
     });
 });
 </script>
+
+
+
+<script>
+    const innovatorSelect  = document.getElementById('innovator-select');
+    const innovationSelect = document.getElementById('innovation-select');
+
+    function updateInnovationOptions(innovatorId) {
+        innovationSelect.innerHTML = '<option value="">-- pilih inovasi unggulan --</option>';
+
+        if (!innovatorId || !innovatorInnovations[innovatorId]) return;
+
+        innovatorInnovations[innovatorId].forEach(inv => {
+            const opt = document.createElement('option');
+            opt.value = inv.id;
+            opt.textContent = inv.title;
+
+            if (inv.id == selectedInnovationId) {
+                opt.selected = true;
+            }
+
+            innovationSelect.appendChild(opt);
+        });
+    }
+
+    // saat ganti innovator
+    innovatorSelect.addEventListener('change', e => {
+        updateInnovationOptions(e.target.value);
+    });
+
+    // saat page load (EDIT / reload error)
+    document.addEventListener('DOMContentLoaded', () => {
+        updateInnovationOptions(innovatorSelect.value);
+    });
+</script>
+
+
 @endpush
