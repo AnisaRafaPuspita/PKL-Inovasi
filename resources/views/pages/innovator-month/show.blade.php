@@ -52,7 +52,7 @@
 
           <div>
             <div class="text-gray-700">Deskripsi</div>
-            <div class="mt-2 text-[16px] md:text-[18px] text-gray-700">
+            <div class="mt-1 text-[18px] md:text-[20px] font-semibold text-[#001349]">
               {{ $iom->innovator?->bio ?? '-' }}
             </div>
           </div>
