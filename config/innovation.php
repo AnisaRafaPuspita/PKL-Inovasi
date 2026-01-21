@@ -7,6 +7,6 @@ return [
         'Kesehatan dan Farmasi',
         'Manufaktur dan Infrastruktur',
         'Pangan dan Teknologi Pertanian',
-        'Inovasi Lainnya',
+        'Teknologi Digital, AI, dan sejenisnya',     
     ],
 ];

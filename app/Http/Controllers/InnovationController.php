@@ -92,19 +92,24 @@ class InnovationController extends Controller
     {
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
-            'innovator_id' => ['nullable', 'exists:innovators,id'],
-            'new_innovator_name' => ['nullable', 'string', 'max:255'],
-            'faculty_id' => ['nullable', 'exists:faculties,id'],
-            'category' => ['nullable', 'string', 'max:255'],
-            'partner' => ['nullable', 'string', 'max:255'],
-            'hki_status' => ['nullable', 'string', 'max:255'],
-            'video_url' => ['nullable', 'url', 'max:255'],
+            'innovators' => ['required', 'array', 'min:1'],
+            'innovators.*.faculty_id' => ['required', 'exists:faculties,id'],
+            'innovators.*.innovator_id' => ['nullable', 'exists:innovators,id'],
+            'innovators.*.name' => ['nullable', 'string', 'max:255'],
+            'category' => ['nullable', 'string'],
+            'category_other' => ['nullable', 'string', 'max:255'],
+            'partner' => ['nullable', 'string'],
+            'hki_status' => ['nullable', 'string'],
+            'video_url' => ['nullable', 'url'],
             'description' => ['nullable', 'string'],
             'advantages' => ['nullable', 'string'],
             'impact' => ['nullable', 'string'],
-            'images' => ['nullable', 'array'],
-            'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'images.*' => ['image'],
+            'hki_status' => ['nullable', 'string'],
+            'hki_registration_number' => ['nullable', 'string', 'max:255'],
+            'hki_patent_number' => ['nullable', 'string', 'max:255'],
         ]);
+
 
         $innovatorId = null;
 
@@ -126,7 +131,9 @@ class InnovationController extends Controller
 
         $innovation = Innovation::create([
             'title' => $validated['title'],
-            'category' => $validated['category'] ?? null,
+            'category' => $request->category === 'other'
+                ? $request->category_other
+                : $request->category,
             'partner' => $validated['partner'] ?? null,
             'hki_status' => $validated['hki_status'] ?? null,
             'video_url' => $validated['video_url'] ?? null,
@@ -136,7 +143,25 @@ class InnovationController extends Controller
             'status' => 'pending',
             'views_count' => 0,
             'source' => 'innovator',
+            'hki_status' => $request->hki_status,
+            'hki_registration_number' => $request->hki_registration_number,
+            'hki_patent_number' => $request->hki_patent_number,
         ]);
+
+        foreach ($request->innovators as $item) {
+
+            if (!empty($item['innovator_id'])) {
+                $innovator = Innovator::find($item['innovator_id']);
+            } else {
+                $innovator = Innovator::create([
+                    'name' => $item['name'],
+                    'faculty_id' => $item['faculty_id'],
+                ]);
+            }
+
+            $innovation->innovators()->syncWithoutDetaching($innovator->id);
+        }
+
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $index => $file) {
