@@ -76,7 +76,17 @@
 
   <div class="mt-3 d-flex gap-2">
     <a href="{{ route('admin.innovations.index') }}" class="btn btn-outline-secondary">Kembali</a>
+
     <button id="btnToggleEdit" class="btn btn-navy" type="button">Edit</button>
+
+    <form method="POST"
+          action="{{ route('admin.innovations.destroy', $innovation->id) }}"
+          onsubmit="return confirm('Yakin ingin menghapus inovasi ini?')"
+          style="display:inline;">
+      @csrf
+      @method('DELETE')
+      <button type="submit" class="btn btn-same-height">Delete</button>
+    </form>
   </div>
 </div>
 
@@ -332,6 +342,23 @@
   color:#fff;
   font-weight:700;
   border-radius:10px;
+}
+.btn-navy,
+.btn-same-height{
+  padding: 0.375rem 1.5rem;
+  font-weight: 700;
+  border-radius: 10px;
+  line-height: 1.5;
+}
+.btn-same-height{
+  background-color:#dc3545;
+  border:1px solid #dc3545;
+  color:#fff;
+}
+.btn-same-height:hover{
+  background-color:#bb2d3b;
+  border-color:#b02a37;
+  color:#fff;
 }
 </style>
 @endsection

@@ -92,9 +92,11 @@ class InnovationController extends Controller
     {
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
+
             'innovator_id' => ['nullable', 'exists:innovators,id'],
             'new_innovator_name' => ['nullable', 'string', 'max:255'],
             'faculty_id' => ['nullable', 'exists:faculties,id'],
+
             'category' => ['nullable', 'string', 'max:255'],
             'partner' => ['nullable', 'string', 'max:255'],
             'hki_status' => ['nullable', 'string', 'max:255'],
@@ -102,13 +104,23 @@ class InnovationController extends Controller
             'description' => ['nullable', 'string'],
             'advantages' => ['nullable', 'string'],
             'impact' => ['nullable', 'string'],
+
             'images' => ['nullable', 'array'],
             'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
         $innovatorId = null;
 
-        if ($request->filled('new_innovator_name')) {
+        $hasPick = $request->filled('innovator_id');
+        $hasNew = $request->filled('new_innovator_name');
+
+        if (!$hasPick && !$hasNew) {
+            return back()
+                ->withErrors(['innovator_id' => 'Pilih innovator atau isi nama innovator baru.'])
+                ->withInput();
+        }
+
+        if ($hasNew) {
             $request->validate([
                 'faculty_id' => ['required', 'exists:faculties,id'],
             ]);
@@ -121,7 +133,7 @@ class InnovationController extends Controller
 
             $innovatorId = $innovator->id;
         } else {
-            $innovatorId = $validated['innovator_id'] ?? null;
+            $innovatorId = $validated['innovator_id'];
         }
 
         $innovation = Innovation::create([
@@ -149,9 +161,7 @@ class InnovationController extends Controller
             }
         }
 
-        if ($innovatorId) {
-            $innovation->innovators()->syncWithoutDetaching([$innovatorId]);
-        }
+        $innovation->innovators()->syncWithoutDetaching([$innovatorId]);
 
         InnovationPermission::firstOrCreate(
             ['innovation_id' => $innovation->id],
