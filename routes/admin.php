@@ -42,6 +42,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('/innovations/{innovation}', [AdminInnovationController::class, 'update'])
             ->name('innovations.update');
 
+        Route::delete('/innovations/{innovation}', [AdminInnovationController::class, 'destroy'])
+            ->name('innovations.destroy');
+
         Route::get('/permissions', [AdminPermissionController::class, 'index'])
             ->name('permissions.index');
 

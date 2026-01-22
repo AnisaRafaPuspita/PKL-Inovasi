@@ -20,6 +20,8 @@ class Innovation extends Model
         'category',
         'partner',
         'hki_status',
+        'hki_registration_number',
+        'hki_patent_number',
         'video_url',
         'description',
         'review',
