@@ -44,6 +44,17 @@ class AdminInnovationController extends Controller
             'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
+        if (($data['category'] ?? null) === 'other') {
+            $request->validate([
+                'category_other' => ['required', 'string', 'max:255'],
+            ]);
+
+            $data['category'] = trim((string) $request->input('category_other'));
+        }
+
+        $data['category'] = isset($data['category']) ? trim((string) $data['category']) : null;
+        if ($data['category'] === '') $data['category'] = null;
+
         $data['source'] = 'admin';
         $data['status'] = $data['status'] ?? 'published';
 
@@ -95,6 +106,17 @@ class AdminInnovationController extends Controller
             'delete_image_ids' => ['nullable', 'array'],
             'delete_image_ids.*' => ['integer'],
         ]);
+
+        if (($data['category'] ?? null) === 'other') {
+            $request->validate([
+                'category_other' => ['required', 'string', 'max:255'],
+            ]);
+
+            $data['category'] = trim((string) $request->input('category_other'));
+        }
+
+        $data['category'] = isset($data['category']) ? trim((string) $data['category']) : null;
+        if ($data['category'] === '') $data['category'] = null;
 
         $data['source'] = 'admin';
         $data['status'] = $data['status'] ?? 'published';
@@ -173,8 +195,11 @@ class AdminInnovationController extends Controller
         return $request->validate([
             'title' => 'required|string|max:255',
             'category' => 'nullable|string|max:255',
+            'category_other' => 'nullable|string|max:255',
             'partner' => 'nullable|string|max:255',
             'hki_status' => 'nullable|string|max:255',
+            'hki_registration_number' => 'nullable|string|max:255',
+            'hki_patent_number' => 'nullable|string|max:255',
             'video_url' => 'nullable|url|max:255',
             'description' => 'nullable|string',
             'review' => 'nullable|string',
@@ -183,6 +208,7 @@ class AdminInnovationController extends Controller
             'status' => 'nullable|in:published,draft',
         ]);
     }
+
 
     private function collectInnovatorIdsFromPayload(?string $payload, int $fallbackFacultyId): array
     {

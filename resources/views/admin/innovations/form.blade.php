@@ -58,12 +58,31 @@
             $tmp[] = [
                 'type' => 'existing',
                 'id' => $inv->id,
-                'label' => $inv->name . ' (' . $facultyName . ')',
+                'label' => $inv->name,
                 'faculty_id' => $inv->faculty_id,
                 'faculty_name' => $facultyName,
             ];
         }
         $oldPayload = json_encode($tmp);
+    }
+
+    $knownCategoryValues = [
+        'Energi',
+        'Ekonomi Biru',
+        'Kesehatan dan Farmasi',
+        'Manufaktur dan Infrastruktur',
+        'Pangan dan Teknologi Pertanian',
+        'Teknologi Digital, AI, dan sejenisnya',
+    ];
+
+    $categoryValue = old('category', $innovation->category);
+
+    if ($categoryValue && !in_array($categoryValue, $knownCategoryValues, true) && $categoryValue !== 'other') {
+        $categorySelectValue = 'other';
+        $categoryOtherValue = old('category_other', $categoryValue);
+    } else {
+        $categorySelectValue = $categoryValue;
+        $categoryOtherValue = old('category_other', '');
     }
 @endphp
 
@@ -136,7 +155,12 @@
                 <select id="pick_innovator_id" class="form-select">
                     <option value="">Atau pilih innovator yang sudah ada</option>
                     @foreach($innovators as $inv)
-                        <option value="{{ $inv->id }}" data-faculty="{{ $inv->faculty_id }}">
+                        <option
+                            value="{{ $inv->id }}"
+                            data-name="{{ $inv->name }}"
+                            data-faculty="{{ $inv->faculty_id }}"
+                            data-faculty-name="{{ optional($inv->faculty)->name ?? '-' }}"
+                        >
                             {{ $inv->name }} ({{ optional($inv->faculty)->name ?? '-' }})
                         </option>
                     @endforeach
@@ -145,32 +169,44 @@
 
             <div id="innovatorList" class="mb-3"></div>
 
-            <button type="button" id="addInnovatorBtn" class="btn btn-navy mb-3" style="border-radius:999px;padding:8px 16px;">
+            <div class="mb-4">
+              <button
+                type="button"
+                id="addInnovatorBtn"
+                class="btn btn-navy"
+                style="border-radius:999px;padding:8px 16px; display:inline-block;"
+              >
                 Tambah Innovator
-            </button>
+              </button>
+            </div>
 
             <input type="hidden" name="innovators_payload" id="innovators_payload" value="{{ $oldPayload }}">
 
-            <label class="fw-bold">Fakultas</label>
-            <select name="faculty_id" class="form-select mb-3" required>
-                <option value="">-- Pilih Fakultas --</option>
-                @foreach($faculties as $f)
-                    <option value="{{ $f->id }}"
-                        @selected(old('faculty_id', optional($firstInnovator)->faculty_id) == $f->id)>
-                        {{ $f->name }}
-                    </option>
-                @endforeach
-            </select>
+            <input type="hidden" name="faculty_id" id="faculty_id" value="{{ old('faculty_id') }}">
 
             <label class="fw-bold">Kategori</label>
-            <select name="category" class="form-select mb-3">
-                <option value="">-- Pilih Kategori --</option>
-                @foreach($categoriesMerged as $cat)
-                    <option value="{{ $cat }}" @selected(old('category', $innovation->category) == $cat)>
-                        {{ $cat }}
-                    </option>
-                @endforeach
+            <select name="category" id="category" class="form-select mb-2" onchange="handleCategory(this.value)">
+                <option value="">Pilih Kategori</option>
+                <option value="Energi" @selected($categorySelectValue == 'Energi')>Energi</option>
+                <option value="Ekonomi Biru" @selected($categorySelectValue == 'Ekonomi Biru')>Ekonomi Biru</option>
+                <option value="Kesehatan dan Farmasi" @selected($categorySelectValue == 'Kesehatan dan Farmasi')>Kesehatan dan Farmasi</option>
+                <option value="Manufaktur dan Infrastruktur" @selected($categorySelectValue == 'Manufaktur dan Infrastruktur')>Manufaktur dan Infrastruktur</option>
+                <option value="Pangan dan Teknologi Pertanian" @selected($categorySelectValue == 'Pangan dan Teknologi Pertanian')>Pangan dan Teknologi Pertanian</option>
+                <option value="Teknologi Digital, AI, dan sejenisnya" @selected($categorySelectValue == 'Teknologi Digital, AI, dan sejenisnya')>
+                    Teknologi Digital, AI, dan sejenisnya
+                </option>
+                <option value="other" @selected($categorySelectValue == 'other')>Inovasi Lainnya</option>
             </select>
+
+            <input
+                type="text"
+                name="category_other"
+                id="category_other"
+                class="form-control mb-3"
+                placeholder="Ketik kategori inovasi"
+                value="{{ $categoryOtherValue }}"
+                style="display:none;"
+            >
 
             <label class="fw-bold">Mitra</label>
             <input type="text" class="form-control mb-3" name="partner"
@@ -247,7 +283,7 @@
 .innovator-chip{
   border:1px solid rgba(6,26,77,.25);
   border-radius:14px;
-  padding:12px 14px;
+  padding:14px 16px;
   display:flex;
   justify-content:space-between;
   align-items:center;
@@ -255,20 +291,33 @@
   margin-bottom:12px;
   background:#f9fafb;
 }
+
 .innovator-chip .meta{
   font-weight:800;
   color:#061a4d;
+  display:flex;
+  align-items:center;
+  gap:18px;
+  flex-wrap:wrap;
 }
-.innovator-chip .sub{
+
+.innovator-chip .faculty-inline{
   font-size:13px;
+  font-weight:700;
   color:rgba(6,26,77,.75);
+  background:rgba(6,26,77,.06);
+  border:1px solid rgba(6,26,77,.15);
+  padding:5px 12px;
+  border-radius:999px;
+  margin-left:18px;
 }
+
 .innovator-chip .btn-remove{
   border:0;
   background:#ef4444;
   color:#fff;
-  border-radius:10px;
-  padding:6px 10px;
+  border-radius:12px;
+  padding:10px 16px;
   font-weight:800;
   cursor:pointer;
 }
@@ -276,35 +325,41 @@
 
 <script>
 function handleHkiStatus(val){
-  const reg = document.getElementById('hki_registration');
-  const pat = document.getElementById('hki_patent');
-
+  var reg = document.getElementById('hki_registration');
+  var pat = document.getElementById('hki_patent');
   if (!reg || !pat) return;
 
   reg.style.display = 'none';
   pat.style.display = 'none';
 
-  if (val === 'terdaftar' || val === 'on_process') {
-    reg.style.display = 'block';
-  }
+  if (val === 'terdaftar' || val === 'on_process') reg.style.display = 'block';
+  if (val === 'granted') pat.style.display = 'block';
+}
 
-  if (val === 'granted') {
-    pat.style.display = 'block';
+function handleCategory(val){
+  var other = document.getElementById('category_other');
+  if (!other) return;
+
+  if (val === 'other') {
+    other.style.display = 'block';
+  } else {
+    other.style.display = 'none';
+    other.value = '';
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const input = document.getElementById('photosInput');
-  const preview = document.getElementById('photoPreview');
-  const empty = document.getElementById('photoEmpty');
-  const clearBtn = document.getElementById('clearPhotosBtn');
+document.addEventListener('DOMContentLoaded', function () {
+  var input = document.getElementById('photosInput');
+  var preview = document.getElementById('photoPreview');
+  var empty = document.getElementById('photoEmpty');
+  var clearBtn = document.getElementById('clearPhotosBtn');
 
   if (input && preview && empty && clearBtn) {
-    let selectedFiles = [];
+    var selectedFiles = [];
 
     function syncInputFiles() {
-      const dt = new DataTransfer();
-      selectedFiles.forEach(f => dt.items.add(f));
+      var dt = new DataTransfer();
+      selectedFiles.forEach(function (f) { dt.items.add(f); });
       input.files = dt.files;
     }
 
@@ -320,23 +375,23 @@ document.addEventListener('DOMContentLoaded', () => {
       empty.style.display = 'none';
       preview.style.display = 'grid';
 
-      selectedFiles.forEach((file, idx) => {
-        const url = URL.createObjectURL(file);
+      selectedFiles.forEach(function (file, idx) {
+        var url = URL.createObjectURL(file);
 
-        const wrap = document.createElement('div');
+        var wrap = document.createElement('div');
         wrap.style.position = 'relative';
         wrap.style.border = '1px solid #e5e7eb';
         wrap.style.borderRadius = '12px';
         wrap.style.overflow = 'hidden';
         wrap.style.height = '110px';
 
-        const img = document.createElement('img');
+        var img = document.createElement('img');
         img.src = url;
         img.style.width = '100%';
         img.style.height = '100%';
         img.style.objectFit = 'cover';
 
-        const btn = document.createElement('button');
+        var btn = document.createElement('button');
         btn.type = 'button';
         btn.textContent = '×';
         btn.style.position = 'absolute';
@@ -350,7 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.style.cursor = 'pointer';
         btn.style.background = 'rgba(0,0,0,0.6)';
         btn.style.color = '#fff';
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', function () {
           selectedFiles.splice(idx, 1);
           syncInputFiles();
           renderPhotos();
@@ -360,20 +415,21 @@ document.addEventListener('DOMContentLoaded', () => {
         wrap.appendChild(btn);
         preview.appendChild(wrap);
 
-        img.addEventListener('load', () => URL.revokeObjectURL(url));
+        img.addEventListener('load', function(){ URL.revokeObjectURL(url); });
       });
     }
 
-    input.addEventListener('change', () => {
-      const files = Array.from(input.files || []);
+    input.addEventListener('change', function () {
+      var files = Array.from(input.files || []);
       if (!files.length) return;
 
-      files.forEach(f => {
+      files.forEach(function (f) {
         if (!f.type || !f.type.startsWith('image/')) return;
 
-        const exists = selectedFiles.some(x =>
-          x.name === f.name && x.size === f.size && x.lastModified === f.lastModified
-        );
+        var exists = selectedFiles.some(function (x) {
+          return x.name === f.name && x.size === f.size && x.lastModified === f.lastModified;
+        });
+
         if (!exists) selectedFiles.push(f);
       });
 
@@ -381,7 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
       renderPhotos();
     });
 
-    clearBtn.addEventListener('click', () => {
+    clearBtn.addEventListener('click', function () {
       selectedFiles = [];
       syncInputFiles();
       renderPhotos();
@@ -390,46 +446,70 @@ document.addEventListener('DOMContentLoaded', () => {
     renderPhotos();
   }
 
-  const nameInput = document.getElementById('new_innovator_name');
-  const facultySelect = document.getElementById('new_innovator_faculty');
-  const pickSelect = document.getElementById('pick_innovator_id');
-  const addBtn = document.getElementById('addInnovatorBtn');
-  const list = document.getElementById('innovatorList');
-  const payload = document.getElementById('innovators_payload');
+  var cat = document.getElementById('category');
+  if (cat) handleCategory(cat.value);
+
+  var nameInput = document.getElementById('new_innovator_name');
+  var facultySelect = document.getElementById('new_innovator_faculty');
+  var pickSelect = document.getElementById('pick_innovator_id');
+  var addBtn = document.getElementById('addInnovatorBtn');
+  var list = document.getElementById('innovatorList');
+  var payload = document.getElementById('innovators_payload');
+  var facultyHidden = document.getElementById('faculty_id');
 
   if (nameInput && facultySelect && pickSelect && addBtn && list && payload) {
-    let items = [];
+    var items = [];
+
+    function syncFacultyIdFromItems(){
+      if (!facultyHidden) return;
+      if (!items.length) {
+        facultyHidden.value = '';
+        return;
+      }
+      var first = items[0];
+      if (first && first.faculty_id) {
+        facultyHidden.value = String(first.faculty_id);
+      } else {
+        facultyHidden.value = '';
+      }
+    }
 
     function setPayload(){
       payload.value = JSON.stringify(items);
+      syncFacultyIdFromItems();
+    }
+
+    function getFacultyNameById(id){
+      var opt = facultySelect.querySelector('option[value="' + id + '"]');
+      return opt ? opt.textContent.trim() : '';
     }
 
     function renderInnovators(){
       list.innerHTML = '';
       if (!items.length) return;
 
-      items.forEach((it, idx) => {
-        const div = document.createElement('div');
+      items.forEach(function (it, idx) {
+        var div = document.createElement('div');
         div.className = 'innovator-chip';
 
-        const left = document.createElement('div');
+        var left = document.createElement('div');
+        left.className = 'meta';
 
-        const meta = document.createElement('div');
-        meta.className = 'meta';
-        meta.textContent = it.type === 'existing' ? it.label : it.name;
+        var nameSpan = document.createElement('span');
+        nameSpan.textContent = (it.type === 'existing') ? (it.label || '-') : (it.name || '-');
 
-        const sub = document.createElement('div');
-        sub.className = 'sub';
-        sub.textContent = it.faculty_name ? `Fakultas: ${it.faculty_name}` : 'Fakultas: -';
+        var facultySpan = document.createElement('span');
+        facultySpan.className = 'faculty-inline';
+        facultySpan.textContent = it.faculty_name ? it.faculty_name : '-';
 
-        left.appendChild(meta);
-        left.appendChild(sub);
+        left.appendChild(nameSpan);
+        left.appendChild(facultySpan);
 
-        const rm = document.createElement('button');
+        var rm = document.createElement('button');
         rm.type = 'button';
         rm.className = 'btn-remove';
         rm.textContent = 'Hapus';
-        rm.addEventListener('click', () => {
+        rm.addEventListener('click', function () {
           items.splice(idx, 1);
           setPayload();
           renderInnovators();
@@ -441,27 +521,26 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    function getFacultyNameById(id){
-      const opt = facultySelect.querySelector(`option[value="${id}"]`);
-      return opt ? opt.textContent.trim() : '';
-    }
-
     function addExisting(){
-      const id = pickSelect.value;
+      var id = pickSelect.value;
       if (!id) return false;
 
-      const opt = pickSelect.options[pickSelect.selectedIndex];
-      const label = opt ? opt.textContent.trim() : '';
-      const facultyId = opt ? (opt.getAttribute('data-faculty') || '') : '';
-      const facultyName = facultyId ? getFacultyNameById(facultyId) : '';
+      var opt = pickSelect.options[pickSelect.selectedIndex];
+      if (!opt) return false;
 
-      const exists = items.some(x => x.type === 'existing' && String(x.id) === String(id));
+      var name = opt.getAttribute('data-name') || '';
+      var facultyId = opt.getAttribute('data-faculty') || '';
+      var facultyName = opt.getAttribute('data-faculty-name') || '';
+
+      var exists = items.some(function (x) {
+        return x.type === 'existing' && String(x.id) === String(id);
+      });
       if (exists) return true;
 
       items.push({
         type: 'existing',
         id: Number(id),
-        label: label,
+        label: name,
         faculty_id: facultyId ? Number(facultyId) : null,
         faculty_name: facultyName
       });
@@ -469,22 +548,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function addNew(){
-      const name = (nameInput.value || '').trim();
+      var name = (nameInput.value || '').trim();
       if (!name) return false;
 
-      const facultyId = facultySelect.value;
+      var facultyId = facultySelect.value;
       if (!facultyId) {
         alert('Pilih Fakultas untuk innovator baru.');
         return true;
       }
 
-      const facultyName = getFacultyNameById(facultyId);
+      var facultyName = getFacultyNameById(facultyId);
 
-      const exists = items.some(x =>
-        x.type === 'new'
-        && x.name.toLowerCase() === name.toLowerCase()
-        && String(x.faculty_id) === String(facultyId)
-      );
+      var exists = items.some(function (x) {
+        return x.type === 'new'
+          && (x.name || '').toLowerCase() === name.toLowerCase()
+          && String(x.faculty_id) === String(facultyId);
+      });
       if (exists) return true;
 
       items.push({
@@ -496,9 +575,9 @@ document.addEventListener('DOMContentLoaded', () => {
       return true;
     }
 
-    addBtn.addEventListener('click', () => {
-      const picked = addExisting();
-      const created = addNew();
+    addBtn.addEventListener('click', function () {
+      var picked = addExisting();
+      var created = addNew();
 
       if (!picked && !created){
         alert('Isi nama innovator baru + fakultas, atau pilih innovator yang sudah ada.');
@@ -515,7 +594,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (payload.value) {
       try{
-        const parsed = JSON.parse(payload.value);
+        var parsed = JSON.parse(payload.value);
         if (Array.isArray(parsed)) items = parsed;
       }catch(e){}
     }
@@ -524,8 +603,9 @@ document.addEventListener('DOMContentLoaded', () => {
     renderInnovators();
   }
 
-  const sel = document.getElementById('hki_status');
+  var sel = document.getElementById('hki_status');
   if (sel) handleHkiStatus(sel.value);
+  
 });
 </script>
 

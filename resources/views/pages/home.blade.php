@@ -111,7 +111,7 @@
                     px-4 md:px-6 py-4
                     shadow">
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
                 {{-- kategori --}}
                 <select name="category"
@@ -140,6 +140,22 @@
                         </option>
                     @endforeach
                 </select>
+
+                {{-- innovator --}}
+                <select name="innovator_id"
+                        autocomplete="off"
+                        class="h-[42px] rounded-full px-5
+                            border border-[#001349]/30
+                            outline-none">
+                    <option value="">Semua Innovator</option>
+                    @foreach ($innovators as $innovator)
+                        <option value="{{ $innovator->id }}"
+                            {{ request('innovator_id') == $innovator->id ? 'selected' : '' }}>
+                            {{ $innovator->name }}
+                        </option>
+                    @endforeach
+                </select>
+
 
             </div>
 
@@ -176,7 +192,8 @@
     // auto-open filter jika ada filter aktif
     const hasActiveFilter =
         new URLSearchParams(window.location.search).get('category') ||
-        new URLSearchParams(window.location.search).get('faculty_id');
+        new URLSearchParams(window.location.search).get('faculty_id')||
+        new URLSearchParams(window.location.search).get('innovator_id');
 
     if (hasActiveFilter && filter) {
         filter.classList.remove('hidden');

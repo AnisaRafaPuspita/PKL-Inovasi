@@ -16,6 +16,8 @@ class InnovationController extends Controller
         $q = $request->query('q');
         $category = $request->query('category');
         $facultyId = $request->query('faculty_id');
+        $innovatorId = $request->query('innovator_id');
+
 
         $baseQuery = Innovation::query()
             ->where('status', 'published')
@@ -33,7 +35,13 @@ class InnovationController extends Controller
                 $query->whereHas('innovators.faculty', function ($q) use ($facultyId) {
                     $q->where('faculties.id', $facultyId);
                 });
+            })
+            ->when($innovatorId, function ($query) use ($innovatorId) {
+                $query->whereHas('innovators', function ($q) use ($innovatorId) {
+                    $q->where('innovators.id', $innovatorId);
+                });
             });
+
 
         $impactInnovations = (clone $baseQuery)
             ->impact()
@@ -58,6 +66,8 @@ class InnovationController extends Controller
             'facultyId' => $facultyId,
             'categories' => config('innovation.categories'),
             'faculties' => Faculty::orderBy('name')->get(),
+            'innovators' => Innovator::orderBy('name')->get(),
+            'innovatorId' => $innovatorId,
         ]);
     }
 
@@ -91,23 +101,53 @@ class InnovationController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
+        'title' => ['required', 'string', 'max:255'],
 
-            'innovator_id' => ['nullable', 'exists:innovators,id'],
-            'new_innovator_name' => ['nullable', 'string', 'max:255'],
-            'faculty_id' => ['nullable', 'exists:faculties,id'],
+        'innovators' => ['required', 'array', 'min:1'],
+        'innovators.*.innovator_id' => ['nullable', 'exists:innovators,id'],
+        'innovators.*.name' => ['nullable', 'string', 'max:255'],
 
-            'category' => ['nullable', 'string', 'max:255'],
-            'partner' => ['nullable', 'string', 'max:255'],
-            'hki_status' => ['nullable', 'string', 'max:255'],
-            'video_url' => ['nullable', 'url', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'advantages' => ['nullable', 'string'],
-            'impact' => ['nullable', 'string'],
+        // fakultas wajib kalau innovator baru (tidak pilih existing)
+        'innovators.*.faculty_id' => [
+            'nullable',
+            'exists:faculties,id',
+            function ($attr, $value, $fail) use ($request) {
+                $parts = explode('.', $attr);       
+                $index = $parts[1] ?? null;
 
-            'images' => ['nullable', 'array'],
-            'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-        ]);
+                $item = $request->input("innovators.$index", []);
+                $innovatorId = $item['innovator_id'] ?? null;
+                $name = trim((string)($item['name'] ?? ''));
+
+                if (empty($innovatorId) && $name !== '' && empty($value)) {
+                    $fail('Fakultas wajib diisi untuk innovator baru.');
+                }
+            }
+        ],
+
+        // FIELD LAIN
+        'category' => ['nullable', 'string', 'max:255'],
+        'category_other' => ['nullable', 'string', 'max:255'],
+        'partner' => ['nullable', 'string', 'max:255'],
+
+        // status paten
+        'hki_status' => ['nullable', 'in:terdaftar,on_process,granted'],
+        'hki_registration_number' => ['nullable', 'string', 'max:255'],
+        'hki_patent_number' => ['nullable', 'string', 'max:255'],
+
+        // link (opsional tapi harus valid kalau diisi)
+        'video_url' => ['nullable', 'url', 'max:255'],
+
+        'description' => ['nullable', 'string'],
+        'advantages' => ['nullable', 'string'],
+        'impact' => ['nullable', 'string'],
+
+        // images
+        'images' => ['nullable', 'array'],
+        'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+    ]);
+
+
 
         $innovatorId = null;
 
@@ -138,7 +178,9 @@ class InnovationController extends Controller
 
         $innovation = Innovation::create([
             'title' => $validated['title'],
-            'category' => $validated['category'] ?? null,
+            'category' => $request->category === 'other'
+                ? $request->category_other
+                : $request->category,
             'partner' => $validated['partner'] ?? null,
             'hki_status' => $validated['hki_status'] ?? null,
             'video_url' => $validated['video_url'] ?? null,
@@ -148,7 +190,28 @@ class InnovationController extends Controller
             'status' => 'pending',
             'views_count' => 0,
             'source' => 'innovator',
+            'hki_status' => $request->hki_status,
+            'hki_registration_number' => $request->hki_registration_number,
+            'hki_patent_number' => $request->hki_patent_number,
         ]);
+
+        foreach ($request->innovators as $item) {
+
+            if (!empty($item['innovator_id'])) {
+                // existing innovator → ambil dari DB
+                $innovator = Innovator::findOrFail($item['innovator_id']);
+            } else {
+                // innovator baru → pakai input fakultas
+                $innovator = Innovator::create([
+                    'name' => $item['name'],
+                    'faculty_id' => $item['faculty_id'],
+                ]);
+            }
+
+            $innovation->innovators()->syncWithoutDetaching($innovator->id);
+        }
+
+
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $index => $file) {

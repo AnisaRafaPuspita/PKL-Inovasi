@@ -6,6 +6,7 @@ use App\Models\Innovation;
 use App\Models\InnovatorOfTheMonth;
 use App\Models\InnovationRanking;
 use App\Models\Faculty;
+use App\Models\Innovator;
 
 
 
@@ -45,7 +46,9 @@ class HomeController extends Controller
 
         $faculties = Faculty::orderBy('name')->get();
 
-        return view('pages.home', compact('impactInnovations','innovations', 'mostVisited', 'innovatorMonth', 'rankings', 'faculties'));
+        $innovators = Innovator::orderBy('name')->get(); 
+
+        return view('pages.home', compact('impactInnovations','innovations', 'mostVisited', 'innovatorMonth', 'rankings', 'faculties', 'innovators'));
     }
 
     public function about()
