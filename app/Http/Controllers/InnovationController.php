@@ -16,6 +16,8 @@ class InnovationController extends Controller
         $q = $request->query('q');
         $category = $request->query('category');
         $facultyId = $request->query('faculty_id');
+        $innovatorId = $request->query('innovator_id');
+
 
         $baseQuery = Innovation::query()
             ->where('status', 'published')
@@ -33,7 +35,13 @@ class InnovationController extends Controller
                 $query->whereHas('innovators.faculty', function ($q) use ($facultyId) {
                     $q->where('faculties.id', $facultyId);
                 });
+            })
+            ->when($innovatorId, function ($query) use ($innovatorId) {
+                $query->whereHas('innovators', function ($q) use ($innovatorId) {
+                    $q->where('innovators.id', $innovatorId);
+                });
             });
+
 
         $impactInnovations = (clone $baseQuery)
             ->impact()
@@ -58,6 +66,8 @@ class InnovationController extends Controller
             'facultyId' => $facultyId,
             'categories' => config('innovation.categories'),
             'faculties' => Faculty::orderBy('name')->get(),
+            'innovators' => Innovator::orderBy('name')->get(),
+            'innovatorId' => $innovatorId,
         ]);
     }
 
