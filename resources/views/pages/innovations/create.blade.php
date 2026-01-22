@@ -93,48 +93,60 @@
 
                 <div id="innovators-wrapper" class="space-y-3">
 
-                    {{-- ITEM TEMPLATE --}}
+                    {{-- SATU ITEM INNOVATOR --}}
                     <div class="innovator-item grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {{-- Nama / Select Innovator --}}
-                        <div>
-                            <input
-                                type="text"
-                                name="innovators[0][name]"
-                                placeholder="Ketik nama innovator (jika baru)"
-                                class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 outline-none"
-                            >
 
-                            <select
-                                name="innovators[0][innovator_id]"
-                                class="mt-2 h-[46px] w-full rounded-[30px] border border-[#001349] px-6 bg-white outline-none">
-                                <option value="">Atau pilih innovator yang sudah ada</option>
-                                @foreach ($innovators as $innovator)
-                                    <option value="{{ $innovator->id }}">
-                                        {{ $innovator->name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                        <!-- ROW 1: INNOVATOR BARU -->
+                        <input
+                            type="text"
+                            name="innovators[0][name]"
+                            placeholder="Ketik nama innovator (jika baru)"
+                            class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 outline-none"
+                        >
 
-                            <input type="hidden" name="innovators[0][type]" value="new">
-                        </div>
+                        <select
+                            name="innovators[0][faculty_new]"
+                            class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 bg-white outline-none"
+                        >
+                            <option value="">Pilih Fakultas</option>
+                            @foreach ($faculties as $faculty)
+                                <option value="{{ $faculty->id }}">{{ $faculty->name }}</option>
+                            @endforeach
+                        </select>
 
-                        {{-- Fakultas --}}
-                        <div>
-                            <select
-                                name="innovators[0][faculty_id]"
-                                class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 bg-white outline-none">
-                                <option value="">Pilih Fakultas</option>
-                                @foreach($faculties as $faculty)
-                                    <option value="{{ $faculty->id }}">
-                                        {{ $faculty->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                        <!-- ROW 2: INNOVATOR EXISTING -->
+                        <select
+                            name="innovators[0][innovator_id]"
+                            
+                            class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 bg-white outline-none"
+                        >
+                            <option value="">Atau pilih innovator yang sudah ada</option>
+                            @foreach ($innovators as $innovator)
+                                <option
+                                    value="{{ $innovator->id }}"
+                                    data-faculty-id="{{ $innovator->faculty_id }}"
+                                >
+                                    {{ $innovator->name }}
+                                </option>
+                            @endforeach
+                        </select>
+
+                        <select
+                            name="innovators[0][faculty_id]"
+                            class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 bg-white outline-none"
+                        >
+                            <option value="">Pilih Fakultas</option>
+                            @foreach ($faculties as $faculty)
+                                <option value="{{ $faculty->id }}">{{ $faculty->name }}</option>
+                            @endforeach
+                        </select>
+
                     </div>
+
 
                 </div>
 
+                {{-- TOMBOL TAMBAH INNOVATOR --}}
                 <div class="md:col-start-2">
                     <button
                         type="button"
@@ -143,15 +155,18 @@
                             rounded-full bg-[#001349]
                             px-4 py-2
                             text-white text-sm font-semibold
-                            hover:bg-[#001349]/90 transition">
+                            hover:bg-[#001349]/90 transition"
+                    >
                         <span>Tambah Innovator</span>
                         <img
                             src="{{ asset('images/add_circle.png') }}"
                             class="h-3.5 w-3.5"
-                            alt="+">
+                            alt="+"
+                        >
                     </button>
                 </div>
             </div>
+
 
 
 
@@ -346,43 +361,91 @@ function addInnovator() {
 
     const html = `
     <div class="innovator-item grid grid-cols-1 md:grid-cols-2 gap-3">
-        <div>
-            <input
-                type="text"
-                name="innovators[${innovatorIndex}][name]"
-                placeholder="Ketik nama innovator (jika baru)"
-                class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 outline-none"
-            >
 
-            <select
-                name="innovators[${innovatorIndex}][innovator_id]"
-                class="mt-2 h-[46px] w-full rounded-[30px] border border-[#001349] px-6 bg-white outline-none">
-                <option value="">Atau pilih innovator yang sudah ada</option>
-                @foreach ($innovators as $innovator)
-                    <option value="{{ $innovator->id }}">{{ $innovator->name }}</option>
-                @endforeach
-            </select>
+        <!-- ROW 1: INNOVATOR BARU -->
+        <input
+            type="text"
+            name="innovators[${innovatorIndex}][name]"
+            placeholder="Ketik nama innovator (jika baru)"
+            class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 outline-none"
+        >
 
-            <input type="hidden" name="innovators[${innovatorIndex}][type]" value="new">
-        </div>
+        <select
+            name="innovators[${innovatorIndex}][faculty_new]"
+            class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 bg-white outline-none"
+        >
+            <option value="">Pilih Fakultas</option>
+            @foreach($faculties as $faculty)
+                <option value="{{ $faculty->id }}">{{ $faculty->name }}</option>
+            @endforeach
+        </select>
 
-        <div>
-            <select
-                name="innovators[${innovatorIndex}][faculty_id]"
-                class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 bg-white outline-none">
-                <option value="">Pilih Fakultas</option>
-                @foreach($faculties as $faculty)
-                    <option value="{{ $faculty->id }}">{{ $faculty->name }}</option>
-                @endforeach
-            </select>
-        </div>
+        <!-- ROW 2: INNOVATOR EXISTING -->
+        <select
+            name="innovators[${innovatorIndex}][innovator_id]"
+            class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 bg-white outline-none"
+        >
+            <option value="">Atau pilih innovator yang sudah ada</option>
+            @foreach ($innovators as $innovator)
+                <option
+                    value="{{ $innovator->id }}"
+                    data-faculty-id="{{ $innovator->faculty_id }}"
+                >
+                    {{ $innovator->name }}
+                </option>
+            @endforeach
+        </select>
+
+        <select
+            name="innovators[${innovatorIndex}][faculty_id]"
+            class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 bg-white outline-none"
+        >
+            <option value="">Pilih Fakultas</option>
+            @foreach($faculties as $faculty)
+                <option value="{{ $faculty->id }}">{{ $faculty->name }}</option>
+            @endforeach
+        </select>
+
     </div>
     `;
 
     wrapper.insertAdjacentHTML('beforeend', html);
     innovatorIndex++;
 }
+
 </script>
+
+
+
+
+
+<script>
+document.addEventListener('change', function (e) {
+    if (!e.target.matches('select[name$="[innovator_id]"]')) return;
+
+    const select = e.target;
+    const row = select.closest('.innovator-item');
+    const facultySelect = row.querySelector(
+        'select[name$="[faculty_id]"]'
+    );
+
+    const option = select.options[select.selectedIndex];
+
+    if (option && option.dataset.facultyId) {
+        facultySelect.value = option.dataset.facultyId;
+    } else {
+        facultySelect.value = '';
+    }
+});
+</script>
+
+
+
+
+
+
+
+
 
 <script>
 function handleHkiStatus(value) {

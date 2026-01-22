@@ -93,9 +93,23 @@ class InnovationController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'innovators' => ['required', 'array', 'min:1'],
-            'innovators.*.faculty_id' => ['required', 'exists:faculties,id'],
+
             'innovators.*.innovator_id' => ['nullable', 'exists:innovators,id'],
             'innovators.*.name' => ['nullable', 'string', 'max:255'],
+
+            // fakultas hanya wajib kalau TIDAK pilih innovator existing
+            'innovators.*.faculty_id' => [
+                'nullable',
+                'exists:faculties,id',
+                function ($attr, $value, $fail) use ($request) {
+                    $index = explode('.', $attr)[1];
+                    $item = $request->innovators[$index];
+
+                    if (empty($item['innovator_id']) && empty($value)) {
+                        $fail('Fakultas wajib diisi untuk innovator baru.');
+                    }
+                }
+            ],
             'category' => ['nullable', 'string'],
             'category_other' => ['nullable', 'string', 'max:255'],
             'partner' => ['nullable', 'string'],
@@ -151,8 +165,10 @@ class InnovationController extends Controller
         foreach ($request->innovators as $item) {
 
             if (!empty($item['innovator_id'])) {
-                $innovator = Innovator::find($item['innovator_id']);
+                // existing innovator → ambil dari DB
+                $innovator = Innovator::findOrFail($item['innovator_id']);
             } else {
+                // innovator baru → pakai input fakultas
                 $innovator = Innovator::create([
                     'name' => $item['name'],
                     'faculty_id' => $item['faculty_id'],
@@ -161,6 +177,7 @@ class InnovationController extends Controller
 
             $innovation->innovators()->syncWithoutDetaching($innovator->id);
         }
+
 
 
         if ($request->hasFile('images')) {
