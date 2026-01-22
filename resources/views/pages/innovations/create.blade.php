@@ -85,55 +85,89 @@
                 >
             </div>
 
-            {{-- Nama Innovator --}}
-            <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] items-start gap-4">
+            {{-- Innovators --}}
+            <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-4">
                 <label class="text-[#001349] text-[18px] font-bold pt-2">
-                    Nama Innovator
+                    Innovator
                 </label>
 
-                <div class="space-y-3">
-                    {{-- Input ketik nama --}}
-                    <input
-                        name="new_innovator_name"
-                        placeholder="Ketik nama innovator (jika belum ada)"
-                        class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 outline-none"
-                    >
+                <div id="innovators-wrapper" class="space-y-3">
 
-                    {{-- Dropdown pilih --}}
-                    <select
-                        name="innovator_id"
-                        class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 bg-white outline-none">
-                        <option value="">
-                            Atau pilih innovator yang sudah ada
-                        </option>
-                        @foreach ($innovators as $innovator)
-                            <option value="{{ $innovator->id }}">
-                                {{ $innovator->name }}
-                            </option>
-                        @endforeach
-                    </select>
+                    {{-- SATU ITEM INNOVATOR --}}
+                    <div class="innovator-item grid grid-cols-1 md:grid-cols-2 gap-3">
+
+                        <!-- ROW 1: INNOVATOR BARU -->
+                        <input
+                            type="text"
+                            name="innovators[0][name]"
+                            placeholder="Ketik nama innovator (jika baru)"
+                            class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 outline-none"
+                        >
+
+                        <select
+                            name="innovators[0][faculty_new]"
+                            class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 bg-white outline-none"
+                        >
+                            <option value="">Pilih Fakultas</option>
+                            @foreach ($faculties as $faculty)
+                                <option value="{{ $faculty->id }}">{{ $faculty->name }}</option>
+                            @endforeach
+                        </select>
+
+                        <!-- ROW 2: INNOVATOR EXISTING -->
+                        <select
+                            name="innovators[0][innovator_id]"
+                            
+                            class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 bg-white outline-none"
+                        >
+                            <option value="">Atau pilih innovator yang sudah ada</option>
+                            @foreach ($innovators as $innovator)
+                                <option
+                                    value="{{ $innovator->id }}"
+                                    data-faculty-id="{{ $innovator->faculty_id }}"
+                                >
+                                    {{ $innovator->name }}
+                                </option>
+                            @endforeach
+                        </select>
+
+                        <select
+                            name="innovators[0][faculty_id]"
+                            class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 bg-white outline-none"
+                        >
+                            <option value="">Pilih Fakultas</option>
+                            @foreach ($faculties as $faculty)
+                                <option value="{{ $faculty->id }}">{{ $faculty->name }}</option>
+                            @endforeach
+                        </select>
+
+                    </div>
+
+
+                </div>
+
+                {{-- TOMBOL TAMBAH INNOVATOR --}}
+                <div class="md:col-start-2">
+                    <button
+                        type="button"
+                        onclick="addInnovator()"
+                        class="mt-1 inline-flex items-center gap-2
+                            rounded-full bg-[#001349]
+                            px-4 py-2
+                            text-white text-sm font-semibold
+                            hover:bg-[#001349]/90 transition"
+                    >
+                        <span>Tambah Innovator</span>
+                        <img
+                            src="{{ asset('images/add_circle.png') }}"
+                            class="h-3.5 w-3.5"
+                            alt="+"
+                        >
+                    </button>
                 </div>
             </div>
 
-            {{-- Fakultas --}}
-            <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] items-center gap-4">
-                <label class="text-[#001349] text-[18px] font-bold">
-                    Fakultas
-                </label>
 
-                <select
-                    name="faculty_id"
-                    class="h-[46px] w-full rounded-[30px]
-                        border border-[#001349]
-                        px-6 bg-white outline-none">
-                    <option value="">Pilih Fakultas</option>
-                    @foreach($faculties as $faculty)
-                        <option value="{{ $faculty->id }}" @selected(old('faculty_id') == $faculty->id)>
-                            {{ $faculty->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
 
 
 
@@ -148,20 +182,49 @@
                 >
             </div>
 
-            {{-- Status HKI --}}
-            <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] items-center gap-4">
-                <label class="text-[#001349] text-[18px] font-bold">Status HKI</label>
-                <input
-                    name="hki_status"
-                    value="{{ old('hki_status') }}"
-                    class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 outline-none"
-                    placeholder="Contoh: Paten Granted"
-                >
+            {{-- Status Paten --}}
+            <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] items-start gap-4">
+                <label class="text-[#001349] text-[18px] font-bold pt-2">
+                    Status Paten
+                </label>
+
+                <div class="space-y-2">
+                    <select
+                        name="hki_status"
+                        id="hki_status"
+                        class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 bg-white outline-none"
+                        onchange="handleHkiStatus(this.value)"
+                    >
+                        <option value="">Pilih Status</option>
+                        <option value="terdaftar">Terdaftar</option>
+                        <option value="on_process">On Process</option>
+                        <option value="granted">Granted</option>
+                    </select>
+
+                    {{-- Nomor Pendaftaran --}}
+                    <input
+                        type="text"
+                        name="hki_registration_number"
+                        id="hki_registration"
+                        placeholder="Nomor Pendaftaran HKI"
+                        class="hidden h-[46px] w-full rounded-[30px] border border-[#001349] px-6 outline-none"
+                    >
+
+                    {{-- Nomor Paten --}}
+                    <input
+                        type="text"
+                        name="hki_patent_number"
+                        id="hki_patent"
+                        placeholder="Nomor Paten"
+                        class="hidden h-[46px] w-full rounded-[30px] border border-[#001349] px-6 outline-none"
+                    >
+                </div>
             </div>
 
-            {{-- Nama Video URL --}}
+
+            {{-- Link URL --}}
             <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] items-center gap-4">
-                <label class="text-[#001349] text-[18px] font-bold">Nama Video URL</label>
+                <label class="text-[#001349] text-[18px] font-bold">Link Inovasi</label>
                 <input
                     name="video_url"
                     value="{{ old('video_url') }}"
@@ -171,24 +234,38 @@
             </div>
 
             {{-- Kategori --}}
-            <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] items-center gap-4">
-                <label class="text-[#001349] text-[18px] font-bold">
+            <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] items-start gap-4">
+                <label class="text-[#001349] text-[18px] font-bold pt-2">
                     Kategori
                 </label>
 
-                <select
-                    name="category"
-                    class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 bg-white outline-none">
+                {{-- KOLOM KANAN --}}
+                <div class="space-y-2">
+                    <select
+                        name="category"
+                        id="category"
+                        onchange="handleCategory(this.value)"
+                        class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 bg-white outline-none"
+                    >
+                        <option value="">Pilih Kategori</option>
 
-                    <option value="">Pilih Kategori</option>
+                        @foreach ($categories as $cat)
+                            <option value="{{ $cat }}">{{ $cat }}</option>
+                        @endforeach
 
-                    @foreach ($categories as $cat)
-                        <option value="{{ $cat }}" @selected(old('category') == $cat)>
-                            {{ $cat }}
-                        </option>
-                    @endforeach
-                </select>
+                        <option value="other">Inovasi Lainnya</option>
+                    </select>
+
+                    <input
+                        type="text"
+                        name="category_other"
+                        id="category_other"
+                        placeholder="Ketik kategori inovasi"
+                        class="hidden h-[46px] w-full rounded-[30px] border border-[#001349] px-6 outline-none"
+                    />
+                </div>
             </div>
+
 
 
             {{-- Deskripsi --}}
@@ -217,7 +294,7 @@
                 <textarea
                     name="impact"
                     class="h-[94px] w-full rounded-[30px] border border-[#001349] px-6 py-4 outline-none resize-none"
-                    placeholder="Masukkan keberdampakan"
+                    placeholder="Masukkan Keberdampakan apabila produk sudah memiliki kebermanfaatan baik itu untuk institusi, perusahaan, maupun masyarakat"
                 >{{ old('impact') }}</textarea>
             </div>
 
@@ -275,6 +352,134 @@ document.getElementById('imageInput').addEventListener('change', function (e) {
     document.getElementById('finalInput').files = dataTransfer.files;
 });
 </script>
+
+<script>
+let innovatorIndex = 1;
+
+function addInnovator() {
+    const wrapper = document.getElementById('innovators-wrapper');
+
+    const html = `
+    <div class="innovator-item grid grid-cols-1 md:grid-cols-2 gap-3">
+
+        <!-- ROW 1: INNOVATOR BARU -->
+        <input
+            type="text"
+            name="innovators[${innovatorIndex}][name]"
+            placeholder="Ketik nama innovator (jika baru)"
+            class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 outline-none"
+        >
+
+        <select
+            name="innovators[${innovatorIndex}][faculty_new]"
+            class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 bg-white outline-none"
+        >
+            <option value="">Pilih Fakultas</option>
+            @foreach($faculties as $faculty)
+                <option value="{{ $faculty->id }}">{{ $faculty->name }}</option>
+            @endforeach
+        </select>
+
+        <!-- ROW 2: INNOVATOR EXISTING -->
+        <select
+            name="innovators[${innovatorIndex}][innovator_id]"
+            class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 bg-white outline-none"
+        >
+            <option value="">Atau pilih innovator yang sudah ada</option>
+            @foreach ($innovators as $innovator)
+                <option
+                    value="{{ $innovator->id }}"
+                    data-faculty-id="{{ $innovator->faculty_id }}"
+                >
+                    {{ $innovator->name }}
+                </option>
+            @endforeach
+        </select>
+
+        <select
+            name="innovators[${innovatorIndex}][faculty_id]"
+            class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 bg-white outline-none"
+        >
+            <option value="">Pilih Fakultas</option>
+            @foreach($faculties as $faculty)
+                <option value="{{ $faculty->id }}">{{ $faculty->name }}</option>
+            @endforeach
+        </select>
+
+    </div>
+    `;
+
+    wrapper.insertAdjacentHTML('beforeend', html);
+    innovatorIndex++;
+}
+
+</script>
+
+
+
+
+
+<script>
+document.addEventListener('change', function (e) {
+    if (!e.target.matches('select[name$="[innovator_id]"]')) return;
+
+    const select = e.target;
+    const row = select.closest('.innovator-item');
+    const facultySelect = row.querySelector(
+        'select[name$="[faculty_id]"]'
+    );
+
+    const option = select.options[select.selectedIndex];
+
+    if (option && option.dataset.facultyId) {
+        facultySelect.value = option.dataset.facultyId;
+    } else {
+        facultySelect.value = '';
+    }
+});
+</script>
+
+
+
+
+
+
+
+
+
+<script>
+function handleHkiStatus(value) {
+    const reg = document.getElementById('hki_registration');
+    const patent = document.getElementById('hki_patent');
+
+    reg.classList.add('hidden');
+    patent.classList.add('hidden');
+
+    if (value === 'terdaftar') {
+        reg.classList.remove('hidden');
+    }
+
+    if (value === 'granted') {
+        patent.classList.remove('hidden');
+    }
+}
+</script>
+
+<script>
+function handleCategory(value) {
+    const other = document.getElementById('category_other');
+
+    if (value === 'other') {
+        other.classList.remove('hidden');
+    } else {
+        other.classList.add('hidden');
+        other.value = '';
+    }
+}
+</script>
+
+
+
 
 
 

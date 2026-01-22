@@ -49,12 +49,12 @@
     {{-- ADVANCED FILTER (HIDDEN) --}}
     <div id="advancedFilter"
          class="mx-auto max-w-[1000px]
-                mt-4 hidden
+                mt-4 
                 rounded-[20px]
                 bg-[#F9F9F9]
                 px-6 py-4">
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
             {{-- Kategori --}}
             <select name="category" form="searchForm"
@@ -76,6 +76,18 @@
                     <option value="{{ $faculty->id }}"
                         @selected(request('faculty_id') == $faculty->id)>
                         {{ $faculty->name }}
+                    </option>
+                @endforeach
+            </select>
+
+            {{-- Innovator --}}
+            <select name="innovator_id" form="searchForm"
+                class="rounded-full px-5 py-2 outline-none">
+                <option value="">Semua Innovator</option>
+                @foreach ($innovators as $innovator)
+                    <option value="{{ $innovator->id }}"
+                        @selected(request('innovator_id') == $innovator->id)>
+                        {{ $innovator->name }}
                     </option>
                 @endforeach
             </select>
