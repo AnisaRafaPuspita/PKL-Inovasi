@@ -101,80 +101,29 @@ class InnovationController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-        'title' => ['required', 'string', 'max:255'],
+            'title' => ['required', 'string', 'max:255'],
+            'innovators' => ['required', 'array', 'min:1'],
 
-        'innovators' => ['required', 'array', 'min:1'],
-        'innovators.*.innovator_id' => ['nullable', 'exists:innovators,id'],
-        'innovators.*.name' => ['nullable', 'string', 'max:255'],
+            'innovators.*.innovator_id' => ['nullable', 'exists:innovators,id'],
+            'innovators.*.name' => ['nullable', 'string', 'max:255'],
+            'innovators.*.faculty_id' => ['nullable', 'exists:faculties,id'],
 
-        // fakultas wajib kalau innovator baru (tidak pilih existing)
-        'innovators.*.faculty_id' => [
-            'nullable',
-            'exists:faculties,id',
-            function ($attr, $value, $fail) use ($request) {
-                $parts = explode('.', $attr);       
-                $index = $parts[1] ?? null;
-
-                $item = $request->input("innovators.$index", []);
-                $innovatorId = $item['innovator_id'] ?? null;
-                $name = trim((string)($item['name'] ?? ''));
-
-                if (empty($innovatorId) && $name !== '' && empty($value)) {
-                    $fail('Fakultas wajib diisi untuk innovator baru.');
-                }
-            }
-        ],
-
-        // FIELD LAIN
-        'category' => ['nullable', 'string', 'max:255'],
-        'category_other' => ['nullable', 'string', 'max:255'],
-        'partner' => ['nullable', 'string', 'max:255'],
-
-        // status paten
-        'hki_status' => ['nullable', 'in:terdaftar,on_process,granted'],
-        'hki_registration_number' => ['nullable', 'string', 'max:255'],
-        'hki_patent_number' => ['nullable', 'string', 'max:255'],
-
-        // link (opsional tapi harus valid kalau diisi)
-        'video_url' => ['nullable', 'url', 'max:255'],
-
-        'description' => ['nullable', 'string'],
-        'advantages' => ['nullable', 'string'],
-        'impact' => ['nullable', 'string'],
-
-        // images
-        'images' => ['nullable', 'array'],
-        'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-    ]);
+            'category' => ['nullable', 'string'],
+            'category_other' => ['nullable', 'string', 'max:255'],
+            'partner' => ['nullable', 'string'],
+            'hki_status' => ['nullable', 'string'],
+            'video_url' => ['nullable', 'url'],
+            'description' => ['nullable', 'string'],
+            'advantages' => ['nullable', 'string'],
+            'impact' => ['nullable', 'string'],
+            'images.*' => ['image'],
+            'hki_registration_number' => ['nullable', 'string'],
+            'hki_patent_number' => ['nullable', 'string'],
+        ]);
 
 
 
-        $innovatorId = null;
-
-        $hasPick = $request->filled('innovator_id');
-        $hasNew = $request->filled('new_innovator_name');
-
-        if (!$hasPick && !$hasNew) {
-            return back()
-                ->withErrors(['innovator_id' => 'Pilih innovator atau isi nama innovator baru.'])
-                ->withInput();
-        }
-
-        if ($hasNew) {
-            $request->validate([
-                'faculty_id' => ['required', 'exists:faculties,id'],
-            ]);
-
-            $innovator = Innovator::create([
-                'name' => $request->input('new_innovator_name'),
-                'faculty_id' => $request->input('faculty_id'),
-                'status' => 'pending',
-            ]);
-
-            $innovatorId = $innovator->id;
-        } else {
-            $innovatorId = $validated['innovator_id'];
-        }
+        
 
         $innovation = Innovation::create([
             'title' => $validated['title'],
@@ -197,19 +146,32 @@ class InnovationController extends Controller
 
         foreach ($request->innovators as $item) {
 
+            // existing innovator
             if (!empty($item['innovator_id'])) {
-                // existing innovator → ambil dari DB
                 $innovator = Innovator::findOrFail($item['innovator_id']);
-            } else {
-                // innovator baru → pakai input fakultas
+            }
+            // innovator baru
+            else {
+                if (empty($item['name']) || empty($item['faculty_id'])) {
+                    return back()
+                        ->withErrors([
+                            'innovators' => 'Nama dan Fakultas wajib diisi untuk innovator baru.'
+                        ])
+                        ->withInput();
+                }
+
                 $innovator = Innovator::create([
                     'name' => $item['name'],
                     'faculty_id' => $item['faculty_id'],
+                    'status' => 'pending',
                 ]);
             }
 
             $innovation->innovators()->syncWithoutDetaching($innovator->id);
         }
+
+
+
 
 
 
@@ -224,7 +186,7 @@ class InnovationController extends Controller
             }
         }
 
-        $innovation->innovators()->syncWithoutDetaching([$innovatorId]);
+        
 
         InnovationPermission::firstOrCreate(
             ['innovation_id' => $innovation->id],

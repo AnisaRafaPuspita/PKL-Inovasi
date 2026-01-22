@@ -78,7 +78,7 @@ class AdminInnovationController extends Controller
 
     public function edit(Innovation $innovation)
     {
-        abort_if($innovation->source !== 'admin', 404);
+        abort_if(!in_array($innovation->source, ['admin', 'innovator']), 404);
 
         $innovation->load(['innovators.faculty', 'images', 'primaryImage']);
 
@@ -91,9 +91,10 @@ class AdminInnovationController extends Controller
         ]);
     }
 
+
     public function update(Request $request, Innovation $innovation)
     {
-        abort_if($innovation->source !== 'admin', 404);
+        abort_if(!in_array($innovation->source, ['admin', 'innovator']), 404);
 
         $data = $this->validateInnovation($request);
 
