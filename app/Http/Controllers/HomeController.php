@@ -19,11 +19,21 @@ class HomeController extends Controller
         // impact innovations (published & is_impact)
         $impactInnovations = Innovation::query()
             ->where('status', 'published')
+            ->whereHas('permission', fn ($q) => $q->where('status', 'accepted'))
             ->where('is_impact', true)
             ->latest()
             ->get();
 
-        $innovations = Innovation::where('is_impact', false)->latest()->get();
+
+        $innovations = Innovation::query()
+            ->where('status', 'published')
+            ->whereHas('permission', function ($q) {
+                $q->where('status', 'accepted');
+            })
+            ->where('is_impact', false)
+            ->latest()
+            ->get();
+
 
         // most visited
         $mostVisited = Innovation::query()
