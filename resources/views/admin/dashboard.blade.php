@@ -5,7 +5,6 @@
 @section('content')
     <h1 class="mb-4" style="font-weight:900;color:#061a4d;">Welcome admin!</h1>
 
-    {{-- Stat cards --}}
     <div class="row g-3 mb-4">
         <div class="col-12 col-lg-4">
             <div class="stat-card">
@@ -13,7 +12,9 @@
                     <div class="stat-title">Total Innovations</div>
                     <div class="stat-value">{{ number_format($stats['total_innovations']) }}</div>
                 </div>
-                <div class="icon-badge">💡</div>
+                <div style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid #0B2A6F;border-radius:8px;flex:0 0 32px;overflow:hidden;margin-left:auto;">
+                    <img src="{{ asset('images/total-innovation.svg') }}" alt="Total Innovations" style="width:16px;height:16px;display:block;object-fit:contain;">
+                </div>
             </div>
         </div>
 
@@ -23,7 +24,9 @@
                     <div class="stat-title">Total Innovators</div>
                     <div class="stat-value">{{ number_format($stats['total_innovators']) }}</div>
                 </div>
-                <div class="icon-badge">👥</div>
+                <div style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid #0B2A6F;border-radius:8px;flex:0 0 32px;overflow:hidden;margin-left:auto;">
+                    <img src="{{ asset('images/total-innovators.svg') }}" alt="Total Innovators" style="width:16px;height:16px;display:block;object-fit:contain;">
+                </div>
             </div>
         </div>
 
@@ -33,12 +36,13 @@
                     <div class="stat-title">Total Visited</div>
                     <div class="stat-value">{{ number_format($stats['total_visited']) }}</div>
                 </div>
-                <div class="icon-badge">👁️</div>
+                <div style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid #0B2A6F;border-radius:8px;flex:0 0 32px;overflow:hidden;margin-left:auto;">
+                    <img src="{{ asset('images/total-visited.svg') }}" alt="Total Visited" style="width:16px;height:16px;display:block;object-fit:contain;">
+                </div>
             </div>
         </div>
     </div>
 
-    {{-- Chart --}}
     <div class="panel mb-4">
         <div class="section-title">Innovations Views Over Time</div>
         <div style="height:360px;">
@@ -48,7 +52,6 @@
         </div>
     </div>
 
-    {{-- Innovator of the month --}}
     <div class="panel">
         <div class="section-title">Innovator of The Month</div>
 
@@ -66,8 +69,6 @@
                     <p class="iom-text">Nama: {{ $innovatorOfMonth?->innovator?->name ?? '-' }}</p>
                     <p class="iom-text">Fakultas: {{ $innovatorOfMonth?->innovator?->faculty?->name ?? '-' }}</p>
 
-
-                    {{-- inovasi ditampilin dari relasi (kalau kamu bikin relasi innovation()) --}}
                     @if(!empty($innovatorOfMonth?->innovation?->title))
                         <p class="iom-text">Nama Inovasi: {{ $innovatorOfMonth->innovation->title }}</p>
                     @else
