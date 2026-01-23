@@ -21,6 +21,7 @@ class InnovationController extends Controller
 
         $baseQuery = Innovation::query()
             ->where('status', 'published')
+            ->whereHas('permission', fn ($q) => $q->where('status', 'accepted'))
             ->when($q, function ($query) use ($q) {
                 $query->where(function ($sub) use ($q) {
                     $sub->where('title', 'like', "%{$q}%")

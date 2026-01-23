@@ -51,7 +51,10 @@ class AdminPermissionController extends Controller
             ['status' => 'declined', 'reviewed_at' => now()]
         );
 
-        $innovation->update(['status' => 'draft']);
+        $innovation->update([
+            'status' => 'draft',
+            'review' => 'Ditolak admin'
+        ]);
 
         return redirect()
             ->route('admin.permissions.index')
