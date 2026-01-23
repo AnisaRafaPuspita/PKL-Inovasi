@@ -16,7 +16,7 @@
       </h1>
     </div>
 
-    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
+    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 items-start">
       {{-- FOTO --}}
       <div class="rounded-[20px] border border-[#8D8585] p-6">
         <div class="h-[220px] md:h-[260px] rounded-[16px] bg-gray-100 overflow-hidden flex items-center justify-center">
@@ -37,25 +37,41 @@
       <div class="rounded-[20px] border border-[#8D8585] p-6">
         <div class="space-y-5" style="font-family: Inter, sans-serif;">
           <div>
-            <div class="text-gray-700">Nama</div>
-            <div class="mt-1 text-[18px] md:text-[20px] font-semibold text-[#001349]">
+            <div class="text-[#001349] font-semibold text-[18px] md:text-[20px]"
+                style="font-family: Inter, sans-serif;">
+              Nama
+            </div>
+            <div class="mt-1 text-gray-800 font-medium text-[16px] md:text-[18px]"
+                style="font-family: Inter, sans-serif;">
               {{ $iom->innovator?->name ?? '-' }}
             </div>
           </div>
 
+
+
           <div>
-            <div class="text-gray-700">Fakultas</div>
-            <div class="mt-1 text-[18px] md:text-[20px] font-semibold text-[#001349]">
+            <div class="text-[#001349] font-semibold text-[18px] md:text-[20px]"
+                style="font-family: Inter, sans-serif;">
+              Fakultas
+            </div>
+            <div class="mt-1 text-gray-800 font-medium text-[16px] md:text-[18px]"
+                style="font-family: Inter, sans-serif;">
               {{ $iom->innovator?->faculty?->name ?? '-' }}
             </div>
           </div>
 
+
           <div>
-            <div class="text-gray-700">Deskripsi</div>
-            <div class="mt-1 text-[18px] md:text-[20px] font-semibold text-[#001349]">
+            <div class="text-[#001349] font-semibold text-[18px] md:text-[20px]"
+                style="font-family: Inter, sans-serif;">
+              Deskripsi
+            </div>
+            <div class="mt-1 text-gray-800 font-medium text-[15px] md:text-[17px] leading-relaxed"
+                style="font-family: Inter, sans-serif;">
               {{ $iom->description ?? '-' }}
             </div>
           </div>
+
         </div>
       </div>
     </div>
@@ -63,15 +79,17 @@
 
   {{-- CARD 2: Featured Innovation --}}
   <div class="mt-8 rounded-[30px] border border-[#8D8585] bg-white p-6 md:p-10">
-    <h2 class="text-[22px] md:text-[26px] font-medium" style="font-family: Inter, sans-serif;">
+    <h2 class="text-[#001349] font-semibold text-[26px] md:text-[26px]" style="font-family: Inter, sans-serif;">
       Featured Innovation
     </h2>
 
     @if($featuredInnovation)
-      <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
-        {{-- KIRI: info --}}
+      <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 item-start">
+        {{-- KIRI: INFO --}}
         <div>
-          <div class="text-[20px] md:text-[26px] font-light" style="font-family: Inter, sans-serif;">
+
+          <div class="text-[20px] md:text-[26px] font-light"
+              style="font-family: Inter, sans-serif;">
             {{ $featuredInnovation->title }}
           </div>
 
@@ -84,100 +102,116 @@
             </span>
           </div>
 
-          <div class="mt-6 text-[14px] md:text-[16px] text-gray-700 leading-relaxed" style="font-family: Inter, sans-serif;">
-            <div class="font-medium text-gray-900">Description</div>
-            <div class="mt-1">{{ $featuredInnovation?->description ?? '-'  }}</div>
-
-            <div class="mt-4 font-medium text-gray-900">Achievements</div>
-            <div class="mt-1">{{ $featuredInnovation->advantages ?? '-' }}</div>
+          {{-- DESCRIPTION --}}
+          <div class="mt-6">
+            <div class="text-[#001349] font-semibold text-[16px] md:text-[18px]"
+                style="font-family: Inter, sans-serif;">
+              Description
+            </div>
+            <div class="mt-1 text-gray-800 font-medium text-[14px] md:text-[15px] leading-relaxed"
+                style="font-family: Inter, sans-serif;">
+              {{ $featuredInnovation->description ?? '-' }}
+            </div>
           </div>
 
-          {{-- Keberdampakan --}}
-          <div class="mt-6 rounded-[20px] bg-[#1A6ECE]/10 border border-[#8D8585] p-6">
-            <div class="text-[16px] font-medium text-gray-900">Keberdampakan</div>
-            <div class="mt-2 text-gray-700">
+          {{-- ACHIEVEMENTS --}}
+          <div class="mt-4">
+            <div class="text-[#001349] font-semibold text-[16px] md:text-[18px]"
+                style="font-family: Inter, sans-serif;">
+              Achievements
+            </div>
+            <div class="mt-1 text-gray-800 font-medium text-[14px] md:text-[15px] leading-relaxed"
+                style="font-family: Inter, sans-serif;">
+              {{ $featuredInnovation->advantages ?? '-' }}
+            </div>
+          </div>
+
+          {{-- BUTTON --}}
+          <div class="mt-6">
+            <a href="{{ route('innovations.show', $featuredInnovation->id) }}"
+              class="inline-flex rounded-[30px] bg-[#001349] px-8 py-3 text-white text-[16px] font-medium">
+              Lihat Detail Inovasi
+            </a>
+          </div>
+
+        </div>
+
+        {{-- KANAN: FOTO + KEBERDAMPAKAN --}}
+        <div class="flex flex-col gap-6">
+
+          {{-- FOTO INOVASI --}}
+          <div class="rounded-[20px] border border-[#8D8585] bg-white p-6">
+            <div class="relative h-[260px] overflow-hidden rounded-[16px]">
+
+              @php
+                $images = $featuredInnovation->images->count()
+                    ? $featuredInnovation->images
+                    : ($featuredInnovation->image_url
+                        ? collect([(object)['image_path' => $featuredInnovation->image_url]])
+                        : collect());
+              @endphp
+
+              @if($images->count())
+                <div
+                  id="slider-{{ $featuredInnovation->id }}"
+                  class="flex h-full transition-transform duration-300 ease-in-out"
+                  data-index="0"
+                >
+                  @foreach ($images as $img)
+                    <img
+                      src="{{ asset('storage/' . $img->image_path) }}"
+                      class="min-w-full h-full object-cover"
+                      alt="Featured Innovation"
+                    >
+                  @endforeach
+                </div>
+
+                @if ($images->count() > 1)
+                  <button
+                    type="button"
+                    class="slide-btn absolute left-3 top-1/2 -translate-y-1/2
+                          bg-black/50 text-white w-8 h-8 rounded-full z-10"
+                    data-id="{{ $featuredInnovation->id }}"
+                    data-dir="-1"
+                  >
+                    &lsaquo;
+                  </button>
+
+                  <button
+                    type="button"
+                    class="slide-btn absolute right-3 top-1/2 -translate-y-1/2
+                          bg-black/50 text-white w-8 h-8 rounded-full z-10"
+                    data-id="{{ $featuredInnovation->id }}"
+                    data-dir="1"
+                  >
+                    &rsaquo;
+                  </button>
+                @endif
+
+              @else
+                <div class="h-full flex items-center justify-center text-gray-400">
+                  Gambar inovasi belum tersedia
+                </div>
+              @endif
+
+            </div>
+          </div>
+
+          {{-- KEBERDAMPAKAN --}}
+          <div class="rounded-[20px] bg-[#1A6ECE]/10 border border-[#8D8585] p-6">
+            <div class="text-[#001349] font-semibold text-[16px] md:text-[18px]"
+                style="font-family: Inter, sans-serif;">
+              Keberdampakan
+            </div>
+
+            <div class="mt-2 text-gray-800 font-medium text-[14px] md:text-[15px] leading-relaxed"
+                style="font-family: Inter, sans-serif;">
               {{ $featuredInnovation->impact ?? '-' }}
             </div>
           </div>
 
-          {{-- Tombol --}}
-          <div class="mt-6">
-            <a href="{{ route('innovations.show', $featuredInnovation->id) }}"
-               class="inline-flex rounded-[30px] bg-[#001349] px-8 py-3 text-white text-[16px] font-medium">
-              Lihat Detail Inovasi
-            </a>
-          </div>
         </div>
 
-        {{-- KANAN: foto innovation --}}
-        <div class="rounded-[20px] border border-[#8D8585] p-6">
-          <div class="relative h-[220px] md:h-[260px] overflow-hidden rounded-[16px]">
-
-            {{-- FEATURED INNOVATION IMAGE SLIDER --}}
-            @if($featuredInnovation)
-              @php
-                  $images = $featuredInnovation->images->count()
-                      ? $featuredInnovation->images
-                      : ($featuredInnovation->image_url
-                          ? collect([(object)['image_path' => $featuredInnovation->image_url]])
-                          : collect());
-              @endphp
-
-              <div class="relative h-[300px] overflow-hidden rounded-[20px] border">
-
-                  @if($images->count())
-                      <div
-                          id="slider-featured-{{ $featuredInnovation->id }}"
-                          class="flex h-full transition-transform duration-300 ease-in-out"
-                          data-index="0"
-                      >
-                          @foreach ($images as $img)
-                              <img
-                                  src="{{ asset('storage/'.$img->image_path) }}"
-                                  class="min-w-full h-full object-cover"
-                                  alt="Featured Innovation"
-                              >
-                          @endforeach
-                      </div>
-
-                      @if ($images->count() > 1)
-                          <button
-                              type="button"
-                              class="slide-btn absolute left-3 top-1/2 -translate-y-1/2
-                                    bg-black/50 text-white w-8 h-8 rounded-full z-10"
-                              data-id="featured-{{ $featuredInnovation->id }}"
-                              data-dir="-1"
-                          >
-                              &lsaquo;
-                          </button>
-
-                          <button
-                              type="button"
-                              class="slide-btn absolute right-3 top-1/2 -translate-y-1/2
-                                    bg-black/50 text-white w-8 h-8 rounded-full z-10"
-                              data-id="featured-{{ $featuredInnovation->id }}"
-                              data-dir="1"
-                          >
-                              &rsaquo;
-                          </button>
-                      @endif
-                  @else
-                      <div class="h-full flex items-center justify-center text-gray-400">
-                          Gambar inovasi belum tersedia
-                      </div>
-                  @endif
-
-              </div>
-          @else
-              <div class="h-[300px] flex items-center justify-center text-gray-400">
-                  Inovasi unggulan belum dipilih
-              </div>
-          @endif
-
-
-                
-          </div>
-        </div>
       </div>
     @else
       <p class="mt-3 text-gray-500" style="font-family: Inter, sans-serif;">
@@ -188,3 +222,29 @@
 
 </section>
 @endsection
+
+<script>
+document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.slide-btn');
+    if (!btn) return;
+
+    const id = btn.dataset.id;
+    const direction = parseInt(btn.dataset.dir);
+
+    slideCard(id, direction);
+});
+
+function slideCard(id, direction) {
+    const slider = document.getElementById('slider-' + id);
+    if (!slider) return;
+
+    const total = slider.children.length;
+    let index = parseInt(slider.dataset.index || 0);
+
+    index = (index + direction + total) % total;
+    slider.dataset.index = index;
+
+    slider.style.transform = `translateX(-${index * 100}%)`;
+}
+</script>
+

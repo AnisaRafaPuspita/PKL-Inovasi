@@ -29,7 +29,7 @@
         {{-- Image card --}}
         <div class="rounded-[30px] border border-[#8D8585] bg-white p-6 md:p-8">
             {{-- IMAGE CARD SLIDER --}}
-            <div class="relative h-[215px] overflow-hidden rounded-[20px]">
+            <div class="relative h-[215px] overflow-hidden rounded-[20px] bg-gray-100">
 
                 @php
                     $images = $innovation->images->count()
@@ -45,11 +45,13 @@
                     data-index="0"
                 >
                     @foreach ($images as $img)
-                        <img
-                            src="{{ asset('storage/' . $img->image_path) }}"
-                            class="min-w-full h-full object-cover"
-                            alt="Foto Inovasi"
-                        >
+                        <div class="min-w-full h-full flex items-center justify-center">
+                            <img
+                                src="{{ asset('storage/' . $img->image_path) }}"
+                                class="max-w-full max-h-full object-contain"
+                                alt="Foto Inovasi"
+                            >
+                        </div>
                     @endforeach
                 </div>
 
@@ -58,8 +60,7 @@
                         type="button"
                         class="slide-btn absolute left-2 top-1/2 -translate-y-1/2
                             bg-black/50 text-white w-8 h-8 rounded-full
-                            flex items-center justify-center
-                            z-10 pointer-events-auto"
+                            flex items-center justify-center z-10"
                         data-id="{{ $innovation->id }}"
                         data-dir="-1"
                     >
@@ -70,8 +71,7 @@
                         type="button"
                         class="slide-btn absolute right-2 top-1/2 -translate-y-1/2
                             bg-black/50 text-white w-8 h-8 rounded-full
-                            flex items-center justify-center
-                            z-10 pointer-events-auto"
+                            flex items-center justify-center z-10"
                         data-id="{{ $innovation->id }}"
                         data-dir="1"
                     >
@@ -79,6 +79,7 @@
                     </button>
                 @endif
             </div>
+
 
 
         </div>
@@ -104,12 +105,12 @@
                 </p>
 
                 <p class="mt-3">
-                    <span class="font-semibold text-[#001349]">Status HKI:</span>
+                    <span class="font-semibold text-[#001349]">Status Paten:</span>
                     <span class="font-light">{{ $innovation->hki_status ?? '-' }}</span>
                 </p>
 
                 <p class="mt-3">
-                    <span class="font-semibold text-[#001349]">Video URL:</span>
+                    <span class="font-semibold text-[#001349]">Link Inovasi:</span>
                     @if($innovation->video_url)
                         <a class="font-semibold text-[#1A6ECE] hover:underline break-all"
                            href="{{ $innovation->video_url }}" target="_blank" rel="noopener">
@@ -164,7 +165,8 @@
             style="font-family: Inter, sans-serif;">
                 Keberdampakan
             </div>
-            <div class="mt-3 text-[14px] md:text-[16px] font-light text-gray-800 leading-relaxed">
+            <div class="mt-3 text-[14px] md:text-[16px] font-light text-gray-800 leading-relaxed"
+                style="font-family: Inter, sans-serif;">
                 {{ $innovation->impact ?? '-' }}
             </div>
         </div>

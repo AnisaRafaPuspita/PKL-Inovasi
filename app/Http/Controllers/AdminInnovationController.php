@@ -205,7 +205,7 @@ class AdminInnovationController extends Controller
             'description' => 'nullable|string',
             'review' => 'nullable|string',
             'advantages' => 'nullable|string',
-            'impact' => 'nullable|string|max:255',
+            'impact' => 'nullable|string',
             'status' => 'nullable|in:published,draft',
         ]);
     }
