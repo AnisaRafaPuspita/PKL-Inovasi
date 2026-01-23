@@ -370,7 +370,9 @@
                 {{ $innovatorMonth?->innovator?->name ?? 'Nama' }}
             </div>
             <div class="mt-2">{{ $innovatorMonth?->innovator?->faculty?->name ?? 'Fakultas' }}</div>
-            <div class="mt-2">{{ \Illuminate\Support\Str::limit($innovatorMonth?->innovator?->bio ?? 'Deskripsi', 200) }}</div>
+            <div class="mt-2">
+            {{ \Illuminate\Support\Str::limit($innovatorMonth?->description ?? 'Deskripsi', 200) }}
+            </div>
 
             <div class="mt-4">
                 <a href="{{ route('innovator-month.show') }}"
