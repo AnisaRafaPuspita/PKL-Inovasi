@@ -2,7 +2,7 @@
 @section('title','Permission Innovations')
 
 @section('content')
-<h1 style="font-weight:900;color:#061a4d;">Permission Innovations</h1>
+<h1 style="font-weight:900;color:#061a4d;">Persetujuan Inovasi</h1>
 
 @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
@@ -12,7 +12,7 @@
     <table class="table table-bordered align-middle mb-0">
         <thead>
         <tr style="background:#061a4d;color:#fff;">
-            <th>Innovation Title</th>
+            <th>Judul Inovasi</th>
             <th style="width:160px;">Detail</th>
             <th style="width:220px;">Status</th>
         </tr>
@@ -35,9 +35,9 @@
 
                 <td class="text-center">
                     @if($permStatus === 'accepted')
-                        <span class="badge bg-success">Accepted</span>
+                        <span class="badge bg-success">Diterima</span>
                     @elseif($permStatus === 'declined')
-                        <span class="badge bg-danger">Declined</span>
+                        <span class="badge bg-danger">Ditolak</span>
                     @elseif($permStatus === 'pending')
                         <span class="badge bg-warning text-dark">Pending</span>
                     @else

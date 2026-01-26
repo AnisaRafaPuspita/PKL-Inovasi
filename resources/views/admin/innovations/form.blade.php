@@ -3,7 +3,7 @@
 
 @section('content')
 <h1 style="font-weight:900;color:#061a4d;">
-    Manage Innovations
+    Kelola Inovasi
 </h1>
 <p style="font-weight:700;color:#061a4d;">
     {{ $mode === 'create' ? 'Tambah Inovasi' : 'Edit Inovasi' }}
@@ -332,7 +332,7 @@ function handleHkiStatus(val){
   reg.style.display = 'none';
   pat.style.display = 'none';
 
-  if (val === 'terdaftar' || val === 'on_process') reg.style.display = 'block';
+  if (val === 'terdaftar') reg.style.display = 'block';
   if (val === 'granted') pat.style.display = 'block';
 }
 

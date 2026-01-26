@@ -2,7 +2,7 @@
 @section('title','Detail Innovation')
 
 @section('content')
-<h1 style="font-weight:900;color:#061a4d;">Manage Innovations</h1>
+<h1 style="font-weight:900;color:#061a4d;">Kelola Inovasi</h1>
 <p style="font-weight:700;color:#061a4d;">Detail</p>
 
 @if(session('success'))
@@ -76,7 +76,7 @@
       </h4>
 
       <div class="mb-1">
-        <b>Nama Innovator:</b>
+        <b>Nama Inovator:</b>
         @if($innovatorList->count())
           <ol style="margin:6px 0 0 18px;">
             @foreach($innovatorList as $inv)
@@ -103,7 +103,12 @@
         <div class="mb-1"><b>Nomor Paten:</b> {{ $innovation->hki_patent_number ?? '-' }}</div>
       @endif
 
-      <div class="mb-1"><b>Video URL:</b> {{ $innovation->video_url ?? '-' }}</div>
+      <div class="mb-1"><b>Link Inovasi:</b> {{ $innovation->video_url ?? '-' }}</div>
+      <div class="mb-1"><b>Deskripsi:</b> {{ $innovation->description ?? '-' }}</div>
+      <div class="mb-1"><b>Keunggulan:</b> {{ $innovation->advantages ?? '-' }}</div>
+
+
+
       <div class="mb-1"><b>Keberdampakan:</b> {{ $innovation->impact ?? '-' }}</div>
     </div>
 
@@ -145,7 +150,7 @@
           style="display:inline;">
       @csrf
       @method('DELETE')
-      <button type="submit" class="btn btn-same-height">Delete</button>
+      <button type="submit" class="btn btn-same-height">Hapus</button>
     </form>
   </div>
 </div>
@@ -204,7 +209,7 @@
         <input type="text" class="form-control mb-3" name="title" required
                value="{{ old('title', $innovation->title) }}">
 
-        <label class="fw-bold">Innovator</label>
+        <label class="fw-bold">Inovator</label>
 
         <div class="row g-2 align-items-start mb-2">
           <div class="col-12 col-md-6">
@@ -226,7 +231,7 @@
 
         <div class="mb-2">
           <select id="pick_innovator_id" class="form-select">
-            <option value="">Atau pilih innovator yang sudah ada</option>
+            <option value="">Atau pilih inovator yang sudah ada</option>
             @foreach($innovators as $inv)
               <option
                 value="{{ $inv->id }}"
@@ -312,7 +317,7 @@
           style="display:none;"
         >
 
-        <label class="fw-bold">Video URL</label>
+        <label class="fw-bold">Link Inovasi</label>
         <input type="text" class="form-control mb-3" name="video_url"
                value="{{ old('video_url', $innovation->video_url) }}">
 

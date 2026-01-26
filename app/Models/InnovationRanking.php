@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Innovation;
 
 class InnovationRanking extends Model
 {
@@ -14,18 +13,12 @@ class InnovationRanking extends Model
 
     protected $fillable = [
         'rank',
-        'innovation_id',
         'achievement',
-        'status',
+        'description',
         'image',
     ];
 
     protected $casts = [
         'rank' => 'integer',
     ];
-
-    public function innovation()
-    {
-        return $this->belongsTo(Innovation::class, 'innovation_id');
-    }
 }

@@ -36,9 +36,9 @@
     <div style="flex:1; min-width: 340px;">
 
       <div class="mb-3">
-        <label class="fw-bold">Pilih Innovator</label>
+        <label class="fw-bold">Pilih Inovator</label>
         <select name="innovator_id" id="innovator-select" class="form-select" required>
-          <option value="">-- pilih innovator --</option>
+          <option value="">-- pilih inovator --</option>
           @foreach($innovators as $innovator)
             <option value="{{ $innovator->id }}"
               @selected(old('innovator_id', $iotm?->innovator_id) == $innovator->id)>
@@ -49,11 +49,11 @@
         @error('innovator_id') <small class="text-danger">{{ $message }}</small> @enderror
       </div>
 
-      {{-- PILIH INOVASI (SATU SAJA) --}}
+      {{-- PILIH INOVASI --}}
       <div class="mb-3">
         <label class="fw-bold">Pilih Inovasi Unggulan</label>
         <select name="innovation_id" id="innovation-select" class="form-select">
-            <option value="">-- pilih inovasi unggulan --</option>
+            <option value="">-- Pilih Inovasi Unggulan --</option>
         </select>
         <small class="text-muted">
           * Satu inovasi yang ditampilkan sebagai highlight

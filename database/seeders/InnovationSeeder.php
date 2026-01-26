@@ -30,7 +30,7 @@ class InnovationSeeder extends Seeder
             'impact'      => 'Meningkatkan efisiensi pemupukan dan produktivitas panen.',
             'is_impact'   => 1,
             'status'      => 'published',
-            'views_count' => 15434,
+            'views_count' => 0,
             'image_url'   => 'https://placehold.co/450x399',
         ]);
 
@@ -46,7 +46,7 @@ class InnovationSeeder extends Seeder
             'impact'      => 'Mengurangi limbah minyak jelantah dan menyediakan alternatif energi bersih.',
             'is_impact'   => 1,
             'status'      => 'published',
-            'views_count' => 9821,
+            'views_count' => 0,
             'image_url'   => 'https://placehold.co/450x399',
         ]);
 
@@ -62,7 +62,7 @@ class InnovationSeeder extends Seeder
             'impact'      => 'Membantu deteksi dini dan monitoring kesehatan.',
             'is_impact'   => 0,
             'status'      => 'published',
-            'views_count' => 3112,
+            'views_count' => 0,
             'image_url'   => 'https://placehold.co/450x399',
         ]);
     }

@@ -21,6 +21,7 @@ class InnovationController extends Controller
 
         $baseQuery = Innovation::query()
             ->where('status', 'published')
+            ->whereHas('permission', fn ($q) => $q->where('status', 'accepted'))
             ->when($q, function ($query) use ($q) {
                 $query->where(function ($sub) use ($q) {
                     $sub->where('title', 'like', "%{$q}%")
@@ -43,23 +44,17 @@ class InnovationController extends Controller
             });
 
 
-        $impactInnovations = (clone $baseQuery)
-            ->impact()
-            ->with('images')
-            ->latest()
-            ->take(9)
-            ->get();
+        
 
-        $innovations = (clone $baseQuery)
-            ->product()
+        $innovations = $baseQuery
             ->with('images')
             ->latest()
             ->paginate(9);
 
+
         $innovations->appends($request->query());
 
         return view('pages.innovations.index', [
-            'impactInnovations' => $impactInnovations,
             'innovations' => $innovations,
             'q' => $q,
             'category' => $category,

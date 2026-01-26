@@ -3,7 +3,7 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 style="font-weight:900;color:#061a4d;">Manage Innovations</h1>
+    <h1 style="font-weight:900;color:#061a4d;">Kelola Inovasi</h1>
 
     <a href="{{ route('admin.innovations.create') }}" class="btn btn-navy">
         + Tambah Inovasi
@@ -20,8 +20,8 @@
     <table class="table table-bordered align-middle mb-0">
         <thead style="background:#061a4d;color:#fff;">
             <tr>
-                <th>Innovation Title</th>
-                <th>Innovator</th>
+                <th>Judul Inovasi</th>
+                <th>Inovator</th>
                 <th style="width:140px;" class="text-center">Status</th>
                 <th style="width:120px;" class="text-center">Actions</th>
             </tr>

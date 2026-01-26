@@ -253,7 +253,7 @@
                 <img class="menu-icon"
                     src="{{ $isDash ? asset('images/dashboard-biru.png') : asset('images/dashboard-putih.png') }}"
                     alt="">
-                <span>Dashboard Overview</span>
+                <span>Dashboard</span>
             </a>
 
             {{-- Manage Innovations --}}
@@ -265,7 +265,7 @@
                 <img class="menu-icon"
                      src="{{ $isManage ? asset('images/manage-biru.png') : asset('images/manage-putih.png') }}"
                      alt="">
-                <span>Manage Innovations</span>
+                <span>Kelola Inovasi</span>
             </a>
 
             {{-- Permission Innovations --}}
@@ -277,7 +277,7 @@
                 <img class="menu-icon"
                     src="{{ $isPermission ? asset('images/accept-biru.png') : asset('images/accept-putih.png') }}"
                     alt="">
-                <span>Permission Innovations</span>
+                <span>Persetujuan Inovasi</span>
             </a>
 
 
@@ -304,7 +304,7 @@
                 <img class="menu-icon"
                     src="{{ $isRanking ? asset('images/ranking-biru.png') : asset('images/ranking-putih.png') }}"
                     alt="">
-                <span>Innovation Ranking</span>
+                <span>Peringkat Inovasi</span>
             </a>
 
 

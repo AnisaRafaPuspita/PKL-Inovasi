@@ -2,7 +2,7 @@
 @section('title','Detail Permission')
 
 @section('content')
-<h1 style="font-weight:900;color:#061a4d;">Permission Innovations</h1>
+<h1 style="font-weight:900;color:#061a4d;">Persetujuan Inovasi</h1>
 <p style="font-weight:700;color:#061a4d;">Detail</p>
 
 @if(session('success'))
@@ -59,7 +59,7 @@
             @endif
 
             <div class="perm-row">
-                <b>Video URL:</b>
+                <b>Link Inovasi:</b>
                 <span class="val">
                     @if($innovation->video_url)
                         <a href="{{ $innovation->video_url }}" target="_blank" rel="noopener noreferrer">
@@ -101,9 +101,9 @@
 
                 <div class="ms-auto">
                     @if($permStatus === 'accepted')
-                        <span class="badge bg-success">Accepted</span>
+                        <span class="badge bg-success">Diterima</span>
                     @elseif($permStatus === 'declined')
-                        <span class="badge bg-danger">Declined</span>
+                        <span class="badge bg-danger">Ditolak</span>
                     @elseif($permStatus === 'pending')
                         <span class="badge bg-warning text-dark">Pending</span>
                     @else

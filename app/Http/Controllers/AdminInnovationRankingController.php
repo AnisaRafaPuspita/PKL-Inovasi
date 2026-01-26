@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Innovation;
 use App\Models\InnovationRanking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -11,18 +10,15 @@ class AdminInnovationRankingController extends Controller
 {
     public function index()
     {
-        $rankings = InnovationRanking::with('innovation')->orderBy('rank')->get();
+        $rankings = InnovationRanking::orderBy('rank')->get();
         return view('admin.rankings.index', compact('rankings'));
     }
 
     public function create()
     {
-        $innovations = Innovation::orderBy('title')->get();
-
         return view('admin.rankings.form', [
             'mode' => 'create',
             'ranking' => new InnovationRanking(),
-            'innovations' => $innovations,
         ]);
     }
 
@@ -30,9 +26,8 @@ class AdminInnovationRankingController extends Controller
     {
         $data = $request->validate([
             'rank' => 'required|integer|min:1|max:100',
-            'innovation_id' => 'required|exists:innovations,id',
             'achievement' => 'nullable|string|max:255',
-            'status' => 'required|in:active,inactive',
+            'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
@@ -44,17 +39,14 @@ class AdminInnovationRankingController extends Controller
 
         return redirect()
             ->route('admin.innovation_rankings.index')
-            ->with('success', 'Ranking berhasil ditambahkan.');
+            ->with('success', 'Peringkat berhasil ditambahkan.');
     }
 
     public function edit(InnovationRanking $ranking)
     {
-        $innovations = Innovation::orderBy('title')->get();
-
         return view('admin.rankings.form', [
             'mode' => 'edit',
             'ranking' => $ranking,
-            'innovations' => $innovations,
         ]);
     }
 
@@ -62,9 +54,8 @@ class AdminInnovationRankingController extends Controller
     {
         $data = $request->validate([
             'rank' => 'required|integer|min:1|max:100',
-            'innovation_id' => 'required|exists:innovations,id',
             'achievement' => 'nullable|string|max:255',
-            'status' => 'required|in:active,inactive',
+            'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
@@ -72,6 +63,7 @@ class AdminInnovationRankingController extends Controller
             if (!empty($ranking->image)) {
                 Storage::disk('public')->delete($ranking->image);
             }
+
             $data['image'] = $request->file('image')->store('rankings', 'public');
         }
 
@@ -79,7 +71,7 @@ class AdminInnovationRankingController extends Controller
 
         return redirect()
             ->route('admin.innovation_rankings.index')
-            ->with('success', 'Ranking berhasil diperbarui.');
+            ->with('success', 'Peringkat berhasil diperbarui.');
     }
 
     public function destroy(InnovationRanking $ranking)
@@ -92,6 +84,6 @@ class AdminInnovationRankingController extends Controller
 
         return redirect()
             ->route('admin.innovation_rankings.index')
-            ->with('success', 'Ranking berhasil dihapus.');
+            ->with('success', 'Peringkat berhasil dihapus.');
     }
 }
