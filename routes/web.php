@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InnovationController;
 use App\Http\Controllers\InnovatorOfMonthController;
 use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\RankingController;
 
 
 /*
@@ -49,5 +50,10 @@ Route::get('/admin/login', fn () => 'Admin login page')
 Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
 Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login.submit');
 Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
+
+/* ========== RANGKINK =========== */ 
+Route::get('/rankings/{ranking}', [RankingController::class, 'show'])
+    ->name('rankings.show');
+
 
 

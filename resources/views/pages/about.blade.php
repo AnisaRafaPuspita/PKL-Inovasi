@@ -22,8 +22,7 @@
     <div class="mt-8 max-w-5xl mx-auto text-[20px] font-normal text-justify" style="font-family:'Source Serif Pro', serif;">
         Universitas Diponegoro sebagai salah satu Perguruan Tinggi Negeri Berbadan Hukum di Indonesia, memiliki Visi besar, yaitu “Universitas Diponegoro Menjadi Universitas Riset yang Unggul”. Dalam mencapai visi tersebut, telah ditetapkan dalam misi-misinya, yang diantaranya adalah dengan Menyelenggarakan penelitian yang menghasilkan publikasi, Hak Atas Kekayaan Intelektual (HAKI), buku ajar, kebijakan dan teknologi yang berhasil guna dan berdaya guna dengan mengedepankan budaya dan sumber daya lokal; dan juga dengan Menyelenggarakan pengabdian kepada masyarakat yang menghasilkan publikasi, Hak Atas Kekayaan Intelektual (HAKI), buku ajar, kebijakan dan teknologi yang berhasil guna dan berdaya guna dengan mengedepankan budaya dan sumber daya lokal. Untuk mencapai tujuan mulia tersebut, Undip akan terus mendukung penelitian yang dapat bermanfaat bagi masyarakat, dan juga mendorong untuk dapat terimplementasinya hasil penelitian yang telah dilaksanakan untuk masyarakat yang luas.
         <br><br>
-        Dalam implementasinya, Undip telah memberikan berbagai pengaplikasian hasil penelitian terhadap masyarakat, seperti halnya dalam menciptakan berbagai Inovasi yang dapat membantu kehidupan manusia. Berikut adalah rincian hasil inovasi dari para peneliti Undip, secara spesifik adalah output dari Matching Fund Kedaireka 2022 dan juga 2023
-    </div>
+        Dalam implementasinya, Undip telah memberikan berbagai pengaplikasian hasil penelitian terhadap masyarakat, seperti halnya dalam menciptakan berbagai Inovasi yang dapat membantu kehidupan manusia. 
 </section>
 @endsection
 
