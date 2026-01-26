@@ -332,7 +332,7 @@ function handleHkiStatus(val){
   reg.style.display = 'none';
   pat.style.display = 'none';
 
-  if (val === 'terdaftar' || val === 'on_process') reg.style.display = 'block';
+  if (val === 'terdaftar') reg.style.display = 'block';
   if (val === 'granted') pat.style.display = 'block';
 }
 
