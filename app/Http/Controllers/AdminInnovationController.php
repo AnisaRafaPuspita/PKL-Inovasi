@@ -165,7 +165,7 @@ class AdminInnovationController extends Controller
 
     public function destroy(Innovation $innovation)
     {
-        abort_if($innovation->source !== 'admin', 404);
+        abort_if(!in_array($innovation->source, ['admin', 'innovator']), 404);
 
         $innovation->load(['images', 'primaryImage']);
 
