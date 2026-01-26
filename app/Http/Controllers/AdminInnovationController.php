@@ -7,6 +7,7 @@ use App\Models\Innovator;
 use App\Models\Faculty;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Models\InnovationPermission;
 
 class AdminInnovationController extends Controller
 {
@@ -31,6 +32,8 @@ class AdminInnovationController extends Controller
             'categories' => config('innovation.categories'),
         ]);
     }
+
+    
 
     public function store(Request $request)
     {
@@ -59,6 +62,11 @@ class AdminInnovationController extends Controller
         $data['status'] = $data['status'] ?? 'published';
 
         $innovation = Innovation::create($data);
+
+        InnovationPermission::firstOrCreate(
+            ['innovation_id' => $innovation->id],
+            ['status' => 'accepted']
+        );
 
         $innovatorIds = $this->collectInnovatorIdsFromPayload(
             $request->input('innovators_payload'),

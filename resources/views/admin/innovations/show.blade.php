@@ -103,7 +103,12 @@
         <div class="mb-1"><b>Nomor Paten:</b> {{ $innovation->hki_patent_number ?? '-' }}</div>
       @endif
 
-      <div class="mb-1"><b>Video URL:</b> {{ $innovation->video_url ?? '-' }}</div>
+      <div class="mb-1"><b>Link Inovasi:</b> {{ $innovation->video_url ?? '-' }}</div>
+      <div class="mb-1"><b>Deskripsi:</b> {{ $innovation->description ?? '-' }}</div>
+      <div class="mb-1"><b>Keunggulan:</b> {{ $innovation->advantages ?? '-' }}</div>
+
+
+
       <div class="mb-1"><b>Keberdampakan:</b> {{ $innovation->impact ?? '-' }}</div>
     </div>
 
@@ -312,7 +317,7 @@
           style="display:none;"
         >
 
-        <label class="fw-bold">Video URL</label>
+        <label class="fw-bold">Link Inovasi</label>
         <input type="text" class="form-control mb-3" name="video_url"
                value="{{ old('video_url', $innovation->video_url) }}">
 
