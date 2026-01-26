@@ -3,7 +3,7 @@
 
 @section('content')
 <h1 style="font-weight:900;color:#061a4d;">
-  {{ $mode === 'create' ? 'Tambah Peringkat Inovasi' : 'Detail Peringkat Inovasi' }}
+  {{ $mode === 'create' ? 'Tambah Peringkat Inovasi' : 'Ubah Peringkat Inovasi' }}
 </h1>
 
 <form method="POST"
@@ -12,7 +12,7 @@
           ? route('admin.innovation_rankings.store')
           : route('admin.innovation_rankings.update', $ranking->id) }}">
   @csrf
-  @if($mode === 'edit')
+  @if($mode !== 'create')
     @method('PUT')
   @endif
 
@@ -30,7 +30,7 @@
       </div>
 
       <div class="col-12 col-md-10">
-        <label class="fw-bold">Prestasi</label>
+        <label class="fw-bold">Nama Penghargaan</label>
         <input type="text"
                name="achievement"
                class="form-control"
@@ -49,20 +49,49 @@
       </div>
 
       <div class="col-12">
-        <label class="fw-bold">Gambar</label>
+        <label class="fw-bold">Sumber</label>
+        <input type="url"
+              name="reference_link"
+              class="form-control"
+              value="{{ old('reference_link', $ranking->reference_link) }}"
+              placeholder="https://www.ui-greenmetric.org/...">
+        @error('reference_link') <small class="text-danger">{{ $message }}</small> @enderror
+      </div>
+
+
+      <div class="col-12">
+        <label class="fw-bold">Logo</label>
         <input type="file"
-               name="image"
+               name="logo"
                class="form-control"
                accept="image/*"
-               onchange="previewImage(event)">
-        @error('image') <small class="text-danger">{{ $message }}</small> @enderror
+               onchange="previewImage(event, 'logoPreview')">
+        @error('logo') <small class="text-danger">{{ $message }}</small> @enderror
 
         <div class="mt-2">
-          <img id="imagePreview"
-               src="{{ !empty($ranking->image) ? asset('storage/'.$ranking->image) : '' }}"
-               class="{{ empty($ranking->image) ? 'd-none' : '' }}"
-               style="max-height:120px;border-radius:8px;"
-               alt="Preview Gambar">
+          <img id="logoPreview"
+               src="{{ !empty($ranking->logo) ? asset('storage/'.$ranking->logo) : '' }}"
+               class="{{ empty($ranking->logo) ? 'd-none' : '' }}"
+               style="max-height:100px;border-radius:8px;"
+               alt="Preview Logo">
+        </div>
+      </div>
+
+      <div class="col-12">
+        <label class="fw-bold">Pamflet<span class="text-muted">(opsional)</span></label>
+        <input type="file"
+               name="pamphlet"
+               class="form-control"
+               accept="image/*"
+               onchange="previewImage(event, 'pamphletPreview')">
+        @error('pamphlet') <small class="text-danger">{{ $message }}</small> @enderror
+
+        <div class="mt-2">
+          <img id="pamphletPreview"
+               src="{{ !empty($ranking->pamphlet) ? asset('storage/'.$ranking->pamphlet) : '' }}"
+               class="{{ empty($ranking->pamphlet) ? 'd-none' : '' }}"
+               style="max-height:140px;border-radius:8px;"
+               alt="Preview Pamflet">
         </div>
       </div>
 
@@ -79,8 +108,8 @@
 
 @push('scripts')
 <script>
-function previewImage(event) {
-  const img = document.getElementById('imagePreview');
+function previewImage(event, previewId) {
+  const img = document.getElementById(previewId);
   const file = event.target.files && event.target.files[0];
   if (!file) return;
 

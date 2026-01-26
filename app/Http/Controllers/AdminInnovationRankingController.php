@@ -26,14 +26,22 @@ class AdminInnovationRankingController extends Controller
     {
         $data = $request->validate([
             'rank' => 'required|integer|min:1|max:100',
-            'achievement' => 'nullable|string|max:255',
-            'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'achievement' => 'required|string|max:255',
+            'description' => 'required|string',
+            'logo' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'pamphlet' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
+            'reference_link' => 'required|url|max:255',
+
         ]);
 
-        if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('rankings', 'public');
+        if ($request->hasFile('logo')) {
+            $data['logo'] = $request->file('logo')->store('rankings', 'public');
         }
+
+        if ($request->hasFile('pamphlet')) {
+            $data['pamphlet'] = $request->file('pamphlet')->store('rankings', 'public');
+        }
+
 
         InnovationRanking::create($data);
 
@@ -54,17 +62,25 @@ class AdminInnovationRankingController extends Controller
     {
         $data = $request->validate([
             'rank' => 'required|integer|min:1|max:100',
-            'achievement' => 'nullable|string|max:255',
-            'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'achievement' => 'required|string|max:255',
+            'description' => 'required|string',
+            'logo' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'pamphlet' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
+            'reference_link' => 'required|url|max:255',
         ]);
 
-        if ($request->hasFile('image')) {
-            if (!empty($ranking->image)) {
-                Storage::disk('public')->delete($ranking->image);
+        if ($request->hasFile('logo')) {
+            if ($ranking->logo) {
+                Storage::disk('public')->delete($ranking->logo);
             }
+            $data['logo'] = $request->file('logo')->store('rankings', 'public');
+        }
 
-            $data['image'] = $request->file('image')->store('rankings', 'public');
+        if ($request->hasFile('pamphlet')) {
+            if ($ranking->pamphlet) {
+                Storage::disk('public')->delete($ranking->pamphlet);
+            }
+            $data['pamphlet'] = $request->file('pamphlet')->store('rankings', 'public');
         }
 
         $ranking->update($data);

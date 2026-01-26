@@ -12,11 +12,15 @@ class InnovationRanking extends Model
     protected $table = 'innovation_rankings';
 
     protected $fillable = [
-        'rank',
-        'achievement',
-        'description',
-        'image',
+    'rank',
+    'achievement',
+    'description',
+    'reference_link',
+    'logo',
+    'pamphlet',
     ];
+
+
 
     protected $casts = [
         'rank' => 'integer',

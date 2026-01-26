@@ -32,11 +32,11 @@ class AdminInnovatorOfTheMonthController extends Controller
     {
         $validated = $request->validate([
             'innovator_id' => ['required', 'exists:innovators,id'],
-            'innovation_id'=> ['nullable', 'exists:innovations,id'],
-            'description'  => ['nullable', 'string'],
+            'innovation_id'=> ['required', 'exists:innovations,id'],
+            'description'  => ['required', 'string'],
             'month'        => ['required', 'integer', 'min:1', 'max:12'],
             'year'         => ['required', 'integer'],
-            'photo'        => ['nullable', 'image'],
+            'photo'        => ['required', 'image'],
         ]);
 
         $iotm = InnovatorOfTheMonth::firstOrNew([

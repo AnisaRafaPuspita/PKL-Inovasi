@@ -19,12 +19,15 @@
     <thead>
       <tr style="background:#061a4d;color:#fff;">
         <th style="width:90px;">Peringkat</th>
-        <th style="width:320px;">Prestasi</th>
+        <th style="width:280px;">Prestasi</th>
         <th>Deskripsi</th>
-        <th style="width:140px;">Gambar</th>
+        <th style="width:160px;">Link Referensi</th>
+        <th style="width:120px;">Logo</th>
+        <th style="width:140px;">Pamflet</th>
         <th style="width:180px;">Aksi</th>
       </tr>
     </thead>
+
     <tbody>
       @forelse($rankings as $r)
         <tr>
@@ -41,13 +44,39 @@
           </td>
 
           <td class="text-center">
-            @if(!empty($r->image))
-              <img src="{{ asset('storage/'.$r->image) }}"
-                   style="height:44px;border-radius:8px;cursor:pointer;"
-                   alt="Preview"
+            @if(!empty($r->reference_link))
+              <a href="{{ $r->reference_link }}"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 class="btn btn-sm btn-outline-primary">
+                Lihat
+              </a>
+            @else
+              <span class="text-muted">-</span>
+            @endif
+          </td>
+
+          <td class="text-center">
+            @if(!empty($r->logo))
+              <img src="{{ asset('storage/'.$r->logo) }}"
+                   style="height:42px;border-radius:8px;cursor:pointer;"
+                   alt="Logo"
                    data-bs-toggle="modal"
                    data-bs-target="#imagePreviewModal"
-                   data-image="{{ asset('storage/'.$r->image) }}">
+                   data-image="{{ asset('storage/'.$r->logo) }}">
+            @else
+              <span class="text-muted">-</span>
+            @endif
+          </td>
+
+          <td class="text-center">
+            @if(!empty($r->pamphlet))
+              <img src="{{ asset('storage/'.$r->pamphlet) }}"
+                   style="height:54px;border-radius:8px;cursor:pointer;"
+                   alt="Pamflet"
+                   data-bs-toggle="modal"
+                   data-bs-target="#imagePreviewModal"
+                   data-image="{{ asset('storage/'.$r->pamphlet) }}">
             @else
               <span class="text-muted">-</span>
             @endif
@@ -68,14 +97,13 @@
         </tr>
       @empty
         <tr>
-          <td colspan="5" class="text-center text-muted">Belum ada peringkat.</td>
+          <td colspan="7" class="text-center text-muted">Belum ada peringkat.</td>
         </tr>
       @endforelse
     </tbody>
   </table>
 </div>
 
-<!-- Modal Preview Gambar -->
 <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
