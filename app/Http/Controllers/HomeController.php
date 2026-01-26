@@ -49,10 +49,7 @@ class HomeController extends Controller
             ->orderByDesc('month')
             ->first();
 
-        $rankings = InnovationRanking::with('innovation')
-            ->where('status', 'active')
-            ->orderBy('rank')
-            ->get();
+        $rankings = InnovationRanking::orderBy('rank')->get();
 
         $faculties = Faculty::orderBy('name')->get();
 

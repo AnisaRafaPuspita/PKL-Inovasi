@@ -424,7 +424,13 @@
 
                         <div>
                             <div class="text-[18px] md:text-[20px] font-semibold text-[#001349] leading-snug">
-                                {{ $rank->innovation->title ?? '-' }}
+                                @foreach ($rankings as $ranking)
+                                    <div class="ranking-item">
+                                        <h4>{{ $ranking->achievement }}</h4>
+                                        <p>{{ $ranking->description }}</p>
+                                    </div>
+                                @endforeach
+
                             </div>
 
                             <div class="mt-1 text-[13px] md:text-[14px] text-gray-700">
