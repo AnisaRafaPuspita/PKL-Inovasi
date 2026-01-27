@@ -12,17 +12,19 @@ class InnovationRanking extends Model
     protected $table = 'innovation_rankings';
 
     protected $fillable = [
-    'rank',
-    'achievement',
-    'description',
-    'reference_link',
-    'logo',
-    'pamphlet',
+        'rank',
+        'achievement',
+        'description',
+        'reference_link',
+        'logo',
     ];
-
-
 
     protected $casts = [
         'rank' => 'integer',
     ];
+
+    public function photos()
+    {
+        return $this->hasMany(InnovationRankingPhoto::class, 'innovation_ranking_id');
+    }
 }
