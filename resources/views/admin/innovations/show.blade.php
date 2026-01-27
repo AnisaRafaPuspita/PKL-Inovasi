@@ -2,7 +2,7 @@
 @section('title','Detail Innovation')
 
 @section('content')
-<h1 style="font-weight:900;color:#061a4d;">Manage Innovations</h1>
+<h1 style="font-weight:900;color:#061a4d;">Kelola Inovasi</h1>
 <p style="font-weight:700;color:#061a4d;">Detail</p>
 
 @if(session('success'))
@@ -22,8 +22,6 @@
 
 @php
   $photos = $innovation->images ?? collect();
-  $primary = $innovation->primaryImage ?? ($photos->firstWhere('is_primary', true) ?? $photos->first());
-
   $innovatorList = $innovation->relationLoaded('innovators')
       ? ($innovation->innovators ?? collect())
       : collect();
@@ -62,96 +60,119 @@
   }
 
   $categoryDisplay = $innovation->category ?? '-';
-
   if (($innovation->category ?? '') === 'other') {
     $categoryDisplay = 'Inovasi Lainnya';
   }
+
+  $showRegNumber = in_array(($innovation->hki_status ?? ''), ['terdaftar','on_process'], true)
+      && trim((string)($innovation->hki_registration_number ?? '')) !== '';
+
+  $showPatentNumber = (($innovation->hki_status ?? '') === 'granted')
+      && trim((string)($innovation->hki_patent_number ?? '')) !== '';
 @endphp
 
 <div class="panel mb-4">
-  <div class="d-flex justify-content-between align-items-start gap-3">
-    <div>
-      <h4 class="mb-2" style="font-weight:900;color:#061a4d;">
-        {{ $innovation->title }}
-      </h4>
+  <div class="row g-4 align-items-start">
+    <div class="col-12 col-lg-8">
+      <h3 class="page-title">{{ $innovation->title }}</h3>
 
-      <div class="mb-1">
-        <b>Nama Innovator:</b>
-        @if($innovatorList->count())
-          <ol style="margin:6px 0 0 18px;">
-            @foreach($innovatorList as $inv)
-              <li style="margin-bottom:4px;">
-                {{ $inv->name ?? '-' }}
-                <span style="color:#061a4d;opacity:.8;">- {{ $inv->faculty?->name ?? '-' }}</span>
-              </li>
+      <div class="info-grid">
+        <div class="label">Nama Inovator</div>
+        <div class="value">
+          @if($innovatorList->count())
+            <ol class="innovator-ol">
+              @foreach($innovatorList as $inv)
+                <li class="innovator-li">
+                  {{ $inv->name ?? '-' }}
+                  <span class="faculty">- {{ $inv->faculty?->name ?? '-' }}</span>
+                </li>
+              @endforeach
+            </ol>
+          @else
+            <span class="text-muted">-</span>
+          @endif
+        </div>
+
+        <div class="label">Kategori</div>
+        <div class="value">{{ $categoryDisplay }}</div>
+
+        <div class="label">Mitra</div>
+        <div class="value">{{ $innovation->partner ?? '-' }}</div>
+
+        <div class="label">Status Paten</div>
+        <div class="value">{{ $innovation->hki_status ?? '-' }}</div>
+
+        @if($showRegNumber)
+          <div class="label">Nomor Pendaftaran HKI</div>
+          <div class="value">{{ $innovation->hki_registration_number }}</div>
+        @endif
+
+        @if($showPatentNumber)
+          <div class="label">Nomor Paten</div>
+          <div class="value">{{ $innovation->hki_patent_number }}</div>
+        @endif
+
+        <div class="label">Link Inovasi</div>
+        <div class="value">
+          @if(!empty($innovation->video_url))
+            <a href="{{ $innovation->video_url }}" target="_blank" rel="noopener noreferrer">
+              {{ $innovation->video_url }}
+            </a>
+          @else
+            <span class="text-muted">-</span>
+          @endif
+        </div>
+      </div>
+
+      <div class="mt-3">
+        <div class="section-title">Deskripsi</div>
+        <div class="text-block">{{ $innovation->description ?? '-' }}</div>
+      </div>
+
+      <div class="mt-3">
+        <div class="section-title">Keunggulan</div>
+        <div class="text-block">{{ $innovation->advantages ?? '-' }}</div>
+      </div>
+
+      <div class="mt-3">
+        <div class="section-title">Keberdampakan</div>
+        <div class="text-block">{{ $innovation->impact ?? '-' }}</div>
+      </div>
+
+      <div class="mt-3 d-flex gap-2 flex-wrap">
+        <a href="{{ route('admin.innovations.index') }}" class="btn btn-outline-secondary">Kembali</a>
+
+        <button id="btnToggleEdit" class="btn btn-navy" type="button">Edit</button>
+
+        <form method="POST"
+              action="{{ route('admin.innovations.destroy', $innovation->id) }}"
+              onsubmit="return confirm('Yakin ingin menghapus inovasi ini?')"
+              style="display:inline;">
+          @csrf
+          @method('DELETE')
+          <button type="submit" class="btn btn-same-height">Hapus</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-4">
+      <div class="photo-card">
+        <div class="photo-title">Foto</div>
+
+        @if($photos->count())
+          <div class="photo-grid">
+            @foreach($photos as $img)
+              <a href="{{ asset('storage/'.$img->image_path) }}" target="_blank"
+                 rel="noopener noreferrer" class="photo-item">
+                <img src="{{ asset('storage/'.$img->image_path) }}" alt="Foto inovasi">
+              </a>
             @endforeach
-          </ol>
-        @else
-          -
-        @endif
-      </div>
-
-      <div class="mb-1"><b>Kategori:</b> {{ $categoryDisplay }}</div>
-      <div class="mb-1"><b>Mitra:</b> {{ $innovation->partner ?? '-' }}</div>
-      <div class="mb-1"><b>Status Paten:</b> {{ $innovation->hki_status ?? '-' }}</div>
-
-      @if(in_array(($innovation->hki_status ?? ''), ['terdaftar','on_process'], true))
-        <div class="mb-1"><b>Nomor Pendaftaran HKI:</b> {{ $innovation->hki_registration_number ?? '-' }}</div>
-      @endif
-
-      @if(($innovation->hki_status ?? '') === 'granted')
-        <div class="mb-1"><b>Nomor Paten:</b> {{ $innovation->hki_patent_number ?? '-' }}</div>
-      @endif
-
-      <div class="mb-1"><b>Link Inovasi:</b> {{ $innovation->video_url ?? '-' }}</div>
-      <div class="mb-1"><b>Deskripsi:</b> {{ $innovation->description ?? '-' }}</div>
-      <div class="mb-1"><b>Keunggulan:</b> {{ $innovation->advantages ?? '-' }}</div>
-
-
-
-      <div class="mb-1"><b>Keberdampakan:</b> {{ $innovation->impact ?? '-' }}</div>
-    </div>
-
-    <div style="width:180px;">
-      <div style="border:2px solid #061a4d;border-radius:14px;overflow:hidden;background:#fff;">
-        @if($primary)
-          <img src="{{ asset('storage/'.$primary->image_path) }}" style="width:100%;height:180px;object-fit:cover;">
-        @else
-          <div style="height:180px;display:flex;align-items:center;justify-content:center;font-weight:800;">
-            No Photo
           </div>
+        @else
+          <div class="photo-empty">Belum ada foto</div>
         @endif
       </div>
     </div>
-  </div>
-
-  @if($photos->count())
-    <div class="mt-3">
-      <div class="fw-bold mb-2" style="color:#061a4d;">Semua Foto</div>
-      <div class="d-grid" style="grid-template-columns:repeat(6,1fr);gap:10px;">
-        @foreach($photos as $img)
-          <a href="{{ asset('storage/'.$img->image_path) }}" target="_blank"
-             style="border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;background:#fff;display:block;">
-            <img src="{{ asset('storage/'.$img->image_path) }}" style="width:100%;height:90px;object-fit:cover;">
-          </a>
-        @endforeach
-      </div>
-    </div>
-  @endif
-
-  <div class="mt-3 d-flex gap-2">
-    <a href="{{ route('admin.innovations.index') }}" class="btn btn-outline-secondary">Kembali</a>
-
-    <button id="btnToggleEdit" class="btn btn-navy" type="button">Edit</button>
-
-    <form method="POST"
-          action="{{ route('admin.innovations.destroy', $innovation->id) }}"
-          onsubmit="return confirm('Yakin ingin menghapus inovasi ini?')"
-          style="display:inline;">
-      @csrf
-      @method('DELETE')
-      <button type="submit" class="btn btn-same-height">Delete</button>
-    </form>
   </div>
 </div>
 
@@ -209,7 +230,7 @@
         <input type="text" class="form-control mb-3" name="title" required
                value="{{ old('title', $innovation->title) }}">
 
-        <label class="fw-bold">Innovator</label>
+        <label class="fw-bold">Inovator</label>
 
         <div class="row g-2 align-items-start mb-2">
           <div class="col-12 col-md-6">
@@ -231,7 +252,7 @@
 
         <div class="mb-2">
           <select id="pick_innovator_id" class="form-select">
-            <option value="">Atau pilih innovator yang sudah ada</option>
+            <option value="">Atau pilih inovator yang sudah ada</option>
             @foreach($innovators as $inv)
               <option
                 value="{{ $inv->id }}"
@@ -644,6 +665,82 @@
   padding:20px;
   background:#fff;
 }
+.page-title{
+  font-weight:900;
+  color:#061a4d;
+  margin-bottom:12px;
+  font-size:24px;
+  line-height:1.2;
+}
+.info-grid{
+  display:grid;
+  grid-template-columns: 180px 1fr;
+  gap:10px 12px;
+  font-size:15px;
+  color:#0f172a;
+}
+.info-grid .label{
+  font-weight:900;
+  color:#061a4d;
+}
+.info-grid .value{
+  font-weight:500;
+  color:#0f172a;
+}
+.section-title{
+  font-weight:900;
+  color:#061a4d;
+  margin-top:14px;
+  margin-bottom:6px;
+  font-size:16px;
+}
+.text-block{
+  white-space:pre-wrap;
+  line-height:1.6;
+  color:#0f172a;
+}
+.photo-card{
+  border:2px solid #061a4d;
+  border-radius:18px;
+  padding:14px;
+  background:#fff;
+}
+.photo-title{
+  font-weight:900;
+  color:#061a4d;
+  margin-bottom:10px;
+}
+.photo-grid{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:10px;
+  max-height:540px;
+  overflow:auto;
+  padding-right:4px;
+}
+.photo-item{
+  border:1px solid rgba(6,26,77,.25);
+  border-radius:14px;
+  overflow:hidden;
+  background:#fff;
+  display:block;
+}
+.photo-item img{
+  width:100%;
+  height:150px;
+  object-fit:cover;
+  display:block;
+}
+.photo-empty{
+  height:220px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:800;
+  border:2px dashed #cbd5e1;
+  border-radius:18px;
+  color:#64748b;
+}
 .btn-navy{
   background:#061a4d;
   color:#fff;
@@ -666,6 +763,18 @@
   background-color:#bb2d3b;
   border-color:#b02a37;
   color:#fff;
+}
+.innovator-ol{
+  margin:6px 0 0 18px;
+  padding-left:18px;
+}
+.innovator-li{
+  margin-bottom:6px;
+}
+.faculty{
+  color:#061a4d;
+  opacity:.8;
+  font-weight:600;
 }
 .innovator-chip{
   border:1px solid rgba(6,26,77,.25);
@@ -704,6 +813,11 @@
   padding:10px 16px;
   font-weight:800;
   cursor:pointer;
+}
+@media (max-width: 992px){
+  .info-grid{
+    grid-template-columns: 1fr;
+  }
 }
 </style>
 @endsection

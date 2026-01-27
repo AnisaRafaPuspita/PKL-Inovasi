@@ -3,7 +3,7 @@
 
 @section('content')
 <h1 style="font-weight:900;color:#061a4d;">
-    Manage Innovations
+    Kelola Inovasi
 </h1>
 <p style="font-weight:700;color:#061a4d;">
     {{ $mode === 'create' ? 'Tambah Inovasi' : 'Edit Inovasi' }}

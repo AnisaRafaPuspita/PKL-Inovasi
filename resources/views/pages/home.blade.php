@@ -45,7 +45,7 @@
                         transition duration-200
                         hover:bg-[#001349]/80 hover:-translate-y-[1px]"
                 style="font-family: Inter, sans-serif;">
-                    <span>Selengkapnya</span>
+                    <span>Tentang Inovasi</span>
                     <img src="{{ asset('images/Arrow 4.png') }}"
                         alt="Arrow Icon"
                         class="h-[14px] w-[14px] shrink-0
@@ -396,27 +396,26 @@
                 shadow-[0px_4px_8px_rgba(0,0,0,0.25)]
                 px-6 md:px-10 py-4 md:py-6">
         <img src="{{ asset('images/Group 28.png') }}"
-             alt="Icon"
-             class="h-[38px] md:h-[50px] w-auto">
+             class="h-[38px] md:h-[50px] w-auto"
+             alt="Icon">
         <h2 class="text-[#001349] text-[20px] md:text-[24px] font-bold"
             style="font-family: Inter, sans-serif;">
             National Innovation Ranking
         </h2>
     </div>
 
-    {{-- CONTENT --}}
+    {{-- CARDS --}}
     <div class="mt-7 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
 
         @forelse($rankings as $rank)
             <div class="rounded-[30px] border-2 border-[#8D8585] bg-white
                         p-5 md:p-6
-                        transition-all duration-200 ease-out
+                        transition-all duration-200
                         hover:-translate-y-1 hover:shadow-lg">
 
-                {{-- TOP ROW --}}
                 <div class="flex items-start justify-between gap-4">
 
-                    {{-- LEFT: RANK + TITLE --}}
+                    {{-- LEFT --}}
                     <div class="flex items-start gap-4">
                         <div class="text-[22px] md:text-[24px] font-bold text-[#001349]">
                             #{{ $rank->rank }}
@@ -424,27 +423,24 @@
 
                         <div>
                             <div class="text-[18px] md:text-[20px] font-semibold text-[#001349] leading-snug">
-                                {{ $rank->innovation->title ?? '-' }}
+                                {{ $rank->achievement }}
                             </div>
 
-                            <div class="mt-1 text-[13px] md:text-[14px] text-gray-700">
-                                {{ $rank->innovation->category ?? 'Kategori' }}
+                            <div class="mt-2 text-[13px] md:text-[14px] text-gray-700 leading-relaxed">
+                                {{ \Illuminate\Support\Str::limit($rank->description, 80) }}
                             </div>
                         </div>
                     </div>
 
-                    {{-- RIGHT: LOGO --}}
+                    {{-- LOGO --}}
                     <div class="w-[64px] h-[64px] md:w-[72px] md:h-[72px]
                                 rounded-full border border-gray-300
-                                overflow-hidden flex-shrink-0
-                                bg-gray-100 flex items-center justify-center">
-
-                        @if(!empty($rank->image))
-                            <img
-                                src="{{ asset('storage/' . $rank->image) }}"
-                                alt="Logo Institusi"
-                                class="w-full h-full object-cover"
-                            >
+                                overflow-hidden bg-gray-100 flex items-center justify-center
+                                flex-shrink-0">
+                        @if($rank->logo)
+                            <img src="{{ asset('storage/'.$rank->logo) }}"
+                                 class="w-full h-full object-cover"
+                                 alt="Logo">
                         @else
                             <span class="text-[11px] text-gray-400 text-center px-2">
                                 No Logo
@@ -453,24 +449,18 @@
                     </div>
                 </div>
 
-                {{-- ACHIEVEMENT --}}
-                <div class="mt-4 text-[13px] md:text-[14px] text-gray-700 leading-relaxed">
-                    {{ \Illuminate\Support\Str::limit($rank->achievement ?? 'Deskripsi', 100) }}
-                </div>
-
                 {{-- BUTTON --}}
                 <div class="mt-5">
-                    <a href="{{ route('innovations.show', $rank->innovation_id) }}"
+                    <a href="{{ route('rankings.show', $rank->id) }}"
                        class="inline-flex items-center justify-center
                               rounded-[30px] bg-[#001349]
                               px-6 py-2
                               text-white text-[14px] font-semibold
                               transition hover:bg-[#001349]/90">
-                        Lihat Detail Inovasi
+                        Lihat Detail Ranking
                     </a>
                 </div>
             </div>
-
         @empty
             <div class="col-span-full text-center text-gray-500 py-10">
                 Data ranking belum tersedia.
@@ -479,6 +469,7 @@
 
     </div>
 </section>
+
 
 
 {{-- INNOVATION PRODUCTS --}}
