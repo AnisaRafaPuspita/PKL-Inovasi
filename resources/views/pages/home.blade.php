@@ -435,7 +435,8 @@
                     {{-- LOGO --}}
                     <div class="w-[64px] h-[64px] md:w-[72px] md:h-[72px]
                                 rounded-full border border-gray-300
-                                overflow-hidden bg-gray-100 flex items-center justify-center">
+                                overflow-hidden bg-gray-100 flex items-center justify-center
+                                flex-shrink-0">
                         @if($rank->logo)
                             <img src="{{ asset('storage/'.$rank->logo) }}"
                                  class="w-full h-full object-cover"
