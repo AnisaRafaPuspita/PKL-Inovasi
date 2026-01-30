@@ -204,7 +204,7 @@
                         type="text"
                         name="hki_registration_number"
                         id="hki_registration"
-                        placeholder="Nomor Pendaftaran HKI"
+                        placeholder="Nomor Pendaftaran"
                         class="hidden h-[46px] w-full rounded-[30px] border border-[#001349] px-6 outline-none"
                     >
 
