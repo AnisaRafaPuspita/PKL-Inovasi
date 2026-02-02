@@ -103,7 +103,7 @@
         <div class="value">{{ $innovation->hki_status ?? '-' }}</div>
 
         @if($showRegNumber)
-          <div class="label">Nomor Pendaftaran HKI</div>
+          <div class="label">Nomor Pendaftaran</div>
           <div class="value">{{ $innovation->hki_registration_number }}</div>
         @endif
 
@@ -322,7 +322,7 @@
           type="text"
           name="hki_registration_number"
           id="hki_registration"
-          placeholder="Nomor Pendaftaran HKI"
+          placeholder="Nomor Pendaftaran"
           class="form-control mb-2"
           value="{{ old('hki_registration_number', $innovation->hki_registration_number ?? '') }}"
           style="display:none;"

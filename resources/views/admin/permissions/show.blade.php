@@ -67,7 +67,7 @@
         <div class="value">{{ $innovation->hki_status ?? '-' }}</div>
 
         @if($showRegNumber)
-          <div class="label">Nomor Pendaftaran HKI</div>
+          <div class="label">Nomor Pendaftaran</div>
           <div class="value">{{ $innovation->hki_registration_number }}</div>
         @endif
 

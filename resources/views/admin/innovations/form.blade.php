@@ -225,7 +225,7 @@
                 type="text"
                 name="hki_registration_number"
                 id="hki_registration"
-                placeholder="Nomor Pendaftaran HKI"
+                placeholder="Nomor Pendaftaran"
                 class="form-control mb-2"
                 value="{{ old('hki_registration_number', $innovation->hki_registration_number ?? '') }}"
                 style="display:none;"
