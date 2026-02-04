@@ -31,12 +31,11 @@ class HomeController extends Controller
             ->take(3)
             ->get();
 
-        // innovator of the month (latest record)
-        $innovatorMonth = InnovatorOfTheMonth::query()
+        $featuredInnovators = InnovatorOfTheMonth::query()
             ->with(['innovator.faculty'])
-            ->orderByDesc('year')
-            ->orderByDesc('month')
-            ->first();
+            ->latest()
+            ->get();
+
 
         $rankings = InnovationRanking::query()
             ->select('*')
@@ -48,7 +47,7 @@ class HomeController extends Controller
 
         $innovators = Innovator::orderBy('name')->get(); 
 
-        return view('pages.home', compact('impactInnovations', 'mostVisited', 'innovatorMonth', 'rankings', 'faculties', 'innovators'));
+        return view('pages.home', compact('impactInnovations', 'mostVisited', 'featuredInnovators', 'rankings', 'faculties', 'innovators'));
     }
 
     public function about()

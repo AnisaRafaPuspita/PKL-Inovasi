@@ -340,53 +340,92 @@
     @endif
 </section>
 
-{{-- INNOVATOR OF THE MONTH --}}
+{{-- DAFTAR INNOVATOR --}}
 <section class="mx-auto max-w-[1320px] px-3 md:px-4 mt-14 md:mt-16">
-    <div class="inline-flex items-center gap-3 md:gap-4 rounded-[30px] bg-white shadow-[0px_4px_8px_rgba(0,0,0,0.25)] px-6 md:px-10 py-4 md:py-6">
+
+    {{-- HEADER --}}
+    <div class="inline-flex items-center gap-3 md:gap-4
+                rounded-[30px] bg-white
+                shadow-[0px_4px_8px_rgba(0,0,0,0.25)]
+                px-6 md:px-10 py-4 md:py-6">
         <img src="{{ asset('images/person.png') }}" alt="Icon" class="h-[38px] md:h-[50px] w-auto">
-        <h2 class="text-[#001349] text-[20px] md:text-[24px] font-bold" style="font-family: Inter, sans-serif;">
-            Inovator of the Month
+        <h2 class="text-[#001349] text-[20px] md:text-[24px] font-bold"
+            style="font-family: Inter, sans-serif;">
+            Daftar Innovator
         </h2>
     </div>
 
-    <div class="mt-7 rounded-[30px] border-2 border-[#8D8585] bg-white p-6 md:p-8 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-center
-                transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-lg">
-        <div class="h-[230px] md:h-[270px] w-full rounded-[30px] border-2 border-[#8D8585] flex items-center justify-center overflow-hidden">
-            @if($innovatorMonth?->photo)
-                <img
-                src="{{ asset('storage/'.$innovatorMonth->photo) }}"
-                alt="Innovator of the Month"
-                class="max-w-full max-h-full object-contain"
-                >
-            @else
-                <div class="text-gray-400">No photo</div>
-            @endif
-        </div>
+    {{-- GRID --}}
+    <div class="mt-7 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+
+        @forelse ($featuredInnovators as $index => $item)
+            <div class="innovator-item {{ $index >= 6 ? 'hidden' : '' }}">
+                <div class="rounded-[30px] border-2 border-[#8D8585] bg-white overflow-hidden
+                            transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
+
+                    {{-- FOTO --}}
+                    <div class="relative h-[215px] overflow-hidden rounded-t-[30px]
+                                bg-gray-100 flex items-center justify-center">
+
+                        <img
+                            src="{{ asset('storage/'.$item->photo) }}"
+                            alt="Foto Innovator"
+                            class="max-h-full max-w-full object-contain"
+                        >
+                    </div>
 
 
+                    {{-- CONTENT --}}
+                    <div class="p-5 md:p-6">
 
-        <div class="md:col-span-2 text-[15px] md:text-[16px] font-light text-gray-800 leading-relaxed" style="font-family: Inter, sans-serif;">
-            <div class="font-semibold text-[#001349] text-[18px] md:text-[20px]">
-                {{ $innovatorMonth?->innovator?->name ?? 'Nama' }}
+                        <div class="text-[18px] md:text-[20px] font-semibold text-[#001349]">
+                            {{ $item->innovator?->name ?? '-' }}
+                        </div>
+
+                        <div class="mt-1 text-[13px] font-semibold text-gray-800">
+                            {{ $item->innovator?->faculty?->name ?? '-' }}
+                        </div>
+
+                        <p class="mt-2 text-[13px] text-gray-700 leading-relaxed">
+                            {{ \Illuminate\Support\Str::limit($item->description ?? $item->innovator?->bio, 100) }}
+                        </p>
+
+                        <div class="mt-4 flex items-center justify-between">
+                            <span class="rounded-full bg-[#1A6ECE]/50
+                                         px-3 py-1.5
+                                         text-[12px] font-semibold text-[#1A6ECE]">
+                                Innovator
+                            </span>
+
+                            <a href="{{ route('innovator-month.show', $item->id) }}"
+                               class="text-[#1A6ECE] font-semibold text-[14px] hover:underline">
+                                Lihat Detail
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
             </div>
-            <div class="mt-2">{{ $innovatorMonth?->innovator?->faculty?->name ?? 'Fakultas' }}</div>
-            <div class="mt-2">
-            {{ \Illuminate\Support\Str::limit($innovatorMonth?->description ?? 'Deskripsi', 200) }}
+        @empty
+            <div class="col-span-1 md:col-span-3 text-gray-600">
+                Belum ada data innovator yang ditampilkan.
             </div>
+        @endforelse
 
-            <div class="mt-4">
-                <a href="{{ route('innovator-month.show') }}"
-                    class="inline-flex items-center justify-center
-                            rounded-[30px] bg-[#001349]
-                            px-6 py-2
-                            text-white text-[14px] font-semibold
-                            transition hover:bg-[#001349]/90">
-                        Lihat Detail Inovator
-                </a>
-            </div>
-        </div>
     </div>
+
+    {{-- BUTTON SELENGKAPNYA --}}
+    @if(isset($featuredInnovators) && $featuredInnovators->count() > 6)
+        <div class="mt-8 text-center">
+            <button type="button"
+                onclick="showMoreInnovator()"
+                class="rounded-full bg-[#001349] px-8 py-2 text-white font-semibold">
+                Selengkapnya
+            </button>
+        </div>
+    @endif
 </section>
+
 
 {{-- NATIONAL INNOVATION RANKING --}}
 <section class="mx-auto max-w-[1320px] px-3 md:px-4 mt-14 md:mt-16">
@@ -534,6 +573,14 @@ function showMoreProduct() {
         .forEach(el => el.classList.remove('hidden'));
 }
 </script>
+
+<script>
+function showMoreInnovator() {
+    document.querySelectorAll('.innovator-item.hidden')
+        .forEach(el => el.classList.remove('hidden'));
+}
+</script>
+
 
 <script>
 document.addEventListener('click', function (e) {
