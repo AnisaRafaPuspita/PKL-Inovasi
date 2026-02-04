@@ -5,7 +5,7 @@
 
 {{-- HERO --}}
 <section class="relative">
-    <img src="{{ asset('images/hero.JPG') }}" class="h-[420px] md:h-[560px] w-full object-cover" alt="">
+    <img src="{{ asset('images/muladi.JPG') }}" class="h-[420px] md:h-[560px] w-full object-cover" alt="">
     <div class="absolute inset-0 bg-black/30"></div>
 
     <div class="absolute inset-0 flex items-center justify-center">
@@ -58,8 +58,53 @@
     </div>
 </section>
 
+{{-- HERO PAMFLET – FINAL PROPORSIONAL --}}
+<section class="relative z-30 mx-auto
+                -mt-[140px] md:-mt-[150px]">
+
+    <div class="mx-auto w-fit flex items-end
+                gap-3 md:gap-4">
+
+        {{-- PAMFLET 1 --}}
+        <div class="w-[150px] md:w-[165px]
+                    h-[215px] md:h-[235px]
+                    rounded-[16px]
+                    bg-gray-100
+                    shadow
+                    overflow-hidden
+                    flex items-center justify-center">
+            <span class="text-gray-400 text-[11px]">Pamflet 1</span>
+        </div>
+
+        {{-- PAMFLET 2 --}}
+        <div class="w-[150px] md:w-[165px]
+                    h-[215px] md:h-[235px]
+                    rounded-[16px]
+                    bg-gray-100
+                    shadow
+                    overflow-hidden
+                    flex items-center justify-center">
+            <span class="text-gray-400 text-[11px]">Pamflet 2</span>
+        </div>
+
+        {{-- PAMFLET 3 --}}
+        <div class="w-[150px] md:w-[165px]
+                    h-[215px] md:h-[235px]
+                    rounded-[16px]
+                    bg-gray-100
+                    shadow
+                    overflow-hidden
+                    flex items-center justify-center">
+            <span class="text-gray-400 text-[11px]">Pamflet 3</span>
+        </div>
+
+    </div>
+</section>
+
+
+
 {{-- SEARCH HOME --}}
-<section class="mx-auto max-w-[1320px] px-3 md:px-4 -mt-10 relative z-10">
+<section class="mx-auto max-w-[1320px] px-3 md:px-4 -mt-10 md:mt-14 relative z-10">
 
     <form id="homeSearchForm"
           action="{{ route('innovations.index') }}"
