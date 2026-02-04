@@ -116,6 +116,29 @@ class InnovationController extends Controller
             'hki_patent_number' => ['nullable', 'string'],
         ]);
 
+        // Validasi maksimal 200 kata untuk field teks utama
+        $fieldsWithWordLimit = [
+            'description' => 'Deskripsi produk',
+            'advantages'  => 'Keunggulan produk',
+            'impact'      => 'Keberdampakan produk',
+        ];
+
+        foreach ($fieldsWithWordLimit as $field => $label) {
+            if ($request->filled($field)) {
+                $wordCount = str_word_count(strip_tags($request->$field));
+
+                if ($wordCount > 200) {
+                    return back()
+                        ->withErrors([
+                            $field => "$label maksimal 200 kata."
+                        ])
+                        ->withInput();
+                }
+            }
+        }
+
+
+
 
 
         

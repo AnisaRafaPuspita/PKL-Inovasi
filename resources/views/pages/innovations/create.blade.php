@@ -272,7 +272,7 @@
                 <textarea
                     name="description"
                     class="h-[171px] w-full rounded-[30px] border border-[#001349] px-6 py-4 outline-none resize-none"
-                    placeholder="Masukkan deskripsi inovasi"
+                    placeholder="Masukkan deskripsi inovasi (maksimal 200 kata)"
                 >{{ old('description') }}</textarea>
             </div>
 
@@ -282,7 +282,7 @@
                 <textarea
                     name="advantages"
                     class="h-[114px] w-full rounded-[30px] border border-[#001349] px-6 py-4 outline-none resize-none"
-                    placeholder="Masukkan keunggulan"
+                    placeholder="Masukkan keunggulan (maksimal 200 kata)"
                 >{{ old('advantages') }}</textarea>
             </div>
 
@@ -292,7 +292,7 @@
                 <textarea
                     name="impact"
                     class="h-[94px] w-full rounded-[30px] border border-[#001349] px-6 py-4 outline-none resize-none"
-                    placeholder="Masukkan Keberdampakan apabila produk sudah memiliki kebermanfaatan baik itu untuk institusi, perusahaan, maupun masyarakat"
+                    placeholder="Masukkan Keberdampakan apabila produk sudah memiliki kebermanfaatan baik itu untuk institusi, perusahaan, maupun masyarakat (maksimal 200 kata)"
                 >{{ old('impact') }}</textarea>
             </div>
 
