@@ -325,7 +325,7 @@
             </div>
         @empty
             <div class="text-gray-600 col-span-1 md:col-span-3">
-                Belum ada inovasi berdampak.
+                Belum ada inovasi yang ditampilkan.
             </div>
         @endforelse
     </div>
@@ -473,125 +473,7 @@
 
 
 {{-- INNOVATION PRODUCTS --}}
-<section class="mx-auto max-w-[1320px] px-3 md:px-4 mt-14 md:mt-16">
-    <div class="inline-flex items-center gap-3 rounded-[30px] bg-white
-                shadow-[0px_4px_8px_rgba(0,0,0,0.25)]
-                px-6 md:px-10 py-4 md:py-6">
 
-        <img src="{{ asset('images/Box.png') }}" class="h-[38px] md:h-[50px]" alt="">
-        <h2 class="text-[#001349] text-[20px] md:text-[24px] font-bold">
-            Innovation Products
-        </h2>
-    </div>
-
-    <div class="mt-7 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-        @forelse ($innovations as $index => $inv)
-            <div class="product-item {{ $index >= 6 ? 'hidden' : '' }}">
-                <div class="rounded-[30px] border-2 border-[#8D8585] bg-white overflow-hidden
-                            transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
-
-                    <div class="relative h-[215px] overflow-hidden rounded-t-[30px]">
-
-                        @php
-                            $images = $inv->images->count()
-                                ? $inv->images->map(fn($i) => (object)['image_path' => $i->image_path])
-                                : ($inv->image_url
-                                    ? collect([(object)['image_path' => $inv->image_url]])
-                                    : collect());
-
-                            $hasImages = $images->count() > 0;
-                        @endphp
-
-                        @if($hasImages)
-                            <div
-                                id="slider-{{ $inv->id }}"
-                                class="flex h-full transition-transform duration-300 ease-in-out"
-                                data-index="0"
-                            >
-                                @foreach ($images as $img)
-                                    @php $src = $resolveImageSrc($img->image_path); @endphp
-                                    <img
-                                        src="{{ $src }}"
-                                        class="min-w-full h-full object-cover"
-                                        alt="Foto Inovasi"
-                                    >
-                                @endforeach
-                            </div>
-
-                            @if ($images->count() > 1)
-                                <button type="button"
-                                    class="slide-btn absolute left-2 top-1/2 -translate-y-1/2
-                                        bg-black/50 text-white w-8 h-8 rounded-full
-                                        flex items-center justify-center"
-                                    data-id="{{ $inv->id }}"
-                                    data-dir="-1">
-                                    &lsaquo;
-                                </button>
-
-                                <button type="button"
-                                    class="slide-btn absolute right-2 top-1/2 -translate-y-1/2
-                                        bg-black/50 text-white w-8 h-8 rounded-full
-                                        flex items-center justify-center"
-                                    data-id="{{ $inv->id }}"
-                                    data-dir="1">
-                                    &rsaquo;
-                                </button>
-                            @endif
-                        @else
-                            <div class="h-full w-full bg-gray-100 flex items-center justify-center text-gray-400 text-sm">
-                                No Image
-                            </div>
-                        @endif
-                    </div>
-
-                    <div class="p-5 md:p-6">
-                        <div class="text-[18px] md:text-[20px] font-semibold text-[#001349]">
-                            {{ $inv->title }}
-                        </div>
-
-                        <div class="mt-1 text-[13px] font-semibold text-gray-800">
-                            {{ $inv->category }}
-                        </div>
-
-                        <p class="mt-2 text-[13px] text-gray-700">
-                            {{ \Illuminate\Support\Str::limit($inv->description, 100) }}
-                        </p>
-
-                        <div class="mt-4 flex items-center justify-between">
-                            <span class="rounded-full bg-[#1A6ECE]/50 px-3 py-1.5 text-[12px] font-semibold text-[#1A6ECE]">
-                                {{ ucfirst($inv->status) }}
-                            </span>
-
-                            <a href="{{ route('innovations.show', $inv->id) }}"
-                               class="text-[#1A6ECE] font-semibold text-[14px] hover:underline">
-                                Lihat Detail
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @empty
-            <div class="text-gray-600 col-span-1 md:col-span-3">
-                Belum ada innovation products.
-            </div>
-        @endforelse
-    </div>
-
-    @if (method_exists($innovations, 'count') && $innovations->count() > 6)
-        <div class="mt-8 text-center">
-            <button type="button" onclick="showMoreProduct()"
-                class="rounded-full bg-[#001349] px-8 py-2 text-white font-semibold">
-                Selengkapnya
-            </button>
-        </div>
-    @endif
-
-    {{-- kalau kamu mau pagination beneran, tinggal buka ini:
-    <div class="mt-8">
-        {{ $innovations->links() }}
-    </div>
-    --}}
-</section>
 
 {{-- MOST VISITED --}}
 <section class="mx-auto max-w-[1320px] px-3 md:px-4 mt-14 md:mt-16">

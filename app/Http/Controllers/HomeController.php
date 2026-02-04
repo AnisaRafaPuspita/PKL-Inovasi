@@ -16,23 +16,12 @@ class HomeController extends Controller
 {
     public function index()
     {
-        // impact innovations (published & is_impact)
         $impactInnovations = Innovation::query()
             ->where('status', 'published')
             ->whereHas('permission', fn ($q) => $q->where('status', 'accepted'))
-            ->where('is_impact', true)
             ->latest()
             ->get();
 
-
-        $innovations = Innovation::query()
-            ->where('status', 'published')
-            ->whereHas('permission', function ($q) {
-                $q->where('status', 'accepted');
-            })
-            ->where('is_impact', false)
-            ->latest()
-            ->get();
 
 
         // most visited
@@ -59,7 +48,7 @@ class HomeController extends Controller
 
         $innovators = Innovator::orderBy('name')->get(); 
 
-        return view('pages.home', compact('impactInnovations','innovations', 'mostVisited', 'innovatorMonth', 'rankings', 'faculties', 'innovators'));
+        return view('pages.home', compact('impactInnovations', 'mostVisited', 'innovatorMonth', 'rankings', 'faculties', 'innovators'));
     }
 
     public function about()
