@@ -1,55 +1,124 @@
 <footer class="mt-20">
-  <!-- Top footer -->
   <div class="bg-[#03061F]">
-    <div class="mx-auto max-w-[1512px] px-6 py-14 grid grid-cols-1 md:grid-cols-4 gap-10">
-      <!-- Logo -->
+    <div
+      class="mx-auto max-w-[1512px] px-6 py-14
+      grid grid-cols-1 md:grid-cols-4 gap-14 items-start"
+    >
+
       <div class="flex flex-col items-center text-center">
         <img
           src="{{ asset('images/Logo Undip Universitas Diponegoro.png') }}"
           alt="UNDIP"
-          class="h-[197px] w-auto"
+          class="h-[170px] w-auto"
         />
-
-        <span class="mt-4 text-white font-semibold text-[16px]" style="font-family: Inter, sans-serif;">
+        <span
+          class="mt-4 text-white font-semibold text-[16px]"
+          style="font-family: Inter, sans-serif;"
+        >
           Universitas Diponegoro
         </span>
       </div>
 
-      <!-- Layanan -->
       <div>
-        <div class="text-[#1A6ECE] text-[24px] font-medium" style="font-family: Inter, sans-serif;">
+        <div
+          class="text-[#1A6ECE] text-[24px] font-medium"
+          style="font-family: Inter, sans-serif;"
+        >
           Layanan
         </div>
-        <ul class="mt-6 space-y-4 text-white font-semibold" style="font-family: Inter, sans-serif;">
+
+        <ul
+          class="mt-6 space-y-4 text-white font-semibold"
+          style="font-family: Inter, sans-serif;"
+        >
           <li>Layanan Inovasi dan Kerjasama</li>
         </ul>
+
+        <div class="mt-10">
+          <div
+            class="text-[#1A6ECE] text-[24px] font-medium"
+            style="font-family: Inter, sans-serif;"
+          >
+            Sosial Media
+          </div>
+
+          <div class="mt-6 flex flex-col gap-5">
+            <div class="flex items-center gap-4">
+              <img
+                src="{{ asset('images/instagram.png') }}"
+                alt="Instagram"
+                style="width:52px;height:52px;object-fit:contain;"
+              />
+              <span
+                class="text-white font-semibold text-[16px]"
+                style="font-family: Inter, sans-serif;"
+              >
+                @dirinovki.undip
+              </span>
+            </div>
+
+            <div class="flex items-center gap-4">
+              <img
+                src="{{ asset('images/youtube.png') }}"
+                alt="YouTube"
+                style="width:52px;height:52px;object-fit:contain;"
+              />
+              <span
+                class="text-white font-semibold text-[16px]"
+                style="font-family: Inter, sans-serif;"
+              >
+                @dirinovkiundip
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- Kontak -->
       <div>
-        <div class="text-[#1A6ECE] text-[24px] font-medium" style="font-family: Inter, sans-serif;">
+        <div
+          class="text-[#1A6ECE] text-[24px] font-medium"
+          style="font-family: Inter, sans-serif;"
+        >
           Kontak
         </div>
-        <div class="mt-6 text-white font-semibold leading-relaxed" style="font-family: Inter, sans-serif;">
+
+        <div
+          class="mt-6 text-white font-semibold"
+          style="font-family: Inter, sans-serif; line-height: 2.2;"
+        >
           Jl. Prof Soedarto, SH, Tembalang Semarang.<br />
           Telp: 024 - 74060020
-          <br /><br />
-          WhatsApp Call Center :<br />
-          00000<br />
-          WhatsApp Helpdesk Inovasi :<br />
-          00000<br />
-          Email:<br />
-          belum
+
+          <div style="margin-top: 20px;">
+            WhatsApp Call Center Inovasi:<br />
+            08113805805 (Sentra KI)
+          </div>
+
+          <div style="margin-top: 20px;">
+            WhatsApp Helpdesk Inovasi:<br />
+            08113848555 (Inovasi)
+          </div>
+
+          <div style="margin-top: 20px;">
+            Email:<br />
+            dirinovki@gmail.com<br />
+            inovasi@live.undip.ac.id
+          </div>
         </div>
       </div>
 
-      <!-- Lokasi + Maps -->
       <div>
-        <div class="text-[#1A6ECE] text-[24px] font-medium" style="font-family: Inter, sans-serif;">
+        <div
+          class="text-[#1A6ECE] text-[24px] font-medium"
+          style="font-family: Inter, sans-serif;"
+        >
           Lokasi
         </div>
 
-        <div class="mt-6 text-white font-semibold leading-relaxed" style="font-family: Inter, sans-serif;">
+        <div
+          class="mt-6 text-white font-semibold leading-relaxed"
+          style="font-family: Inter, sans-serif;"
+        >
           Direktorat Inovasi dan Kerjasama, Innovation Hub, Gedung Widyapuraya Lantai 5
         </div>
 
@@ -63,19 +132,16 @@
           ></iframe>
         </div>
       </div>
+
     </div>
   </div>
 
-  <!-- Bottom footer -->
   <div class="bg-[#020415]">
     <div
-      class="mx-auto max-w-[1512px] px-6 py-3 flex flex-wrap items-center gap-2 text-[15px] text-white/60"
+      class="mx-auto max-w-[1512px] px-6 py-3 flex items-center text-[15px] text-white/60"
       style="font-family: Inter, sans-serif;"
     >
-      <span class="font-semibold">Copyright</span>
-      <span class="font-semibold">&copy;</span>
-      <span class="font-semibold">Universitas Diponegoro</span>
-      <span class="font-semibold">2026</span>
+      Copyright © Universitas Diponegoro 2026
     </div>
   </div>
 </footer>

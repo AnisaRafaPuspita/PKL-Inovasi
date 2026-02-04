@@ -53,38 +53,82 @@
     </div>
 
     <div class="panel">
-        <div class="section-title">Innovator of The Month</div>
+        <div class="section-title">Pamflet Beranda</div>
 
-        <div class="iom-wrap">
-            <div class="iom-photo">
-                @if(!empty($innovatorOfMonth?->photo))
-                    <img src="{{ asset('storage/'.$innovatorOfMonth->photo) }}" alt="photo">
-                @else
-                    Photo
-                @endif
+        @if(session('success'))
+            <div class="alert alert-success mb-3">{{ session('success') }}</div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger mb-3">{{ session('error') }}</div>
+        @endif
+
+        @if($errors->any())
+            <div class="alert alert-danger mb-3">
+                <div class="fw-bold mb-1">Gagal menyimpan:</div>
+                <ul class="mb-0">
+                    @foreach($errors->all() as $e)
+                        <li>{{ $e }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form action="{{ route('admin.dashboard.home_pamflet.update') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+
+            <div class="row g-3">
+                @foreach ([1,2,3] as $i)
+                    @php $key = "pamflet_{$i}"; @endphp
+
+                    <div class="col-12 col-md-4">
+                        <div style="border:1px solid #e5e7eb;border-radius:12px;padding:14px;">
+                            <div class="d-flex align-items-center justify-content-between" style="margin-bottom:10px;">
+                                <div style="font-weight:800;color:#061a4d;">Pamflet {{ $i }}</div>
+
+                                @if(!empty($homePamflet?->$key))
+                                    <button
+                                        type="submit"
+                                        name="delete_slot"
+                                        value="{{ $i }}"
+                                        class="btn btn-sm btn-outline-danger"
+                                        onclick="return confirm('Hapus Pamflet {{ $i }}?')"
+                                    >
+                                        Hapus
+                                    </button>
+                                @endif
+                            </div>
+
+                            <div style="width:100%;height:180px;border-radius:12px;border:1px dashed #cbd5e1;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#f8fafc;">
+                                @if(!empty($homePamflet?->$key))
+                                    <img src="{{ asset('storage/'.$homePamflet->$key) }}" alt="Pamflet {{ $i }}"
+                                         style="width:100%;height:100%;object-fit:cover;">
+                                @else
+                                    <span style="color:#94a3b8;">Belum ada gambar</span>
+                                @endif
+                            </div>
+
+                            <div class="mt-2">
+                                <input type="file" name="{{ $key }}" class="form-control">
+                                @error($key)
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
             </div>
 
-            <div class="d-flex justify-content-between align-items-end gap-3 flex-wrap">
-                <div>
-                    <p class="iom-text">Nama: {{ $innovatorOfMonth?->innovator?->name ?? '-' }}</p>
-                    <p class="iom-text">Fakultas: {{ $innovatorOfMonth?->innovator?->faculty?->name ?? '-' }}</p>
-
-                    @if(!empty($innovatorOfMonth?->innovation?->title))
-                        <p class="iom-text">Nama Inovasi: {{ $innovatorOfMonth->innovation->title }}</p>
-                    @else
-                        <p class="iom-text">Nama Inovasi: -</p>
-                    @endif
-                </div>
-
-                <a href="{{ route('admin.innovator_of_month.edit') }}" class="btn btn-navy">Edit</a>
+            <div class="mt-3 d-flex justify-content-end">
+                <button type="submit" class="btn btn-navy">Simpan Pamflet</button>
             </div>
-        </div>
+        </form>
     </div>
 @endsection
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function () {
     const canvas = document.getElementById('viewsChart');
     if (!canvas) return;
 
@@ -111,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 tension: 0.25,
                 borderWidth: 2,
                 pointRadius: 4,
-                fill: false,
+                fill: false
             }]
         },
         options: {

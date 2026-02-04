@@ -84,6 +84,10 @@
         $categorySelectValue = $categoryValue;
         $categoryOtherValue = old('category_other', '');
     }
+
+    $kiTypeValue = old('ki_type', $innovation->ki_type);
+    $kiStatusValue = old('ki_status', $innovation->ki_status);
+    $kiNumberValue = old('ki_number', $innovation->ki_number);
 @endphp
 
 <div class="panel">
@@ -181,7 +185,6 @@
             </div>
 
             <input type="hidden" name="innovators_payload" id="innovators_payload" value="{{ $oldPayload }}">
-
             <input type="hidden" name="faculty_id" id="faculty_id" value="{{ old('faculty_id') }}">
 
             <label class="fw-bold">Kategori</label>
@@ -213,32 +216,37 @@
                    placeholder="Contoh: PT ABC, UNDIP, dll"
                    value="{{ old('partner', $innovation->partner) }}">
 
-            <label class="fw-bold">Status Paten</label>
-            <select name="hki_status" id="hki_status" class="form-select mb-2" onchange="handleHkiStatus(this.value)">
-                <option value="">Pilih Status</option>
-                <option value="terdaftar" @selected(old('hki_status', $innovation->hki_status) === 'terdaftar')>Terdaftar</option>
-                <option value="on_process" @selected(old('hki_status', $innovation->hki_status) === 'on_process')>On Process</option>
-                <option value="granted" @selected(old('hki_status', $innovation->hki_status) === 'granted')>Granted</option>
-            </select>
+            <label class="fw-bold">Status KI</label>
+            <div class="row g-2 mb-2">
+              <div class="col-12 col-md-6">
+                <select id="ki_type" name="ki_type" class="form-select" onchange="handleKiStatus()">
+                  <option value="">Pilih Jenis KI</option>
+                  <option value="paten" @selected($kiTypeValue === 'paten')>Paten</option>
+                  <option value="hak_cipta" @selected($kiTypeValue === 'hak_cipta')>Hak Cipta</option>
+                  <option value="desain_industri" @selected($kiTypeValue === 'desain_industri')>Desain Industri</option>
+                  <option value="merek" @selected($kiTypeValue === 'merek')>Merek</option>
+                </select>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <select name="ki_status" id="ki_status" class="form-select" onchange="handleKiStatus()">
+                  <option value="">Pilih Status</option>
+                  <option value="terdaftar" @selected($kiStatusValue === 'terdaftar')>Terdaftar</option>
+                  <option value="granted"   @selected($kiStatusValue === 'granted')>Granted</option>
+                </select>
+              </div>
+            </div>
+
+            <label id="kiNumberLabel" class="fw-bold" style="display:none;">Nomor KI</label>
 
             <input
-                type="text"
-                name="hki_registration_number"
-                id="hki_registration"
-                placeholder="Nomor Pendaftaran"
-                class="form-control mb-2"
-                value="{{ old('hki_registration_number', $innovation->hki_registration_number ?? '') }}"
-                style="display:none;"
-            >
-
-            <input
-                type="text"
-                name="hki_patent_number"
-                id="hki_patent"
-                placeholder="Nomor Paten"
-                class="form-control mb-3"
-                value="{{ old('hki_patent_number', $innovation->hki_patent_number ?? '') }}"
-                style="display:none;"
+              type="text"
+              id="ki_number"
+              name="ki_number"
+              class="form-control mb-3"
+              style="display:none;"
+              value="{{ $kiNumberValue }}"
+              placeholder="Nomor KI"
             >
 
             <label class="fw-bold">Link Inovasi (opsional)</label>
@@ -249,12 +257,12 @@
             <label class="fw-bold">Deskripsi</label>
             <textarea class="form-control mb-3" rows="4"
                       name="description"
-                      placeholder="Masukkan deskripsi inovasi">{{ old('description', $innovation->description) }}</textarea>
+                      placeholder="Masukkan deskripsi inovasi (maksimal 200 kata)">{{ old('description', $innovation->description) }}</textarea>
 
             <label class="fw-bold">Keunggulan</label>
             <textarea class="form-control mb-3" rows="3"
                       name="advantages"
-                      placeholder="Masukkan keunggulan">{{ old('advantages', $innovation->advantages) }}</textarea>
+                      placeholder="Masukkan keunggulan (maksimal 200 kata)">{{ old('advantages', $innovation->advantages) }}</textarea>
 
             <label class="fw-bold">Keberdampakan</label>
             <input type="text" class="form-control mb-4" name="impact"
@@ -324,19 +332,43 @@
 </style>
 
 <script>
-function handleHkiStatus(val){
-  var reg = document.getElementById('hki_registration');
-  var pat = document.getElementById('hki_patent');
-  if (!reg || !pat) return;
+function handleKiStatus() {
+  var typeEl = document.getElementById('ki_type');
+  var statusEl = document.getElementById('ki_status');
+  var input = document.getElementById('ki_number');
+  var label = document.getElementById('kiNumberLabel');
 
-  reg.style.display = 'none';
-  pat.style.display = 'none';
+  if (!typeEl || !statusEl || !input || !label) return;
 
-  if (val === 'terdaftar') reg.style.display = 'block';
-  if (val === 'granted') pat.style.display = 'block';
+  var type = typeEl.value;
+  var status = statusEl.value;
+
+  input.style.display = 'none';
+  label.style.display = 'none';
+
+  if (!type || !status) {
+    input.value = '';
+    return;
+  }
+
+  var text = 'Nomor';
+
+  if (type === 'hak_cipta') {
+    if (status === 'terdaftar') text = 'Nomor Pendaftaran Hak Cipta';
+    if (status === 'granted') text = 'Nomor Surat Pencatatan Hak Cipta';
+  } else {
+    if (status === 'terdaftar') text = 'Nomor Pendaftaran';
+    if (status === 'granted') text = 'Nomor Sertifikat';
+  }
+
+  label.textContent = text;
+  input.placeholder = text;
+
+  label.style.display = 'block';
+  input.style.display = 'block';
 }
 
-function handleCategory(val){
+function handleCategory(val) {
   var other = document.getElementById('category_other');
   if (!other) return;
 
@@ -349,6 +381,17 @@ function handleCategory(val){
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+  var cat = document.getElementById('category');
+  if (cat) handleCategory(cat.value);
+
+  var kiType = document.getElementById('ki_type');
+  var kiStatus = document.getElementById('ki_status');
+
+  if (kiType) kiType.addEventListener('change', handleKiStatus);
+  if (kiStatus) kiStatus.addEventListener('change', handleKiStatus);
+
+  handleKiStatus();
+
   var input = document.getElementById('photosInput');
   var preview = document.getElementById('photoPreview');
   var empty = document.getElementById('photoEmpty');
@@ -415,7 +458,7 @@ document.addEventListener('DOMContentLoaded', function () {
         wrap.appendChild(btn);
         preview.appendChild(wrap);
 
-        img.addEventListener('load', function(){ URL.revokeObjectURL(url); });
+        img.addEventListener('load', function () { URL.revokeObjectURL(url); });
       });
     }
 
@@ -446,9 +489,6 @@ document.addEventListener('DOMContentLoaded', function () {
     renderPhotos();
   }
 
-  var cat = document.getElementById('category');
-  if (cat) handleCategory(cat.value);
-
   var nameInput = document.getElementById('new_innovator_name');
   var facultySelect = document.getElementById('new_innovator_faculty');
   var pickSelect = document.getElementById('pick_innovator_id');
@@ -460,7 +500,7 @@ document.addEventListener('DOMContentLoaded', function () {
   if (nameInput && facultySelect && pickSelect && addBtn && list && payload) {
     var items = [];
 
-    function syncFacultyIdFromItems(){
+    function syncFacultyIdFromItems() {
       if (!facultyHidden) return;
       if (!items.length) {
         facultyHidden.value = '';
@@ -474,17 +514,17 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     }
 
-    function setPayload(){
+    function setPayload() {
       payload.value = JSON.stringify(items);
       syncFacultyIdFromItems();
     }
 
-    function getFacultyNameById(id){
+    function getFacultyNameById(id) {
       var opt = facultySelect.querySelector('option[value="' + id + '"]');
       return opt ? opt.textContent.trim() : '';
     }
 
-    function renderInnovators(){
+    function renderInnovators() {
       list.innerHTML = '';
       if (!items.length) return;
 
@@ -521,7 +561,7 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }
 
-    function addExisting(){
+    function addExisting() {
       var id = pickSelect.value;
       if (!id) return false;
 
@@ -547,7 +587,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return true;
     }
 
-    function addNew(){
+    function addNew() {
       var name = (nameInput.value || '').trim();
       if (!name) return false;
 
@@ -579,7 +619,7 @@ document.addEventListener('DOMContentLoaded', function () {
       var picked = addExisting();
       var created = addNew();
 
-      if (!picked && !created){
+      if (!picked && !created) {
         alert('Isi nama innovator baru + fakultas, atau pilih innovator yang sudah ada.');
         return;
       }
@@ -593,20 +633,15 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     if (payload.value) {
-      try{
+      try {
         var parsed = JSON.parse(payload.value);
         if (Array.isArray(parsed)) items = parsed;
-      }catch(e){}
+      } catch (e) {}
     }
 
     setPayload();
     renderInnovators();
   }
-
-  var sel = document.getElementById('hki_status');
-  if (sel) handleHkiStatus(sel.value);
-  
 });
 </script>
-
 @endsection

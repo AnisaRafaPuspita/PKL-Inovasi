@@ -164,6 +164,10 @@ class InnovationController extends Controller
             'hki_status' => $request->hki_status,
             'hki_registration_number' => $request->hki_registration_number,
             'hki_patent_number' => $request->hki_patent_number,
+            'ki_type'   => $validated['ki_type'],
+            'ki_status' => $validated['ki_status'],
+            'ki_number' => $validated['ki_number'],
+
         ]);
 
         foreach ($request->innovators as $item) {

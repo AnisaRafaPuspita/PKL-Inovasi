@@ -66,36 +66,43 @@
                 gap-3 md:gap-4">
 
         {{-- PAMFLET 1 --}}
-        <div class="w-[150px] md:w-[165px]
-                    h-[215px] md:h-[235px]
-                    rounded-[16px]
-                    bg-gray-100
-                    shadow
-                    overflow-hidden
+        <div class="w-[150px] md:w-[165px] h-[215px] md:h-[235px]
+                    rounded-[16px] bg-gray-100 shadow overflow-hidden
                     flex items-center justify-center">
-            <span class="text-gray-400 text-[11px]">Pamflet 1</span>
+            @if(!empty($homePamflet?->pamflet_1))
+                <img src="{{ asset('storage/'.$homePamflet->pamflet_1) }}"
+                    class="w-full h-full object-cover"
+                    alt="Pamflet 1">
+            @else
+                <span class="text-gray-400 text-[11px]">Pamflet 1</span>
+            @endif
         </div>
 
+
         {{-- PAMFLET 2 --}}
-        <div class="w-[150px] md:w-[165px]
-                    h-[215px] md:h-[235px]
-                    rounded-[16px]
-                    bg-gray-100
-                    shadow
-                    overflow-hidden
+        <div class="w-[150px] md:w-[165px] h-[215px] md:h-[235px]
+                    rounded-[16px] bg-gray-100 shadow overflow-hidden
                     flex items-center justify-center">
-            <span class="text-gray-400 text-[11px]">Pamflet 2</span>
+            @if(!empty($homePamflet?->pamflet_2))
+                <img src="{{ asset('storage/'.$homePamflet->pamflet_2) }}"
+                    class="w-full h-full object-cover"
+                    alt="Pamflet 2">
+            @else
+                <span class="text-gray-400 text-[11px]">Pamflet 2</span>
+            @endif
         </div>
 
         {{-- PAMFLET 3 --}}
-        <div class="w-[150px] md:w-[165px]
-                    h-[215px] md:h-[235px]
-                    rounded-[16px]
-                    bg-gray-100
-                    shadow
-                    overflow-hidden
+        <div class="w-[150px] md:w-[165px] h-[215px] md:h-[235px]
+                    rounded-[16px] bg-gray-100 shadow overflow-hidden
                     flex items-center justify-center">
-            <span class="text-gray-400 text-[11px]">Pamflet 3</span>
+            @if(!empty($homePamflet?->pamflet_3))
+                <img src="{{ asset('storage/'.$homePamflet->pamflet_3) }}"
+                    class="w-full h-full object-cover"
+                    alt="Pamflet 3">
+            @else
+                <span class="text-gray-400 text-[11px]">Pamflet 3</span>
+            @endif
         </div>
 
     </div>

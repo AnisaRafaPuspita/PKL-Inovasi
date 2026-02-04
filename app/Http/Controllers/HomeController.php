@@ -7,6 +7,7 @@ use App\Models\InnovatorOfTheMonth;
 use App\Models\InnovationRanking;
 use App\Models\Faculty;
 use App\Models\Innovator;
+use App\Models\HomePamflet;
 
 
 
@@ -47,7 +48,10 @@ class HomeController extends Controller
 
         $innovators = Innovator::orderBy('name')->get(); 
 
-        return view('pages.home', compact('impactInnovations', 'mostVisited', 'featuredInnovators', 'rankings', 'faculties', 'innovators'));
+        $homePamflet = HomePamflet::first() ?? HomePamflet::create();
+
+
+        return view('pages.home', compact('impactInnovations', 'homePamflet', 'mostVisited', 'featuredInnovators', 'rankings', 'faculties', 'innovators'));
     }
 
     public function about()
