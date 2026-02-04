@@ -439,7 +439,7 @@
              alt="Icon">
         <h2 class="text-[#001349] text-[20px] md:text-[24px] font-bold"
             style="font-family: Inter, sans-serif;">
-            National Innovation Ranking
+            International & National Innovation Ranking
         </h2>
     </div>
 

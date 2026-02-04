@@ -114,6 +114,10 @@ class InnovationController extends Controller
             'images.*' => ['image'],
             'hki_registration_number' => ['nullable', 'string'],
             'hki_patent_number' => ['nullable', 'string'],
+            'ki_type'   => ['nullable', 'in:paten,hak_cipta,desain_industri,merek'],
+            'ki_status' => ['nullable', 'in:terdaftar,granted'],
+            'ki_number' => ['required_with:ki_status', 'string', 'max:255'],
+
         ]);
 
         // Validasi maksimal 200 kata untuk field teks utama

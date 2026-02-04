@@ -32,6 +32,10 @@ class Innovation extends Model
         'views_count',
         'image_url',
         'source',
+        'ki_type',
+        'ki_status',
+        'ki_number',
+
     ];
 
     protected $casts = [
