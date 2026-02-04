@@ -449,10 +449,13 @@
                                 Innovator
                             </span>
 
-                            <a href="{{ route('innovator-month.show', $item->id) }}"
-                               class="text-[#1A6ECE] font-semibold text-[14px] hover:underline">
-                                Lihat Detail
+                            <a href="{{ route('innovators.show', $item->innovator_id) }}"
+                                class="text-[#1A6ECE] font-semibold text-[14px] hover:underline">
+                                    Lihat Detail
                             </a>
+
+
+
                         </div>
 
                     </div>
