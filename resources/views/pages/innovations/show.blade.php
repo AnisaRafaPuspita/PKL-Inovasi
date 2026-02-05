@@ -105,9 +105,24 @@
                 </p>
 
                 <p class="mt-3">
-                    <span class="font-semibold text-[#001349]">Status Paten:</span>
-                    <span class="font-light">{{ $innovation->hki_status ?? '-' }}</span>
+                    <span class="font-semibold text-[#001349]">Status KI:</span>
+
+                    @if($innovation->ki_type)
+                        <span class="font-light">
+                            {{ ucfirst($innovation->ki_type) }}
+                            @if($innovation->ki_status)
+                                ({{ $innovation->ki_status }})
+                            @endif
+                        </span>
+                    @elseif($innovation->hki_status)
+                        <span class="font-light">
+                            {{ $innovation->hki_status }}
+                        </span>
+                    @else
+                        <span class="font-light">-</span>
+                    @endif
                 </p>
+
 
                 <p class="mt-3">
                     <span class="font-semibold text-[#001349]">Link Inovasi:</span>
