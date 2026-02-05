@@ -5,17 +5,24 @@
 
 {{-- HERO --}}
 <section class="relative">
-    <img src="{{ asset('images/muladi.JPG') }}" class="h-[420px] md:h-[560px] w-full object-cover" alt="">
+    <img src="{{ asset('images/muladi.JPG') }}"
+     class="h-[420px] md:h-[560px] w-full object-cover animate-fade"
+     alt="">
     <div class="absolute inset-0 bg-black/30"></div>
 
     <div class="absolute inset-0 flex items-center justify-center">
         <div class="text-center px-4">
-            <h1 class="text-white text-[48px] md:text-[92px] font-bold"
-                style="font-family:'Source Serif Pro', serif; text-shadow:0px 4px 4px rgba(0,0,0,.40);">
+            <h1 class="text-white text-[48px] md:text-[92px] font-bold
+                    animate-fade-up delay-1"
+                style="font-family:'Source Serif Pro', serif;
+                    text-shadow:0px 4px 4px rgba(0,0,0,.40);">
                 UNDIP INNOVATION
             </h1>
 
-            <div class="mt-6 flex flex-wrap items-center justify-center gap-5 md:gap-6">
+
+           <div class="mt-6 flex flex-wrap items-center justify-center
+                gap-5 md:gap-6
+                animate-fade-up delay-2">
 
                 {{-- Upload Produk --}}
                 <a href="{{ route('innovations.create') }}"
@@ -60,51 +67,104 @@
 
 {{-- HERO PAMFLET – FINAL PROPORSIONAL --}}
 <section class="relative z-30 mx-auto
-                -mt-[140px] md:-mt-[150px]">
+                -mt-[90px] md:-mt-[110px]
+                animate-fade-up delay-3">
+
 
     <div class="mx-auto w-fit flex items-end
-                gap-3 md:gap-4">
+                gap-15 md:gap-16">
 
         {{-- PAMFLET 1 --}}
-        <div class="w-[150px] md:w-[165px] h-[215px] md:h-[235px]
-                    rounded-[16px] bg-gray-100 shadow overflow-hidden
-                    flex items-center justify-center">
-            @if(!empty($homePamflet?->pamflet_1))
-                <img src="{{ asset('storage/'.$homePamflet->pamflet_1) }}"
-                    class="w-full h-full object-cover"
-                    alt="Pamflet 1">
-            @else
-                <span class="text-gray-400 text-[11px]">Pamflet 1</span>
-            @endif
+        <div class="group
+                    shadow-[0_12px_30px_rgba(0,0,0,0.28)]
+                    hover:shadow-[0_22px_50px_rgba(0,0,0,0.38)]
+                    transition-shadow duration-300
+                    rounded-[18px]">
+
+            <div class="w-[150px] md:w-[165px] h-[215px] md:h-[235px]
+                        rounded-[16px]
+                        bg-gray-100
+                        overflow-hidden
+                        flex items-center justify-center
+                        animate-fade-up delay-2
+                        transition-transform duration-300 ease-out
+                        group-hover:scale-[1.05]
+                        cursor-pointer">
+
+                @if(!empty($homePamflet?->pamflet_1))
+                    <img src="{{ asset('storage/'.$homePamflet->pamflet_1) }}"
+                        class="w-full h-full object-cover
+                                transition-transform duration-300
+                                group-hover:scale-[1.03]"
+                        alt="Pamflet 1">
+                @else
+                    <span class="text-gray-400 text-[11px]">Pamflet 1</span>
+                @endif
+
+            </div>
         </div>
+
 
 
         {{-- PAMFLET 2 --}}
-        <div class="w-[150px] md:w-[165px] h-[215px] md:h-[235px]
-                    rounded-[16px] bg-gray-100 shadow overflow-hidden
-                    flex items-center justify-center">
-            @if(!empty($homePamflet?->pamflet_2))
-                <img src="{{ asset('storage/'.$homePamflet->pamflet_2) }}"
-                    class="w-full h-full object-cover"
-                    alt="Pamflet 2">
-            @else
-                <span class="text-gray-400 text-[11px]">Pamflet 2</span>
-            @endif
+        <div class="group
+                    shadow-[0_12px_30px_rgba(0,0,0,0.28)]
+                    hover:shadow-[0_22px_50px_rgba(0,0,0,0.38)]
+                    transition-shadow duration-300
+                    rounded-[18px]">
+
+            <div class="w-[150px] md:w-[165px] h-[215px] md:h-[235px]
+                        rounded-[16px]
+                        bg-gray-100
+                        overflow-hidden
+                        flex items-center justify-center
+                        animate-fade-up delay-3
+                        transition-transform duration-300 ease-out
+                        group-hover:scale-[1.05]
+                        cursor-pointer">
+
+                @if(!empty($homePamflet?->pamflet_2))
+                    <img src="{{ asset('storage/'.$homePamflet->pamflet_2) }}"
+                        class="w-full h-full object-cover
+                                transition-transform duration-300
+                                group-hover:scale-[1.03]"
+                        alt="Pamflet 2">
+                @else
+                    <span class="text-gray-400 text-[11px]">Pamflet 2</span>
+                @endif
+
+            </div>
         </div>
 
         {{-- PAMFLET 3 --}}
-        <div class="w-[150px] md:w-[165px] h-[215px] md:h-[235px]
-                    rounded-[16px] bg-gray-100 shadow overflow-hidden
-                    flex items-center justify-center">
-            @if(!empty($homePamflet?->pamflet_3))
-                <img src="{{ asset('storage/'.$homePamflet->pamflet_3) }}"
-                    class="w-full h-full object-cover"
-                    alt="Pamflet 3">
-            @else
-                <span class="text-gray-400 text-[11px]">Pamflet 3</span>
-            @endif
-        </div>
+        <div class="group
+                    shadow-[0_12px_30px_rgba(0,0,0,0.28)]
+                    hover:shadow-[0_22px_50px_rgba(0,0,0,0.38)]
+                    transition-shadow duration-300
+                    rounded-[18px]">
 
+            <div class="w-[150px] md:w-[165px] h-[215px] md:h-[235px]
+                        rounded-[16px]
+                        bg-gray-100
+                        overflow-hidden
+                        flex items-center justify-center
+                        animate-fade-up delay-4
+                        transition-transform duration-300 ease-out
+                        group-hover:scale-[1.05]
+                        cursor-pointer">
+
+                @if(!empty($homePamflet?->pamflet_3))
+                    <img src="{{ asset('storage/'.$homePamflet->pamflet_3) }}"
+                        class="w-full h-full object-cover
+                                transition-transform duration-300
+                                group-hover:scale-[1.03]"
+                        alt="Pamflet 3">
+                @else
+                    <span class="text-gray-400 text-[11px]">Pamflet 3</span>
+                @endif
+
+            </div>
+        </div>
     </div>
 </section>
 
