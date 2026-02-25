@@ -17,6 +17,7 @@ class InnovationController extends Controller
         $category = $request->query('category');
         $facultyId = $request->query('faculty_id');
         $innovatorId = $request->query('innovator_id');
+        $year = request('year');
 
 
         $baseQuery = Innovation::query()
@@ -41,6 +42,9 @@ class InnovationController extends Controller
                 $query->whereHas('innovators', function ($q) use ($innovatorId) {
                     $q->where('innovators.id', $innovatorId);
                 });
+            })
+            ->when($year, function ($query) use ($year) {
+                $query->whereYear('created_at', $year);
             });
 
 

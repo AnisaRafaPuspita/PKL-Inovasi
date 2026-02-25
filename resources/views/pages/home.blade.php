@@ -223,7 +223,7 @@
                     px-4 md:px-6 py-4
                     shadow">
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
 
                 {{-- kategori --}}
                 <select name="category"
@@ -266,6 +266,20 @@
                             {{ $innovator->name }}
                         </option>
                     @endforeach
+                </select>
+
+                {{---Tahun---}}
+                <select name="year"
+                        class="h-[42px] rounded-full px-5
+                            border border-[#001349]/30
+                            outline-none">
+                    <option value="">Semua Tahun</option>
+                    @for($y = now()->year; $y >= 2018; $y--)
+                        <option value="{{ $y }}"
+                            {{ request('year') == $y ? 'selected' : '' }}>
+                            {{ $y }}
+                        </option>
+                    @endfor
                 </select>
 
 
