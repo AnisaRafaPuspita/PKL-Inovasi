@@ -45,16 +45,19 @@ class StatistikController extends Controller
         }
 
         // 3️⃣ Distribusi KI
-        $kiData = Innovation::select(
-                'ki_type',
-                DB::raw('COUNT(*) as total')
-            )
+        $kiData = Innovation::where('status', 'published')
+            ->whereHas('permission', function ($q) {
+                $q->where('status', 'accepted');
+            })
             ->whereNotNull('ki_type')
+            ->select('ki_type', DB::raw('COUNT(*) as total'))
             ->groupBy('ki_type')
             ->pluck('total', 'ki_type');
 
         $kiLabels = $kiData->keys();
         $kiTotals = $kiData->values();
+
+        
 
         return view('pages.statistik.index', [
             'monthlyData' => $monthlyData,

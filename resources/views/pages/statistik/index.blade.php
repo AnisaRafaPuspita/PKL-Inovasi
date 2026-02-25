@@ -3,13 +3,13 @@
 @section('title', 'Statistik')
 
 @section('content')
-<div class="max-w-6xl mx-auto py-16 space-y-16">
+<div class="max-w-6xl mx-auto py-14 space-y-10">
 
     <h1 class="text-3xl font-bold text-[#001349] text-center">
         Statistik Inovasi Tahun {{ $year }}
     </h1>
 
-    <!-- DATA HOLDER (AMAN UNTUK BLADE + JS) -->
+    <!-- DATA HOLDER -->
     <div id="statistik-data"
          data-monthly='@json($monthlyData)'
          data-faculty-labels='@json($facultyLabels)'
@@ -18,28 +18,61 @@
          data-ki-totals='@json($kiTotals)'>
     </div>
 
-    <!-- Grafik Per Bulan -->
-    <div class="bg-white p-8 rounded-2xl shadow">
-        <h2 class="text-xl font-semibold mb-6 text-[#001349]">
-            Grafik Inovasi per Bulan
-        </h2>
-        <canvas id="monthlyChart"></canvas>
+    <!-- SUMMARY CARDS -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-gradient-to-r from-[#001349] to-[#1A6ECE] text-white rounded-2xl p-6 shadow">
+            <div class="text-sm opacity-80">Total Inovasi</div>
+            <div class="text-3xl font-bold mt-2">
+                {{ is_array($monthlyData) ? array_sum($monthlyData) : $monthlyData->sum() }}
+            </div>
+        </div>
+
+        <div class="bg-[#EAF2FF] rounded-2xl shadow p-6">
+            <div class="text-sm text-[#001349]/70">
+                Total Fakultas Terlibat
+            </div>
+            <div class="text-3xl font-bold text-[#001349] mt-2">
+                {{ count($facultyLabels) }}
+            </div>
+        </div>
+
+        <div class="bg-[#EAF2FF] rounded-2xl shadow p-6">
+            <div class="text-sm text-gray-500">Total KI</div>
+            <div class="text-3xl font-bold text-[#001349] mt-2">
+                {{ is_array($kiTotals) ? array_sum($kiTotals) : $kiTotals->sum() }}
+            </div>
+        </div>
     </div>
 
-    <!-- Grafik Per Fakultas -->
-    <div class="bg-white p-8 rounded-2xl shadow">
-        <h2 class="text-xl font-semibold mb-6 text-[#001349]">
+    <!-- TOP GRID -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- Grafik Bulanan -->
+        <div class="bg-white rounded-2xl shadow p-6">
+            <h2 class="text-lg font-semibold text-[#001349] mb-4">
+                Grafik Inovasi per Bulan
+            </h2>
+            <canvas id="monthlyChart" height="200"></canvas>
+        </div>
+
+        <!-- Grafik KI -->
+        <div class="bg-white rounded-2xl shadow p-6">
+            <h2 class="text-lg font-semibold text-[#001349] mb-4">
+                Distribusi Hak Kekayaan Intelektual
+            </h2>
+            <div style="max-height:250px;">
+                <canvas id="kiChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Grafik Fakultas -->
+    <div class="bg-white rounded-2xl shadow p-6">
+        <h2 class="text-lg font-semibold text-[#001349] mb-6">
             Distribusi Inovasi per Fakultas
         </h2>
-        <canvas id="facultyChart"></canvas>
-    </div>
-
-    <!-- Grafik KI -->
-    <div class="bg-white p-8 rounded-2xl shadow">
-        <h2 class="text-xl font-semibold mb-6 text-[#001349]">
-            Distribusi Hak Kekayaan Intelektual
-        </h2>
-        <canvas id="kiChart"></canvas>
+        <canvas id="facultyChart" height="110"></canvas>
     </div>
 
 </div>
@@ -60,48 +93,52 @@ document.addEventListener("DOMContentLoaded", function () {
     const kiLabels = JSON.parse(dataEl.dataset.kiLabels || "[]");
     const kiTotals = JSON.parse(dataEl.dataset.kiTotals || "[]");
 
-    // 📊 1. Grafik Per Bulan
-    new Chart(document.getElementById('monthlyChart'), {
+    const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+
+    // 🎨 Gradient Line Chart
+    const ctx = document.getElementById('monthlyChart').getContext('2d');
+    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, 'rgba(26,110,206,0.35)');
+    gradient.addColorStop(1, 'rgba(26,110,206,0)');
+
+    new Chart(ctx, {
         type: 'line',
         data: {
-            labels: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],
+            labels: months,
             datasets: [{
-                label: 'Jumlah Inovasi',
                 data: monthlyData,
-                borderColor: '#001349',
-                backgroundColor: 'rgba(0,19,73,0.15)',
+                borderColor: '#1A6ECE',
+                backgroundColor: gradient,
                 fill: true,
-                tension: 0.4
+                tension: 0.4,
+                pointBackgroundColor: '#001349',
+                pointRadius: 4
             }]
         },
         options: {
-            responsive: true,
-            plugins: {
-                legend: { display: true }
-            }
+            plugins: { legend: { display: false } },
+            responsive: true
         }
     });
 
-    // 🏫 2. Grafik Fakultas
+    // 🏫 Bar Chart Fakultas
     new Chart(document.getElementById('facultyChart'), {
         type: 'bar',
         data: {
             labels: facultyLabels,
             datasets: [{
-                label: 'Jumlah Inovasi',
                 data: facultyTotals,
-                backgroundColor: '#1A6ECE'
+                backgroundColor: '#1A6ECE',
+                borderRadius: 6
             }]
         },
         options: {
-            responsive: true,
-            plugins: {
-                legend: { display: false }
-            }
+            plugins: { legend: { display: false } },
+            responsive: true
         }
     });
 
-    // 📜 3. Grafik KI
+    // 🥧 Pie Chart KI
     new Chart(document.getElementById('kiChart'), {
         type: 'pie',
         data: {
@@ -111,14 +148,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 backgroundColor: [
                     '#001349',
                     '#1A6ECE',
-                    '#6B7280',
-                    '#F59E0B',
-                    '#10B981'
+                    '#7FB3FF',
+                    '#BFD9FF'
                 ]
             }]
         },
         options: {
-            responsive: true
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            },
+            responsive: true,
+            maintainAspectRatio: false
         }
     });
 

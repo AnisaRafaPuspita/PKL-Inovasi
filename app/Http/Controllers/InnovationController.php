@@ -106,7 +106,7 @@ class InnovationController extends Controller
             'innovators.*.innovator_id' => ['nullable', 'exists:innovators,id'],
             'innovators.*.name' => ['nullable', 'string', 'max:255'],
             'innovators.*.faculty_id' => ['nullable', 'exists:faculties,id'],
-
+            'leader_email' => ['required', 'email'],
             'category' => ['nullable', 'string'],
             'category_other' => ['nullable', 'string', 'max:255'],
             'partner' => ['nullable', 'string'],
@@ -171,6 +171,7 @@ class InnovationController extends Controller
             'ki_type'   => $validated['ki_type'],
             'ki_status' => $validated['ki_status'],
             'ki_number' => $validated['ki_number'],
+            'leader_email' => $validated['leader_email'],
 
         ]);
 
