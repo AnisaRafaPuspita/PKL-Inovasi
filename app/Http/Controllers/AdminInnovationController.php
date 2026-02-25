@@ -203,19 +203,32 @@ class AdminInnovationController extends Controller
     {
         return $request->validate([
             'title' => 'required|string|max:255',
-            'category' => 'nullable|string|max:255',
+            'category' => 'required|string|max:255',
             'category_other' => 'nullable|string|max:255',
             'partner' => 'nullable|string|max:255',
-            'hki_status' => 'nullable|string|max:255',
-            'hki_registration_number' => 'nullable|string|max:255',
-            'hki_patent_number' => 'nullable|string|max:255',
+            'ki_type' => 'required|string|max:255',
+            'ki_status' => 'required|string|max:255',
+            'ki_number' => 'required|string|max:255',
             'video_url' => 'nullable|url|max:255',
-            'description' => 'nullable|string',
+            'description' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) {
+                    $text = trim(preg_replace('/\s+/', ' ', (string) $value));
+
+                    $words = $text === '' ? 0 : count(explode(' ', $text));
+
+                    if ($words > 200) {
+                        $fail("Deskripsi maksimal 200 kata. Saat ini {$words} kata.");
+                    }
+                },
+            ],
             'review' => 'nullable|string',
             'advantages' => 'nullable|string',
             'impact' => 'nullable|string',
             'status' => 'nullable|in:published,draft',
         ]);
+
     }
 
 

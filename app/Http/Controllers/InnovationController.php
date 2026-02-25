@@ -114,7 +114,34 @@ class InnovationController extends Controller
             'images.*' => ['image'],
             'hki_registration_number' => ['nullable', 'string'],
             'hki_patent_number' => ['nullable', 'string'],
+            'ki_type'   => ['nullable', 'in:paten,hak_cipta,desain_industri,merek'],
+            'ki_status' => ['nullable', 'in:terdaftar,granted'],
+            'ki_number' => ['required_with:ki_status', 'string', 'max:255'],
+
         ]);
+
+        // Validasi maksimal 200 kata untuk field teks utama
+        $fieldsWithWordLimit = [
+            'description' => 'Deskripsi produk',
+            'advantages'  => 'Keunggulan produk',
+            'impact'      => 'Keberdampakan produk',
+        ];
+
+        foreach ($fieldsWithWordLimit as $field => $label) {
+            if ($request->filled($field)) {
+                $wordCount = str_word_count(strip_tags($request->$field));
+
+                if ($wordCount > 200) {
+                    return back()
+                        ->withErrors([
+                            $field => "$label maksimal 200 kata."
+                        ])
+                        ->withInput();
+                }
+            }
+        }
+
+
 
 
 
@@ -137,6 +164,10 @@ class InnovationController extends Controller
             'hki_status' => $request->hki_status,
             'hki_registration_number' => $request->hki_registration_number,
             'hki_patent_number' => $request->hki_patent_number,
+            'ki_type'   => $validated['ki_type'],
+            'ki_status' => $validated['ki_status'],
+            'ki_number' => $validated['ki_number'],
+
         ]);
 
         foreach ($request->innovators as $item) {

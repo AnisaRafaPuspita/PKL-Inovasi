@@ -282,17 +282,19 @@
 
 
 
-            {{-- Innovator of The Month --}}
+            {{-- Data Innovator --}}
             @php $isIotm = request()->routeIs('admin.innovator_of_month.*'); @endphp
             <a class="menu-item {{ $isIotm ? 'active' : '' }}"
-            href="{{ route('admin.innovator_of_month.edit') }}"
+            href="{{ route('admin.innovator_of_month.index') }}"
             data-icon-blue="{{ asset('images/innovatorofthemonth-biru.png') }}"
             data-icon-white="{{ asset('images/innovatorofthemonth-putih.png') }}">
                 <img class="menu-icon"
                     src="{{ $isIotm ? asset('images/innovatorofthemonth-biru.png') : asset('images/innovatorofthemonth-putih.png') }}"
                     alt="">
-                <span>Innovator of The Month</span>
+                <span>Data Innovator</span>
             </a>
+
+
 
 
             {{-- Innovation ranking --}}

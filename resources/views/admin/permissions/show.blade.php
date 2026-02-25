@@ -14,25 +14,44 @@
   $photos = $innovation->images ?? collect();
   $innovatorList = $innovation->innovators ?? collect();
 
-  $predefinedCategories = [
-    'Energi',
-    'Ekonomi Biru',
-    'Kesehatan dan Farmasi',
-    'Manufaktur dan Infrastruktur',
-    'Pangan dan Teknologi Pertanian',
-    'Teknologi Digital, AI, dan sejenisnya',
-  ];
-
   $categoryDisplay = $innovation->category ?? '-';
   if (($innovation->category ?? '') === 'other') {
     $categoryDisplay = 'Inovasi Lainnya';
   }
 
-  $showRegNumber = in_array(($innovation->hki_status ?? ''), ['terdaftar', 'on_process'], true)
-    && trim((string)($innovation->hki_registration_number ?? '')) !== '';
+  $kiType = $innovation->ki_type ?? null;
+  $kiStatus = $innovation->ki_status ?? null;
+  $kiNumber = trim((string)($innovation->ki_number ?? '')) ?: null;
 
-  $showPatentNumber = (($innovation->hki_status ?? '') === 'granted')
-    && trim((string)($innovation->hki_patent_number ?? '')) !== '';
+  if (!$kiType) $kiType = $innovation->hki_type ?? null;
+  if (!$kiStatus) $kiStatus = $innovation->hki_status ?? null;
+
+  if (!$kiNumber) {
+    if (in_array(($kiStatus ?? ''), ['terdaftar','on_process'], true)) {
+      $kiNumber = trim((string)($innovation->hki_registration_number ?? '')) ?: null;
+    } elseif (($kiStatus ?? '') === 'granted') {
+      $kiNumber = trim((string)($innovation->hki_patent_number ?? '')) ?: null;
+    }
+  }
+
+  $kiTypeLabelMap = [
+    'paten' => 'Paten',
+    'hak_cipta' => 'Hak Cipta',
+    'desain_industri' => 'Desain Industri',
+    'merek' => 'Merek',
+  ];
+  $kiTypeLabel = $kiType ? ($kiTypeLabelMap[$kiType] ?? $kiType) : '-';
+
+  $kiNumberLabel = 'Nomor KI';
+  if ($kiType && $kiStatus) {
+    if ($kiType === 'hak_cipta') {
+      if ($kiStatus === 'terdaftar' || $kiStatus === 'on_process') $kiNumberLabel = 'Nomor Pendaftaran';
+      if ($kiStatus === 'granted') $kiNumberLabel = 'Nomor Surat Pencatatan Hak Cipta';
+    } else {
+      if ($kiStatus === 'terdaftar' || $kiStatus === 'on_process') $kiNumberLabel = 'Nomor Pendaftaran';
+      if ($kiStatus === 'granted') $kiNumberLabel = 'Nomor Sertifikat';
+    }
+  }
 @endphp
 
 <div class="panel">
@@ -63,18 +82,14 @@
         <div class="label">Mitra</div>
         <div class="value">{{ $innovation->partner ?? '-' }}</div>
 
-        <div class="label">Status Paten</div>
-        <div class="value">{{ $innovation->hki_status ?? '-' }}</div>
+        <div class="label">Status KI</div>
+        <div class="value">
+          <div>{{ $kiTypeLabel }}</div>
+          <div>{{ $kiStatus ?? '-' }}</div>
+        </div>
 
-        @if($showRegNumber)
-          <div class="label">Nomor Pendaftaran</div>
-          <div class="value">{{ $innovation->hki_registration_number }}</div>
-        @endif
-
-        @if($showPatentNumber)
-          <div class="label">Nomor Paten</div>
-          <div class="value">{{ $innovation->hki_patent_number }}</div>
-        @endif
+        <div class="label">{{ $kiNumberLabel }}</div>
+        <div class="value">{{ $kiNumber ?? '-' }}</div>
 
         <div class="label">Link Inovasi</div>
         <div class="value">
@@ -160,7 +175,6 @@
   border-radius:18px;
   padding:18px;
 }
-
 .perm-title{
   font-weight:900;
   color:#061a4d;
@@ -168,7 +182,6 @@
   font-size:24px;
   line-height:1.2;
 }
-
 .perm-grid{
   display:grid;
   grid-template-columns: 180px 1fr;
@@ -176,35 +189,29 @@
   font-size:15px;
   color:#0f172a;
 }
-
 .perm-grid .label{
   font-weight:900;
   color:#061a4d;
 }
-
 .perm-grid .value{
   font-weight:500;
   color:#0f172a;
 }
-
 .perm-ol{
   margin:6px 0 0 18px;
   padding-left:18px;
 }
-
 .perm-ol li{
   margin-bottom:6px;
   font-size:15px;
   font-weight:500;
   color:#0f172a;
 }
-
 .perm-ol .faculty{
   color:#061a4d;
   opacity:.8;
   font-weight:600;
 }
-
 .perm-section-title{
   font-weight:900;
   color:#061a4d;
@@ -212,26 +219,22 @@
   margin-bottom:6px;
   font-size:16px;
 }
-
 .text-block{
   white-space:pre-wrap;
   line-height:1.6;
   color:#0f172a;
 }
-
 .photo-card{
   border:2px solid #061a4d;
   border-radius:18px;
   padding:14px;
   background:#fff;
 }
-
 .photo-title{
   font-weight:900;
   color:#061a4d;
   margin-bottom:10px;
 }
-
 .photo-grid{
   display:grid;
   grid-template-columns:repeat(2, 1fr);
@@ -240,7 +243,6 @@
   overflow:auto;
   padding-right:4px;
 }
-
 .photo-item{
   border:1px solid rgba(6,26,77,.25);
   border-radius:14px;
@@ -248,14 +250,12 @@
   background:#fff;
   display:block;
 }
-
 .photo-item img{
   width:100%;
   height:150px;
   object-fit:cover;
   display:block;
 }
-
 .photo-empty{
   height:220px;
   display:flex;
@@ -266,7 +266,6 @@
   border-radius:18px;
   color:#64748b;
 }
-
 @media (max-width: 992px){
   .perm-grid{
     grid-template-columns: 1fr;

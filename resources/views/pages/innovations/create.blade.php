@@ -180,44 +180,66 @@
                 >
             </div>
 
-            {{-- Status Paten --}}
-            <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] items-start gap-4">
+            {{-- Status KI --}}
+            <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-4">
                 <label class="text-[#001349] text-[18px] font-bold pt-2">
-                    Status Paten
+                    Status KI
                 </label>
 
-                <div class="space-y-2">
+                <div>
                     <select
-                        name="hki_status"
-                        id="hki_status"
+                        name="ki_type"
+                        id="ki_type"
                         class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 bg-white outline-none"
-                        onchange="handleHkiStatus(this.value)"
+                        onchange="handleKiStatus()"
+                    >
+                        <option value="">Pilih Jenis KI</option>
+                        <option value="paten">Paten</option>
+                        <option value="hak_cipta">Hak Cipta</option>
+                        <option value="desain_industri">Desain Industri</option>
+                        <option value="merek">Merek</option>
+                    </select>
+                </div>
+            </div>
+
+            {{-- Status Pengajuan --}}
+            <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-4">
+                <label class="text-[#001349] text-[18px] font-bold pt-2">
+                    Status Pengajuan
+                </label>
+
+                <div>
+                    <select
+                        name="ki_status"
+                        id="ki_status"
+                        class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 bg-white outline-none"
+                        onchange="handleKiStatus()"
                     >
                         <option value="">Pilih Status</option>
                         <option value="terdaftar">Terdaftar</option>
-                        <option value="on_process">On Process</option>
                         <option value="granted">Granted</option>
                     </select>
-
-                    {{-- Nomor Pendaftaran --}}
-                    <input
-                        type="text"
-                        name="hki_registration_number"
-                        id="hki_registration"
-                        placeholder="Nomor Pendaftaran"
-                        class="hidden h-[46px] w-full rounded-[30px] border border-[#001349] px-6 outline-none"
-                    >
-
-                    {{-- Nomor Paten --}}
-                    <input
-                        type="text"
-                        name="hki_patent_number"
-                        id="hki_patent"
-                        placeholder="Nomor Paten"
-                        class="hidden h-[46px] w-full rounded-[30px] border border-[#001349] px-6 outline-none"
-                    >
                 </div>
             </div>
+
+            {{-- Nomor KI --}}
+            <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-4">
+                <label
+                    id="kiNumberLabel"
+                    class="text-[#001349] text-[18px] font-bold pt-2 hidden">
+                    Nomor KI
+                </label>
+
+                <input
+                    type="text"
+                    name="ki_number"
+                    id="ki_number"
+                    class="hidden h-[46px] w-full rounded-[30px] border border-[#001349] px-6 outline-none"
+                >
+            </div>
+
+
+
 
 
             {{-- Link URL --}}
@@ -272,7 +294,7 @@
                 <textarea
                     name="description"
                     class="h-[171px] w-full rounded-[30px] border border-[#001349] px-6 py-4 outline-none resize-none"
-                    placeholder="Masukkan deskripsi inovasi"
+                    placeholder="Masukkan deskripsi inovasi (maksimal 200 kata)"
                 >{{ old('description') }}</textarea>
             </div>
 
@@ -282,7 +304,7 @@
                 <textarea
                     name="advantages"
                     class="h-[114px] w-full rounded-[30px] border border-[#001349] px-6 py-4 outline-none resize-none"
-                    placeholder="Masukkan keunggulan"
+                    placeholder="Masukkan keunggulan (maksimal 200 kata)"
                 >{{ old('advantages') }}</textarea>
             </div>
 
@@ -292,7 +314,7 @@
                 <textarea
                     name="impact"
                     class="h-[94px] w-full rounded-[30px] border border-[#001349] px-6 py-4 outline-none resize-none"
-                    placeholder="Masukkan Keberdampakan apabila produk sudah memiliki kebermanfaatan baik itu untuk institusi, perusahaan, maupun masyarakat"
+                    placeholder="Masukkan Keberdampakan apabila produk sudah memiliki kebermanfaatan baik itu untuk institusi, perusahaan, maupun masyarakat (maksimal 200 kata)"
                 >{{ old('impact') }}</textarea>
             </div>
 
@@ -430,6 +452,40 @@ document.addEventListener('change', function (e) {
     }
 });
 </script>
+
+<script>
+function handleKiStatus() {
+    const type   = document.getElementById('ki_type').value;
+    const status = document.getElementById('ki_status').value;
+
+    const input = document.getElementById('ki_number');
+    const label = document.getElementById('kiNumberLabel');
+
+    input.classList.add('hidden');
+    label.classList.add('hidden');
+
+    if (!type || !status) return;
+
+    let text = 'Nomor';
+
+    if (type === 'hak_cipta') {
+        text = status === 'terdaftar'
+            ? 'Nomor Pendaftaran Hak Cipta'
+            : 'Nomor Surat Pencatatan Hak Cipta';
+    } else {
+        text = status === 'terdaftar'
+            ? 'Nomor Pendaftaran'
+            : 'Nomor Sertifikat';
+    }
+
+    label.textContent = text;
+    input.placeholder = text;
+
+    label.classList.remove('hidden');
+    input.classList.remove('hidden');
+}
+</script>
+
 
 
 

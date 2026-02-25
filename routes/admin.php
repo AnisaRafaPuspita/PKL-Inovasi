@@ -6,7 +6,8 @@ use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminInnovationController;
 use App\Http\Controllers\AdminPermissionController;
 use App\Http\Controllers\AdminInnovatorOfTheMonthController;
-use App\Http\Controllers\AdminInnovationRankingController;
+use App\Http\Controllers\AdminInnovationRankingController;;
+
 
 Route::prefix('admin')->name('admin.')->group(function () {
 
@@ -23,9 +24,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])
             ->name('dashboard');
+        
+        Route::post('/dashboard/home-pamflet', [AdminDashboardController::class, 'updateHomePamflet'])
+            ->name('dashboard.home_pamflet.update');
 
         Route::get('/innovations', [AdminInnovationController::class, 'index'])
             ->name('innovations.index');
+
+        Route::delete('/dashboard/home-pamflet/{slot}', [AdminDashboardController::class, 'deletePamflet'])
+         ->name('dashboard.home_pamflet.delete');
 
         Route::get('/innovations/create', [AdminInnovationController::class, 'create'])
             ->name('innovations.create');
@@ -57,11 +64,23 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/permissions/{innovation}/decline', [AdminPermissionController::class, 'decline'])
             ->name('permissions.decline');
 
-        Route::get('/innovator-of-the-month', [AdminInnovatorOfTheMonthController::class, 'edit'])
+        Route::get('/innovator-of-the-month', [AdminInnovatorOfTheMonthController::class, 'index'])
+            ->name('innovator_of_month.index');
+
+        Route::get('/innovator-of-the-month/create', [AdminInnovatorOfTheMonthController::class, 'create'])
+            ->name('innovator_of_month.create');
+
+        Route::post('/innovator-of-the-month', [AdminInnovatorOfTheMonthController::class, 'store'])
+            ->name('innovator_of_month.store');
+
+        Route::get('/innovator-of-the-month/{iotm}/edit', [AdminInnovatorOfTheMonthController::class, 'edit'])
             ->name('innovator_of_month.edit');
 
-        Route::post('/innovator-of-the-month', [AdminInnovatorOfTheMonthController::class, 'update'])
+        Route::put('/innovator-of-the-month/{iotm}', [AdminInnovatorOfTheMonthController::class, 'update'])
             ->name('innovator_of_month.update');
+
+        Route::delete('/innovator-of-the-month/{iotm}', [AdminInnovatorOfTheMonthController::class, 'destroy'])
+            ->name('innovator_of_month.destroy');
 
         Route::get('/innovation-rankings', [AdminInnovationRankingController::class, 'index'])
             ->name('innovation_rankings.index');
@@ -81,8 +100,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::delete('/innovation-rankings/{ranking}', [AdminInnovationRankingController::class, 'destroy'])
             ->name('innovation_rankings.destroy');
 
+        
         Route::prefix('admin')->name('admin.')->group(function () {
-            Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
         });
     });
 });

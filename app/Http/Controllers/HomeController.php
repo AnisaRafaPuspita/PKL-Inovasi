@@ -7,6 +7,7 @@ use App\Models\InnovatorOfTheMonth;
 use App\Models\InnovationRanking;
 use App\Models\Faculty;
 use App\Models\Innovator;
+use App\Models\HomePamflet;
 
 
 
@@ -16,23 +17,12 @@ class HomeController extends Controller
 {
     public function index()
     {
-        // impact innovations (published & is_impact)
         $impactInnovations = Innovation::query()
             ->where('status', 'published')
             ->whereHas('permission', fn ($q) => $q->where('status', 'accepted'))
-            ->where('is_impact', true)
             ->latest()
             ->get();
 
-
-        $innovations = Innovation::query()
-            ->where('status', 'published')
-            ->whereHas('permission', function ($q) {
-                $q->where('status', 'accepted');
-            })
-            ->where('is_impact', false)
-            ->latest()
-            ->get();
 
 
         // most visited
@@ -42,12 +32,11 @@ class HomeController extends Controller
             ->take(3)
             ->get();
 
-        // innovator of the month (latest record)
-        $innovatorMonth = InnovatorOfTheMonth::query()
+        $featuredInnovators = InnovatorOfTheMonth::query()
             ->with(['innovator.faculty'])
-            ->orderByDesc('year')
-            ->orderByDesc('month')
-            ->first();
+            ->latest()
+            ->get();
+
 
         $rankings = InnovationRanking::query()
             ->select('*')
@@ -59,7 +48,10 @@ class HomeController extends Controller
 
         $innovators = Innovator::orderBy('name')->get(); 
 
-        return view('pages.home', compact('impactInnovations','innovations', 'mostVisited', 'innovatorMonth', 'rankings', 'faculties', 'innovators'));
+        $homePamflet = HomePamflet::first() ?? HomePamflet::create();
+
+
+        return view('pages.home', compact('impactInnovations', 'homePamflet', 'mostVisited', 'featuredInnovators', 'rankings', 'faculties', 'innovators'));
     }
 
     public function about()

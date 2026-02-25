@@ -6,6 +6,8 @@ use App\Http\Controllers\InnovationController;
 use App\Http\Controllers\InnovatorOfMonthController;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\RankingController;
+use App\Http\Controllers\InnovatorController;
+
 
 
 /*
@@ -54,6 +56,14 @@ Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admi
 /* ========== RANGKINK =========== */ 
 Route::get('/rankings/{ranking}', [RankingController::class, 'show'])
     ->name('rankings.show');
+
+/* ===== INNOVATOR */
+Route::get('/innovators', [InnovatorController::class, 'index'])
+    ->name('innovators.index');
+
+Route::get('/innovators/{innovator}', [InnovatorController::class, 'show'])
+    ->name('innovators.show');
+
 
 
 

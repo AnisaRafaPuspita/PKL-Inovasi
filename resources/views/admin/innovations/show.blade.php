@@ -64,11 +64,34 @@
     $categoryDisplay = 'Inovasi Lainnya';
   }
 
-  $showRegNumber = in_array(($innovation->hki_status ?? ''), ['terdaftar','on_process'], true)
-      && trim((string)($innovation->hki_registration_number ?? '')) !== '';
+  $kiType = old('ki_type', $innovation->ki_type ?? '');
+  $kiStatus = old('ki_status', $innovation->ki_status ?? '');
+  $kiNumber = old('ki_number', $innovation->ki_number ?? '');
 
-  $showPatentNumber = (($innovation->hki_status ?? '') === 'granted')
-      && trim((string)($innovation->hki_patent_number ?? '')) !== '';
+  $kiNumberLabel = 'Nomor KI';
+  if ($kiType && $kiStatus) {
+    if ($kiType === 'hak_cipta') {
+      if ($kiStatus === 'terdaftar') $kiNumberLabel = 'Nomor Pendaftaran';
+      if ($kiStatus === 'granted') $kiNumberLabel = 'Nomor Surat Pencatatan Hak Cipta';
+    } else {
+      if ($kiStatus === 'terdaftar') $kiNumberLabel = 'Nomor Pendaftaran';
+      if ($kiStatus === 'granted') $kiNumberLabel = 'Nomor Sertifikat';
+    }
+  }
+
+  $kiTypeLabelMap = [
+    'paten' => 'Paten',
+    'hak_cipta' => 'Hak Cipta',
+    'desain_industri' => 'Desain Industri',
+    'merek' => 'Merek',
+  ];
+  $kiTypeLabel = $kiType ? ($kiTypeLabelMap[$kiType] ?? $kiType) : '-';
+
+  $kiStatusLabelMap = [
+    'terdaftar' => 'Terdaftar',
+    'granted' => 'Granted',
+  ];
+  $kiStatusLabel = $kiStatus ? ($kiStatusLabelMap[$kiStatus] ?? $kiStatus) : '-';
 @endphp
 
 <div class="panel mb-4">
@@ -99,18 +122,14 @@
         <div class="label">Mitra</div>
         <div class="value">{{ $innovation->partner ?? '-' }}</div>
 
-        <div class="label">Status Paten</div>
-        <div class="value">{{ $innovation->hki_status ?? '-' }}</div>
+        <div class="label">Status KI</div>
+        <div class="value">
+          <div>{{ $kiTypeLabel }}</div>
+          <div>{{ $kiStatusLabel }}</div>
+        </div>
 
-        @if($showRegNumber)
-          <div class="label">Nomor Pendaftaran</div>
-          <div class="value">{{ $innovation->hki_registration_number }}</div>
-        @endif
-
-        @if($showPatentNumber)
-          <div class="label">Nomor Paten</div>
-          <div class="value">{{ $innovation->hki_patent_number }}</div>
-        @endif
+        <div class="label">{{ $kiNumberLabel }}</div>
+        <div class="value">{{ !empty($kiNumber) ? $kiNumber : '-' }}</div>
 
         <div class="label">Link Inovasi</div>
         <div class="value">
@@ -228,9 +247,10 @@
       <div class="col-12 col-lg-8">
         <label class="fw-bold">Judul Inovasi</label>
         <input type="text" class="form-control mb-3" name="title" required
+               placeholder="Masukkan judul inovasi"
                value="{{ old('title', $innovation->title) }}">
 
-        <label class="fw-bold">Inovator</label>
+        <label class="fw-bold">Innovator</label>
 
         <div class="row g-2 align-items-start mb-2">
           <div class="col-12 col-md-6">
@@ -252,7 +272,7 @@
 
         <div class="mb-2">
           <select id="pick_innovator_id" class="form-select">
-            <option value="">Atau pilih inovator yang sudah ada</option>
+            <option value="">Atau pilih innovator yang sudah ada</option>
             @foreach($innovators as $inv)
               <option
                 value="{{ $inv->id }}"
@@ -308,52 +328,61 @@
 
         <label class="fw-bold">Mitra</label>
         <input type="text" class="form-control mb-3" name="partner"
+               placeholder="Contoh: PT ABC, UNDIP, dll"
                value="{{ old('partner', $innovation->partner) }}">
 
-        <label class="fw-bold">Status Paten</label>
-        <select name="hki_status" id="hki_status" class="form-select mb-2" onchange="handleHkiStatus(this.value)">
-          <option value="">Pilih Status</option>
-          <option value="terdaftar" @selected(old('hki_status', $innovation->hki_status) === 'terdaftar')>Terdaftar</option>
-          <option value="on_process" @selected(old('hki_status', $innovation->hki_status) === 'on_process')>On Process</option>
-          <option value="granted" @selected(old('hki_status', $innovation->hki_status) === 'granted')>Granted</option>
-        </select>
+        <label class="fw-bold">Status KI</label>
+        <div class="row g-2 mb-2">
+          <div class="col-12 col-md-6">
+            <select id="ki_type" name="ki_type" class="form-select" onchange="handleKiUI()">
+              <option value="">Pilih Jenis KI</option>
+              <option value="paten" @selected(old('ki_type', $innovation->ki_type ?? '') === 'paten')>Paten</option>
+              <option value="hak_cipta" @selected(old('ki_type', $innovation->ki_type ?? '') === 'hak_cipta')>Hak Cipta</option>
+              <option value="desain_industri" @selected(old('ki_type', $innovation->ki_type ?? '') === 'desain_industri')>Desain Industri</option>
+              <option value="merek" @selected(old('ki_type', $innovation->ki_type ?? '') === 'merek')>Merek</option>
+            </select>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <select name="ki_status" id="ki_status" class="form-select" onchange="handleKiStatus()">
+              <option value="">Pilih Status</option>
+              <option value="terdaftar" @selected(old('ki_status', $innovation->ki_status ?? '') === 'terdaftar')>Terdaftar</option>
+              <option value="granted" @selected(old('ki_status', $innovation->ki_status ?? '') === 'granted')>Granted</option>
+            </select>
+          </div>
+        </div>
+
+        <label id="kiNumberLabel" class="fw-bold" style="display:none;">Nomor KI</label>
 
         <input
           type="text"
-          name="hki_registration_number"
-          id="hki_registration"
-          placeholder="Nomor Pendaftaran"
-          class="form-control mb-2"
-          value="{{ old('hki_registration_number', $innovation->hki_registration_number ?? '') }}"
-          style="display:none;"
-        >
-
-        <input
-          type="text"
-          name="hki_patent_number"
-          id="hki_patent"
-          placeholder="Nomor Paten"
+          id="ki_number"
+          name="ki_number"
           class="form-control mb-3"
-          value="{{ old('hki_patent_number', $innovation->hki_patent_number ?? '') }}"
           style="display:none;"
+          placeholder="Nomor KI"
+          value="{{ old('ki_number', $innovation->ki_number ?? '') }}"
         >
 
-        <label class="fw-bold">Link Inovasi</label>
-        <input type="text" class="form-control mb-3" name="video_url"
+        <label class="fw-bold">Link Inovasi (opsional)</label>
+        <input type="url" class="form-control mb-3" name="video_url"
+               placeholder="https://..."
                value="{{ old('video_url', $innovation->video_url) }}">
 
         <label class="fw-bold">Deskripsi</label>
         <textarea class="form-control mb-3" rows="4"
-                  name="description">{{ old('description', $innovation->description) }}</textarea>
+                  name="description"
+                  placeholder="Masukkan deskripsi inovasi">{{ old('description', $innovation->description) }}</textarea>
 
         <label class="fw-bold">Keunggulan</label>
         <textarea class="form-control mb-3" rows="3"
-                  name="advantages">{{ old('advantages', $innovation->advantages) }}</textarea>
+                  name="advantages"
+                  placeholder="Masukkan keunggulan">{{ old('advantages', $innovation->advantages) }}</textarea>
 
         <label class="fw-bold">Keberdampakan</label>
         <input type="text" class="form-control mb-4" name="impact"
                value="{{ old('impact', $innovation->impact) }}"
-               placeholder="Isi agar masuk Inovasi Berdampak">
+               placeholder="Masukkan keberdampakan (jika ada)">
 
         <div class="text-end">
           <button class="btn btn-navy px-4" type="submit">Simpan Perubahan</button>
@@ -364,224 +393,245 @@
 </div>
 
 <script>
-  const btn = document.getElementById('btnToggleEdit');
-  const box = document.getElementById('editBox');
+  const btn = document.getElementById('btnToggleEdit')
+  const box = document.getElementById('editBox')
 
   btn.addEventListener('click', () => {
-    const isOpen = box.style.display === 'block';
-    box.style.display = isOpen ? 'none' : 'block';
-    btn.textContent = isOpen ? 'Edit' : 'Tutup Edit';
-    if(!isOpen) box.scrollIntoView({behavior:'smooth', block:'start'});
-  });
+    const isOpen = box.style.display === 'block'
+    box.style.display = isOpen ? 'none' : 'block'
+    btn.textContent = isOpen ? 'Edit' : 'Tutup Edit'
+    if (!isOpen) box.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  })
 
-  function handleHkiStatus(val){
-    var reg = document.getElementById('hki_registration');
-    var pat = document.getElementById('hki_patent');
-    if (!reg || !pat) return;
+  function handleKiUI() {
+    const typeEl = document.getElementById('ki_type')
+    const statusEl = document.getElementById('ki_status')
+    const input = document.getElementById('ki_number')
+    const label = document.getElementById('kiNumberLabel')
 
-    reg.style.display = 'none';
-    pat.style.display = 'none';
+    if (!typeEl || !statusEl || !input || !label) return
 
-    if (val === 'terdaftar' || val === 'on_process') reg.style.display = 'block';
-    if (val === 'granted') pat.style.display = 'block';
+    const type = typeEl.value
+    const status = statusEl.value
+
+    input.style.display = 'none'
+    label.style.display = 'none'
+
+    if (!type || !status) return
+
+    let text = 'Nomor'
+
+    if (type === 'hak_cipta') {
+      if (status === 'terdaftar') text = 'Nomor Pendaftaran'
+      if (status === 'granted') text = 'Nomor Surat Pencatatan Hak Cipta'
+    } else {
+      if (status === 'terdaftar') text = 'Nomor Pendaftaran'
+      if (status === 'granted') text = 'Nomor Sertifikat'
+    }
+
+    label.textContent = text
+    input.placeholder = text
+
+    label.style.display = 'block'
+    input.style.display = 'block'
   }
 
-  function handleCategory(val){
-    var other = document.getElementById('category_other');
-    if (!other) return;
+  function handleCategory(val) {
+    const other = document.getElementById('category_other')
+    if (!other) return
 
     if (val === 'other') {
-      other.style.display = 'block';
+      other.style.display = 'block'
     } else {
-      other.style.display = 'none';
-      other.value = '';
+      other.style.display = 'none'
+      other.value = ''
     }
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    const input = document.getElementById('photosInput');
-    const preview = document.getElementById('photoPreview');
-    const empty = document.getElementById('photoEmpty');
-    const clearBtn = document.getElementById('clearPhotosBtn');
-    const form = document.getElementById('editInnovationForm');
+    const cat = document.getElementById('category')
+    if (cat) handleCategory(cat.value)
 
-    if (input && preview && empty && clearBtn && form) {
-      let selectedFiles = [];
+    handleKiUI()
+
+    const kiType = document.getElementById('ki_type')
+    const kiStatus = document.getElementById('ki_status')
+
+    if (kiType) kiType.addEventListener('change', handleKiUI)
+    if (kiStatus) kiStatus.addEventListener('change', handleKiUI)
+
+    const input = document.getElementById('photosInput')
+    const preview = document.getElementById('photoPreview')
+    const empty = document.getElementById('photoEmpty')
+    const clearBtn = document.getElementById('clearPhotosBtn')
+
+    if (input && preview && empty && clearBtn) {
+      let selectedFiles = []
 
       function syncInputFiles() {
-        const dt = new DataTransfer();
-        selectedFiles.forEach(f => dt.items.add(f));
-        input.files = dt.files;
+        const dt = new DataTransfer()
+        selectedFiles.forEach(f => dt.items.add(f))
+        input.files = dt.files
       }
 
       function render() {
-        preview.innerHTML = '';
+        preview.innerHTML = ''
 
         if (!selectedFiles.length) {
-          preview.style.display = 'none';
-          empty.style.display = 'flex';
-          return;
+          preview.style.display = 'none'
+          empty.style.display = 'flex'
+          return
         }
 
-        empty.style.display = 'none';
-        preview.style.display = 'grid';
+        empty.style.display = 'none'
+        preview.style.display = 'grid'
 
         selectedFiles.forEach((file, idx) => {
-          const url = URL.createObjectURL(file);
+          const url = URL.createObjectURL(file)
 
-          const wrap = document.createElement('div');
-          wrap.style.position = 'relative';
-          wrap.style.border = '1px solid #e5e7eb';
-          wrap.style.borderRadius = '12px';
-          wrap.style.overflow = 'hidden';
-          wrap.style.height = '110px';
+          const wrap = document.createElement('div')
+          wrap.style.position = 'relative'
+          wrap.style.border = '1px solid #e5e7eb'
+          wrap.style.borderRadius = '12px'
+          wrap.style.overflow = 'hidden'
+          wrap.style.height = '110px'
 
-          const img = document.createElement('img');
-          img.src = url;
-          img.style.width = '100%';
-          img.style.height = '100%';
-          img.style.objectFit = 'cover';
+          const img = document.createElement('img')
+          img.src = url
+          img.style.width = '100%'
+          img.style.height = '100%'
+          img.style.objectFit = 'cover'
 
-          const b = document.createElement('button');
-          b.type = 'button';
-          b.textContent = '×';
-          b.style.position = 'absolute';
-          b.style.top = '6px';
-          b.style.right = '6px';
-          b.style.width = '26px';
-          b.style.height = '26px';
-          b.style.borderRadius = '999px';
-          b.style.border = '0';
-          b.style.fontWeight = '900';
-          b.style.cursor = 'pointer';
-          b.style.background = 'rgba(0,0,0,0.6)';
-          b.style.color = '#fff';
+          const b = document.createElement('button')
+          b.type = 'button'
+          b.textContent = '×'
+          b.style.position = 'absolute'
+          b.style.top = '6px'
+          b.style.right = '6px'
+          b.style.width = '26px'
+          b.style.height = '26px'
+          b.style.borderRadius = '999px'
+          b.style.border = '0'
+          b.style.fontWeight = '900'
+          b.style.cursor = 'pointer'
+          b.style.background = 'rgba(0,0,0,0.6)'
+          b.style.color = '#fff'
           b.addEventListener('click', () => {
-            selectedFiles.splice(idx, 1);
-            syncInputFiles();
-            render();
-          });
+            selectedFiles.splice(idx, 1)
+            syncInputFiles()
+            render()
+          })
 
-          wrap.appendChild(img);
-          wrap.appendChild(b);
-          preview.appendChild(wrap);
+          wrap.appendChild(img)
+          wrap.appendChild(b)
+          preview.appendChild(wrap)
 
-          img.addEventListener('load', () => URL.revokeObjectURL(url));
-        });
+          img.addEventListener('load', () => URL.revokeObjectURL(url))
+        })
       }
 
       input.addEventListener('change', () => {
-        const files = Array.from(input.files || []);
-        if (!files.length) return;
+        const files = Array.from(input.files || [])
+        if (!files.length) return
 
         files.forEach(f => {
-          if (!f.type || !f.type.startsWith('image/')) return;
+          if (!f.type || !f.type.startsWith('image/')) return
 
           const exists = selectedFiles.some(x =>
             x.name === f.name && x.size === f.size && x.lastModified === f.lastModified
-          );
-          if (!exists) selectedFiles.push(f);
-        });
+          )
+          if (!exists) selectedFiles.push(f)
+        })
 
-        syncInputFiles();
-        render();
-      });
+        syncInputFiles()
+        render()
+      })
 
       clearBtn.addEventListener('click', () => {
-        selectedFiles = [];
-        syncInputFiles();
-        render();
-      });
+        selectedFiles = []
+        syncInputFiles()
+        render()
+      })
 
-      form.addEventListener('submit', () => {
-        syncInputFiles();
-      });
-
-      render();
+      render()
     }
 
-    const cat = document.getElementById('category');
-    if (cat) handleCategory(cat.value);
-
-    const sel = document.getElementById('hki_status');
-    if (sel) handleHkiStatus(sel.value);
-
-    const nameInput = document.getElementById('new_innovator_name');
-    const facultySelect = document.getElementById('new_innovator_faculty');
-    const pickSelect = document.getElementById('pick_innovator_id');
-    const addBtn = document.getElementById('addInnovatorBtn');
-    const list = document.getElementById('innovatorList');
-    const payload = document.getElementById('innovators_payload');
+    const nameInput = document.getElementById('new_innovator_name')
+    const facultySelect = document.getElementById('new_innovator_faculty')
+    const pickSelect = document.getElementById('pick_innovator_id')
+    const addBtn = document.getElementById('addInnovatorBtn')
+    const list = document.getElementById('innovatorList')
+    const payload = document.getElementById('innovators_payload')
 
     if (nameInput && facultySelect && pickSelect && addBtn && list && payload) {
-      let items = [];
+      let items = []
 
-      function setPayload(){
-        payload.value = JSON.stringify(items);
+      function setPayload() {
+        payload.value = JSON.stringify(items)
 
-        var facultyHidden = document.getElementById('faculty_id');
+        const facultyHidden = document.getElementById('faculty_id')
         if (facultyHidden) {
-          var first = items && items.length ? items[0] : null;
-          var fid = first && first.faculty_id ? first.faculty_id : '';
-          facultyHidden.value = fid ? String(fid) : '';
+          const first = items && items.length ? items[0] : null
+          const fid = first && first.faculty_id ? first.faculty_id : ''
+          facultyHidden.value = fid ? String(fid) : ''
         }
       }
 
-      function getFacultyNameById(id){
-        const opt = facultySelect.querySelector('option[value="' + id + '"]');
-        return opt ? opt.textContent.trim() : '';
+      function getFacultyNameById(id) {
+        const opt = facultySelect.querySelector('option[value="' + id + '"]')
+        return opt ? opt.textContent.trim() : ''
       }
 
-      function renderInnovators(){
-        list.innerHTML = '';
-        if (!items.length) return;
+      function renderInnovators() {
+        list.innerHTML = ''
+        if (!items.length) return
 
         items.forEach((it, idx) => {
-          const div = document.createElement('div');
-          div.className = 'innovator-chip';
+          const div = document.createElement('div')
+          div.className = 'innovator-chip'
 
-          const left = document.createElement('div');
-          left.className = 'meta';
+          const left = document.createElement('div')
+          left.className = 'meta'
 
-          const nameSpan = document.createElement('span');
-          nameSpan.textContent = (it.type === 'existing') ? (it.label || '-') : (it.name || '-');
+          const nameSpan = document.createElement('span')
+          nameSpan.textContent = (it.type === 'existing') ? (it.label || '-') : (it.name || '-')
 
-          const facultySpan = document.createElement('span');
-          facultySpan.className = 'faculty-inline';
-          facultySpan.textContent = it.faculty_name ? it.faculty_name : '-';
+          const facultySpan = document.createElement('span')
+          facultySpan.className = 'faculty-inline'
+          facultySpan.textContent = it.faculty_name ? it.faculty_name : '-'
 
-          left.appendChild(nameSpan);
-          left.appendChild(facultySpan);
+          left.appendChild(nameSpan)
+          left.appendChild(facultySpan)
 
-          const rm = document.createElement('button');
-          rm.type = 'button';
-          rm.className = 'btn-remove';
-          rm.textContent = 'Hapus';
+          const rm = document.createElement('button')
+          rm.type = 'button'
+          rm.className = 'btn-remove'
+          rm.textContent = 'Hapus'
           rm.addEventListener('click', () => {
-            items.splice(idx, 1);
-            setPayload();
-            renderInnovators();
-          });
+            items.splice(idx, 1)
+            setPayload()
+            renderInnovators()
+          })
 
-          div.appendChild(left);
-          div.appendChild(rm);
-          list.appendChild(div);
-        });
+          div.appendChild(left)
+          div.appendChild(rm)
+          list.appendChild(div)
+        })
       }
 
-      function addExisting(){
-        const id = pickSelect.value;
-        if (!id) return false;
+      function addExisting() {
+        const id = pickSelect.value
+        if (!id) return false
 
-        const opt = pickSelect.options[pickSelect.selectedIndex];
-        if (!opt) return false;
+        const opt = pickSelect.options[pickSelect.selectedIndex]
+        if (!opt) return false
 
-        const name = opt.getAttribute('data-name') || '';
-        const facultyId = opt.getAttribute('data-faculty') || '';
-        const facultyName = opt.getAttribute('data-faculty-name') || '';
+        const name = opt.getAttribute('data-name') || ''
+        const facultyId = opt.getAttribute('data-faculty') || ''
+        const facultyName = opt.getAttribute('data-faculty-name') || ''
 
-        const exists = items.some(x => x.type === 'existing' && String(x.id) === String(id));
-        if (exists) return true;
+        const exists = items.some(x => x.type === 'existing' && String(x.id) === String(id))
+        if (exists) return true
 
         items.push({
           type: 'existing',
@@ -589,73 +639,66 @@
           label: name,
           faculty_id: facultyId ? Number(facultyId) : null,
           faculty_name: facultyName
-        });
-        return true;
+        })
+        return true
       }
 
-      function addNew(){
-        const name = (nameInput.value || '').trim();
-        if (!name) return false;
+      function addNew() {
+        const name = (nameInput.value || '').trim()
+        if (!name) return false
 
-        const facultyId = facultySelect.value;
+        const facultyId = facultySelect.value
         if (!facultyId) {
-          alert('Pilih Fakultas untuk innovator baru.');
-          return true;
+          alert('Pilih Fakultas untuk innovator baru.')
+          return true
         }
 
-        const facultyName = getFacultyNameById(facultyId);
+        const facultyName = getFacultyNameById(facultyId)
 
         const exists = items.some(x =>
-          x.type === 'new'
-          && (x.name || '').toLowerCase() === name.toLowerCase()
-          && String(x.faculty_id) === String(facultyId)
-        );
-        if (exists) return true;
+          x.type === 'new' &&
+          (x.name || '').toLowerCase() === name.toLowerCase() &&
+          String(x.faculty_id) === String(facultyId)
+        )
+        if (exists) return true
 
         items.push({
           type: 'new',
           name: name,
           faculty_id: Number(facultyId),
           faculty_name: facultyName
-        });
-        return true;
+        })
+        return true
       }
 
       addBtn.addEventListener('click', () => {
-        const picked = addExisting();
-        const created = addNew();
+        const picked = addExisting()
+        const created = addNew()
 
-        if (!picked && !created){
-          alert('Isi nama innovator baru + fakultas, atau pilih innovator yang sudah ada.');
-          return;
+        if (!picked && !created) {
+          alert('Isi nama innovator baru + fakultas, atau pilih innovator yang sudah ada.')
+          return
         }
 
-        nameInput.value = '';
-        facultySelect.value = '';
-        pickSelect.value = '';
+        nameInput.value = ''
+        facultySelect.value = ''
+        pickSelect.value = ''
 
-        setPayload();
-        renderInnovators();
-      });
+        setPayload()
+        renderInnovators()
+      })
 
       if (payload.value) {
-        try{
-          const parsed = JSON.parse(payload.value);
-          if (Array.isArray(parsed)) items = parsed;
-        }catch(e){}
+        try {
+          const parsed = JSON.parse(payload.value)
+          if (Array.isArray(parsed)) items = parsed
+        } catch (e) {}
       }
 
-      setPayload();
-      renderInnovators();
-
-      var formEdit = document.getElementById('editInnovationForm');
-      if (formEdit) {
-        formEdit.addEventListener('submit', function () {
-          setPayload();
-        });
-      }
+      setPayload()
+      renderInnovators()
     }
-  });
+  })
 </script>
 
 <style>
