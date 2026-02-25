@@ -51,6 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 
+
 <body class="bg-white">
     @include('partials.navbar')
 
