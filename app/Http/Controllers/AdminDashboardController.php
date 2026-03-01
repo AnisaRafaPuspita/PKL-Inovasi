@@ -45,8 +45,8 @@ class AdminDashboardController extends Controller
         $now = Carbon::now();
 
         $innovatorOfMonth = InnovatorOfTheMonth::with(['innovation', 'innovator.faculty'])
-            ->where('month', $now->month)
-            ->where('year', $now->year)
+            ->where('is_active', 1)
+            ->latest()
             ->first();
 
         $homePamflet = HomePamflet::first() ?? HomePamflet::create();

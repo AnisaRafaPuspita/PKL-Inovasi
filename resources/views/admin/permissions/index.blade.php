@@ -10,11 +10,11 @@
 
 <div class="panel">
     <table class="table table-bordered align-middle mb-0">
-        <thead>
-        <tr style="background:#061a4d;color:#fff;">
-            <th>Judul Inovasi</th>
-            <th style="width:160px;">Detail</th>
-            <th style="width:220px;">Status</th>
+        <thead class="custom-thead">
+        <tr>
+            <th style="width:140px;" class="text-center">Judul Inovasi</th>
+            <th style="width:140px;" class="text-center">Detail</th>
+            <th style="width:140px;" class="text-center">Status</th>
         </tr>
         </thead>
         <tbody>
@@ -60,6 +60,24 @@
     border:2px solid #061a4d;
     border-radius:18px;
     padding:18px;
+}
+
+/* HEADER TABLE */
+thead.custom-thead th{
+    background:#061a4d !important;
+    color:#ffffff !important;
+    font-weight:800;
+    text-transform:uppercase;
+    font-size:13px;
+    letter-spacing:.5px;
+    padding:14px 12px;
+    border-color: rgba(6,26,77,.4)!important;
+}
+
+/* Hover effect biar modern */
+.table tbody tr:hover{
+    background:#f1f5ff;
+    transition:.2s ease-in-out;
 }
 </style>
 @endsection

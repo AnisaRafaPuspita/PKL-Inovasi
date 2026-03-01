@@ -41,8 +41,8 @@
       <div class="col-12">
         <label class="fw-bold">Deskripsi</label>
         <textarea name="description"
-                  class="form-control"
-                  rows="4"
+                  class="form-control auto-resize"
+                  rows="3"
                   placeholder="Tulis deskripsi singkat...">{{ old('description', $ranking->description) }}</textarea>
         @error('description') <small class="text-danger">{{ $message }}</small> @enderror
       </div>
@@ -148,6 +148,21 @@
 
 @push('scripts')
 <script>
+function autoResizeTextarea(el) {
+  el.style.height = "auto";
+  el.style.height = el.scrollHeight + "px";
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".auto-resize").forEach(function (textarea) {
+    autoResizeTextarea(textarea);
+
+    textarea.addEventListener("input", function () {
+      autoResizeTextarea(this);
+    });
+  });
+});
+
 function previewSingleImage(event, previewId) {
   const img = document.getElementById(previewId);
   const file = event.target.files && event.target.files[0];
@@ -273,6 +288,15 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   render();
+
+
 });
 </script>
+
+<style>
+  textarea.auto-resize{
+  resize: none;
+  overflow: hidden;
+  }
+</style>  
 @endpush

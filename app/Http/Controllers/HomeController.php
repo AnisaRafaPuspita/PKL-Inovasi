@@ -34,12 +34,16 @@ class HomeController extends Controller
 
         $featuredInnovators = InnovatorOfTheMonth::query()
             ->with(['innovator.faculty'])
+            ->where('is_active', 1)
+            ->whereHas('innovator', function ($q) {
+                $q->where('is_active', 1);
+            })
             ->latest()
             ->get();
 
 
         $rankings = InnovationRanking::query()
-            ->select('*')
+            ->where('is_active', 1)
             ->orderBy('rank')
             ->get();
 

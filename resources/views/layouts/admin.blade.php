@@ -256,6 +256,18 @@
                 <span>Dashboard</span>
             </a>
 
+            {{-- Pamflet --}}
+            @php $isDash = request()->routeIs('admin.dashboard'); @endphp
+            <a class="menu-item {{ $isDash ? 'active' : '' }}"
+               href="{{ route('admin.dashboard') }}"
+               data-icon-blue="{{ asset('images/pamflet-biru.png') }}"
+               data-icon-white="{{ asset('images/pamflet-putih.png') }}">
+                <img class="menu-icon"
+                    src="{{ $isDash ? asset('images/pamflet-biru.png') : asset('images/pamflet-putih.png') }}"
+                    alt="">
+                <span>Pamflet</span>
+            </a>
+
             {{-- Manage Innovations --}}
             @php $isManage = request()->routeIs('admin.innovations.*'); @endphp
             <a class="menu-item {{ $isManage ? 'active' : '' }}"
@@ -283,15 +295,17 @@
 
 
             {{-- Data Innovator --}}
-            @php $isIotm = request()->routeIs('admin.innovator_of_month.*'); @endphp
+            @php
+                $isIotm = request()->routeIs('admin.innovators.*') || request()->routeIs('admin.innovator_of_month.*');
+            @endphp
             <a class="menu-item {{ $isIotm ? 'active' : '' }}"
-            href="{{ route('admin.innovator_of_month.index') }}"
-            data-icon-blue="{{ asset('images/innovatorofthemonth-biru.png') }}"
-            data-icon-white="{{ asset('images/innovatorofthemonth-putih.png') }}">
-                <img class="menu-icon"
-                    src="{{ $isIotm ? asset('images/innovatorofthemonth-biru.png') : asset('images/innovatorofthemonth-putih.png') }}"
-                    alt="">
-                <span>Data Innovator</span>
+                href="{{ route('admin.innovators.index') }}"
+                data-icon-blue="{{ asset('images/innovatorofthemonth-biru.png') }}"
+                data-icon-white="{{ asset('images/innovatorofthemonth-putih.png') }}">
+                    <img class="menu-icon"
+                        src="{{ $isIotm ? asset('images/innovatorofthemonth-biru.png') : asset('images/innovatorofthemonth-putih.png') }}"
+                        alt="">
+                    <span>Data Innovator</span>
             </a>
 
 

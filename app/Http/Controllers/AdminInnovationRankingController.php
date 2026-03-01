@@ -39,6 +39,9 @@ class AdminInnovationRankingController extends Controller
             $data['logo'] = $request->file('logo')->store('rankings', 'public');
         }
 
+        // default status aktif
+        $data['is_active'] = true;
+
         $ranking = InnovationRanking::create($data);
 
         if ($request->hasFile('photos')) {
@@ -107,6 +110,20 @@ class AdminInnovationRankingController extends Controller
         return redirect()
             ->route('admin.innovation_rankings.index')
             ->with('success', 'Peringkat berhasil diperbarui.');
+    }
+
+    public function updateStatus(Request $request, InnovationRanking $ranking)
+    {
+        $data = $request->validate([
+            'is_active' => 'required|in:0,1',
+        ]);
+
+        $ranking->is_active = (bool) $data['is_active'];
+        $ranking->save();
+
+        return redirect()
+            ->back()
+            ->with('success', 'Status peringkat berhasil diperbarui.');
     }
 
     public function destroy(InnovationRanking $ranking)

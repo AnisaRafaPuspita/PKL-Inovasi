@@ -18,8 +18,11 @@ class InnovatorOfTheMonth extends Model
         'innovation_id',
         'description',
         'photo',
-        'month',
-        'year',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'is_active' => 'integer',
     ];
 
 

@@ -16,15 +16,15 @@
 
 <div class="panel">
   <table class="table table-bordered align-middle mb-0">
-    <thead>
-      <tr style="background:#061a4d;color:#fff;">
-        <th style="width:90px;">Peringkat</th>
-        <th style="width:280px;">Nama Penghargaan</th>
-        <th>Deskripsi</th>
-        <th style="width:160px;">Sumber</th>
-        <th style="width:120px;">Logo</th>
-        <th style="width:140px;">Foto</th>
-        <th style="width:180px;">Aksi</th>
+    <thead class="custom-thead">
+      <tr>
+        <th style="width:140px;" class="text-center">Peringkat</th>
+        <th style="width:140px;" class="text-center">Nama Penghargaan</th>
+        <th style="width:140px;" class="text-center">Deskripsi</th>
+        <th style="width:140px;" class="text-center">Sumber</th>
+        <th style="width:140px;" class="text-center">Logo</th>
+        <th style="width:140px;" class="text-center">Foto</th>
+        <th style="width:180px;" class="text-center">Aksi</th>
       </tr>
     </thead>
 
@@ -55,7 +55,23 @@
 
           <td style="white-space:normal;">
             @if(!empty($r->description))
-              {{ $r->description }}
+              @php $limit = 150; @endphp
+
+              <span class="desc-short">
+                {{ \Illuminate\Support\Str::limit($r->description, $limit) }}
+              </span>
+
+              <span class="desc-full d-none">
+                {{ $r->description }}
+              </span>
+
+              @if(mb_strlen($r->description) > $limit)
+                <br>
+                <a href="javascript:void(0);" class="toggle-desc text-primary" style="font-size:13px;">
+                  Selengkapnya
+                </a>
+              @endif
+
             @else
               <span class="text-muted">-</span>
             @endif
@@ -113,6 +129,21 @@
               @method('DELETE')
               <button class="btn btn-sm btn-outline-danger">Hapus</button>
             </form>
+
+            <form class="d-inline" method="POST"
+                  action="{{ route('admin.innovation_rankings.status', $r->id) }}">
+                @csrf
+                @method('PATCH')
+
+                <div class="status-wrapper ms-2">
+                    <select name="is_active"
+                            class="status-dropdown {{ $r->is_active ? 'status-active' : 'status-inactive' }}"
+                            onchange="this.form.submit()">
+                        <option value="1" {{ $r->is_active ? 'selected' : '' }}>Aktif</option>
+                        <option value="0" {{ !$r->is_active ? 'selected' : '' }}>Nonaktif</option>
+                    </select>
+                </div>
+            </form>
           </td>
         </tr>
       @empty
@@ -147,20 +178,95 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+  // image
   const modal = document.getElementById('imagePreviewModal');
-  if (!modal) return;
+  if (modal) {
+    modal.addEventListener('show.bs.modal', function (event) {
+      const trigger = event.relatedTarget;
+      const imageUrl = trigger?.getAttribute('data-image');
+      const img = modal.querySelector('#previewImage');
+      if (img && imageUrl) img.src = imageUrl;
+    });
 
-  modal.addEventListener('show.bs.modal', function (event) {
-    const trigger = event.relatedTarget;
-    const imageUrl = trigger?.getAttribute('data-image');
-    const img = modal.querySelector('#previewImage');
-    if (img && imageUrl) img.src = imageUrl;
-  });
+    modal.addEventListener('hidden.bs.modal', function () {
+      const img = modal.querySelector('#previewImage');
+      if (img) img.src = '';
+    });
+  }
 
-  modal.addEventListener('hidden.bs.modal', function () {
-    const img = modal.querySelector('#previewImage');
-    if (img) img.src = '';
+  // deskripsi
+  document.querySelectorAll('.toggle-desc').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const td = this.closest('td');
+      const shortEl = td.querySelector('.desc-short');
+      const fullEl  = td.querySelector('.desc-full');
+
+      if (fullEl.classList.contains('d-none')) {
+        shortEl.classList.add('d-none');
+        fullEl.classList.remove('d-none');
+        this.textContent = 'Sembunyikan';
+      } else {
+        shortEl.classList.remove('d-none');
+        fullEl.classList.add('d-none');
+        this.textContent = 'Selengkapnya';
+      }
+    });
   });
 });
 </script>
+
+<style>
+thead.custom-thead th{
+  background:#061a4d !important;
+  color:#fff !important;
+  font-weight:800;
+  text-transform:uppercase;
+  font-size:13px;
+  letter-spacing:.5px;
+  padding:14px 12px;
+  border-color: rgba(6,26,77,.4)!important;
+}
+
+.status-wrapper{
+    display:inline-block;
+    position:relative;
+}
+
+.status-dropdown{
+    appearance:none;
+    -webkit-appearance:none;
+    -moz-appearance:none;
+
+    padding:6px 32px 6px 16px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:500; 
+    cursor:pointer;
+    border:1px solid;
+    transition:all .2s ease;
+}
+
+.status-wrapper::after{
+    content:"▼";
+    font-size:10px;
+    position:absolute;
+    right:12px;
+    top:50%;
+    transform:translateY(-50%);
+    pointer-events:none;
+    opacity:.7;
+}
+
+.status-active{
+    background:#e6f4ea;
+    border-color:#b7ebc6;
+    color:#1e7e34;
+}
+
+.status-inactive{
+    background:#fdecea;
+    border-color:#f5c2c7;
+    color:#b02a37;
+}
+</style>
 @endpush

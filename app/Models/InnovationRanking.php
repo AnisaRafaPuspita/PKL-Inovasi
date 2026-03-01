@@ -17,10 +17,12 @@ class InnovationRanking extends Model
         'description',
         'reference_link',
         'logo',
+        'is_active',
     ];
 
     protected $casts = [
         'rank' => 'integer',
+        'is_active' => 'boolean',
     ];
 
     public function photos()

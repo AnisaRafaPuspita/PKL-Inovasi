@@ -327,4 +327,19 @@ class AdminInnovationController extends Controller
         $first = $innovation->images()->orderBy('id')->first();
         if ($first) $first->update(['is_primary' => true]);
     }
+
+    public function updateStatus(Request $request, Innovation $innovation)
+    {
+        abort_if(!in_array($innovation->source, ['admin', 'innovator']), 404);
+
+        $data = $request->validate([
+            'status' => ['required', 'in:published,draft'],
+        ]);
+
+        $innovation->update([
+            'status' => $data['status'],
+        ]);
+
+        return back()->with('success', 'Status inovasi berhasil diubah.');
+    }
 }
