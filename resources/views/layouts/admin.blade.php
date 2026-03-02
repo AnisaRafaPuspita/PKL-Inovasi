@@ -257,9 +257,9 @@
             </a>
 
             {{-- Pamflet --}}
-            @php $isDash = request()->routeIs('admin.dashboard'); @endphp
+            @php $isDash = request()->routeIs('admin.pamflet.*'); @endphp
             <a class="menu-item {{ $isDash ? 'active' : '' }}"
-               href="{{ route('admin.dashboard') }}"
+               href="{{ route('admin.pamflet.index') }}"
                data-icon-blue="{{ asset('images/pamflet-biru.png') }}"
                data-icon-white="{{ asset('images/pamflet-putih.png') }}">
                 <img class="menu-icon"

@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\DeclinedMail;
 use App\Models\Innovation;
 use App\Models\InnovationPermission;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class AdminPermissionController extends Controller
 {
@@ -23,9 +26,11 @@ class AdminPermissionController extends Controller
         abort_if($innovation->source !== 'innovator', 404);
 
         $innovation->load(['innovators.faculty', 'permission', 'images', 'primaryImage']);
+
         return view('admin.permissions.show', compact('innovation'));
     }
 
+    
     public function accept(Innovation $innovation)
     {
         abort_if($innovation->source !== 'innovator', 404);
@@ -42,9 +47,19 @@ class AdminPermissionController extends Controller
             ->with('success', 'Inovasi berhasil di-accept dan dipublish.');
     }
 
-    public function decline(Innovation $innovation)
+   
+    public function decline(Request $request, Innovation $innovation)
     {
         abort_if($innovation->source !== 'innovator', 404);
+
+        $request->validate([
+            'reason' => ['nullable', 'string'],
+        ]);
+
+        $reason = trim((string) $request->input('reason', ''));
+        if ($reason === '') {
+            $reason = 'Inovasi belum memenuhi kriteria yang ditentukan. Silakan lakukan perbaikan dan ajukan kembali.';
+        }
 
         InnovationPermission::updateOrCreate(
             ['innovation_id' => $innovation->id],
@@ -53,11 +68,18 @@ class AdminPermissionController extends Controller
 
         $innovation->update([
             'status' => 'draft',
-            'review' => 'Ditolak admin'
+            'review' => $reason,
         ]);
+
+        $innovation->loadMissing('innovators');
+
+        $to = trim((string) ($innovation->leader_email ?? ''));
+        if ($to !== '') {
+            Mail::to($to)->send(new DeclinedMail($innovation, $reason));
+        }
 
         return redirect()
             ->route('admin.permissions.index')
-            ->with('success', 'Inovasi berhasil di-decline dan dikembalikan ke draft.');
+            ->with('success', 'Inovasi ditolak dan email sudah dikirim.');
     }
 }
