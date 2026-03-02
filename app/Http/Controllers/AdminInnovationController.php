@@ -33,8 +33,6 @@ class AdminInnovationController extends Controller
         ]);
     }
 
-    
-
     public function store(Request $request)
     {
         $data = $this->validateInnovation($request);
@@ -60,6 +58,10 @@ class AdminInnovationController extends Controller
 
         $data['source'] = 'admin';
         $data['status'] = $data['status'] ?? 'published';
+
+        $data['leader_email'] = isset($data['leader_email']) && trim((string)$data['leader_email']) !== ''
+            ? trim((string)$data['leader_email'])
+            : null;
 
         $innovation = Innovation::create($data);
 
@@ -99,7 +101,6 @@ class AdminInnovationController extends Controller
         ]);
     }
 
-
     public function update(Request $request, Innovation $innovation)
     {
         abort_if(!in_array($innovation->source, ['admin', 'innovator']), 404);
@@ -129,6 +130,10 @@ class AdminInnovationController extends Controller
 
         $data['source'] = 'admin';
         $data['status'] = $data['status'] ?? 'published';
+
+        $data['leader_email'] = isset($data['leader_email']) && trim((string)$data['leader_email']) !== ''
+            ? trim((string)$data['leader_email'])
+            : null;
 
         $innovation->update($data);
 
@@ -191,7 +196,6 @@ class AdminInnovationController extends Controller
         }
 
         $innovation->innovators()->detach();
-
         $innovation->delete();
 
         return redirect()
@@ -209,13 +213,15 @@ class AdminInnovationController extends Controller
             'ki_type' => 'required|string|max:255',
             'ki_status' => 'required|string|max:255',
             'ki_number' => 'required|string|max:255',
+
+            'leader_email' => 'nullable|email|max:255',
+
             'video_url' => 'nullable|url|max:255',
             'description' => [
                 'required',
                 'string',
                 function ($attribute, $value, $fail) {
                     $text = trim(preg_replace('/\s+/', ' ', (string) $value));
-
                     $words = $text === '' ? 0 : count(explode(' ', $text));
 
                     if ($words > 200) {
@@ -228,9 +234,7 @@ class AdminInnovationController extends Controller
             'impact' => 'nullable|string',
             'status' => 'nullable|in:published,draft',
         ]);
-
     }
-
 
     private function collectInnovatorIdsFromPayload(?string $payload, int $fallbackFacultyId): array
     {

@@ -1,10 +1,10 @@
 @extends('layouts.admin')
-@section('title', $mode === 'create' ? 'Tambah Innovator' : 'Edit Innovator')
+@section('title', $mode === 'create' ? 'Tambah Highlight Innovator' : 'Edit Highlight Innovator')
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
   <h1 class="m-0" style="font-weight:900;color:#061a4d;">
-    {{ $mode === 'create' ? 'Tambah Innovator' : 'Edit Innovator' }}
+    {{ $mode === 'create' ? 'Tambah Highlight Innovator' : 'Edit Highlight Innovator' }}
   </h1>
 </div>
 
@@ -26,7 +26,7 @@
 <form method="POST"
       action="{{ $mode === 'create'
         ? route('admin.innovators.store')
-        : route('admin.innovators.update', $innovator->id) }}"
+        : route('admin.innovators.update', $iotm->id) }}"
       enctype="multipart/form-data"
       class="mt-3">
   @csrf
@@ -40,7 +40,7 @@
       <div style="width:260px;">
         <div class="photo-box">
           @php
-            $photo = old('photo') ? null : ($innovator->photo ?? null);
+            $photo = old('photo') ? null : ($iotm->photo ?? null);
             $photoUrl = $photo
               ? (str_starts_with($photo, 'http') ? $photo : asset('storage/'.$photo))
               : null;
@@ -66,10 +66,11 @@
 
         <div class="mt-3">
           <label class="fw-bold mb-1 d-block">Status</label>
-          <div class="status-dd {{ (old('is_active', $innovator->is_active ?? 1) == 1) ? 'is-on' : 'is-off' }}">
-            <select name="is_active" class="status-select" aria-label="Status Innovator">
-              <option value="1" {{ old('is_active', $innovator->is_active ?? 1) == 1 ? 'selected' : '' }}>Aktif</option>
-              <option value="0" {{ old('is_active', $innovator->is_active ?? 1) == 0 ? 'selected' : '' }}>Nonaktif</option>
+          @php $activeVal = old('is_active', $iotm->is_active ?? 1); @endphp
+          <div class="status-dd {{ ((int)$activeVal === 1) ? 'is-on' : 'is-off' }}">
+            <select name="is_active" class="status-select" aria-label="Status Highlight Innovator">
+              <option value="1" {{ (int)$activeVal === 1 ? 'selected' : '' }}>Aktif</option>
+              <option value="0" {{ (int)$activeVal === 0 ? 'selected' : '' }}>Nonaktif</option>
             </select>
             <svg class="chev" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M6.7 9.2a1 1 0 0 1 1.4 0L12 13.1l3.9-3.9a1 1 0 1 1 1.4 1.4l-4.6 4.6a1 1 0 0 1-1.4 0L6.7 10.6a1 1 0 0 1 0-1.4z"/>
@@ -82,33 +83,50 @@
       <div style="flex:1; min-width: 340px;">
 
         <div class="mb-3">
-          <label class="fw-bold">Nama Innovator</label>
-          <input type="text"
-                 name="name"
-                 class="form-control"
-                 value="{{ old('name', $innovator->name) }}"
-                 placeholder="Nama lengkap innovator"
-                 required>
-          @error('name') <small class="text-danger">{{ $message }}</small> @enderror
-        </div>
-
-        <div class="mb-3">
-          <label class="fw-bold">Fakultas</label>
-          <select name="faculty_id" class="form-select" required>
-            <option value="">-- pilih fakultas --</option>
-            @foreach($faculties as $f)
-              <option value="{{ $f->id }}" @selected(old('faculty_id', $innovator->faculty_id) == $f->id)>
-                {{ $f->name }}
+          <label class="fw-bold">Pilih Innovator</label>
+          <select name="innovator_id" id="innovatorSelect" class="form-select" required>
+            <option value="">-- pilih innovator --</option>
+            @foreach($innovators as $inv)
+              <option value="{{ $inv->id }}" @selected(old('innovator_id', $iotm->innovator_id) == $inv->id)>
+                {{ $inv->name }} — {{ $inv->faculty->name ?? '-' }}
               </option>
             @endforeach
           </select>
-          @error('faculty_id') <small class="text-danger">{{ $message }}</small> @enderror
+          @error('innovator_id') <small class="text-danger">{{ $message }}</small> @enderror
         </div>
 
         <div class="mb-3">
-          <label class="fw-bold">Bio / Deskripsi</label>
-          <textarea class="form-control" rows="5" name="bio" placeholder="Tulis deskripsi singkat innovator">{{ old('bio', $innovator->bio) }}</textarea>
-          @error('bio') <small class="text-danger">{{ $message }}</small> @enderror
+          <label class="fw-bold">Inovasi yang di-highlight</label>
+          <select name="innovation_id" id="innovationSelect" class="form-select" required>
+            <option value="">-- pilih inovasi --</option>
+
+            @php
+              $selectedInnovatorId = old('innovator_id', $iotm->innovator_id);
+              $preloadInnovations = collect();
+
+              if ($selectedInnovatorId) {
+                $found = $innovators->firstWhere('id', (int)$selectedInnovatorId);
+                $preloadInnovations = $found ? ($found->innovations ?? collect()) : collect();
+              }
+            @endphp
+
+            @foreach($preloadInnovations as $inn)
+              <option value="{{ $inn->id }}" @selected(old('innovation_id', $iotm->innovation_id) == $inn->id)>
+                {{ $inn->title ?? $inn->name ?? ('Inovasi #'.$inn->id) }}
+              </option>
+            @endforeach
+          </select>
+          @error('innovation_id') <small class="text-danger">{{ $message }}</small> @enderror
+        </div>
+
+        <div class="mb-3">
+          <label class="fw-bold">Deskripsi</label>
+          <textarea class="form-control"
+                    rows="5"
+                    name="description"
+                    placeholder="Tulis deskripsi singkat highlight innovator"
+                    required>{{ old('description', $iotm->description) }}</textarea>
+          @error('description') <small class="text-danger">{{ $message }}</small> @enderror
         </div>
 
         <div class="d-flex justify-content-end gap-2">
@@ -218,6 +236,24 @@
 }
 </style>
 
+@php
+  $innovatorsJson = $innovators->map(function ($inv) {
+    return [
+      'id' => $inv->id,
+      'innovations' => $inv->innovations->map(function ($inn) {
+        return [
+          'id' => $inn->id,
+          'label' => $inn->title ?? $inn->name ?? ('Inovasi #'.$inn->id),
+        ];
+      })->values()->all(),
+    ];
+  })->values()->all();
+@endphp
+
+<script id="innovatorsData" type="application/json">
+{!! json_encode($innovatorsJson, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+</script>
+
 <script>
   const photoInput = document.getElementById('photoInput');
   const photoPreview = document.getElementById('photoPreview');
@@ -232,6 +268,42 @@
       photoPreview.style.display = 'block';
       if (photoPlaceholder) photoPlaceholder.style.display = 'none';
     });
+  }
+
+  const innovators = JSON.parse(document.getElementById('innovatorsData').textContent || '[]');
+
+  const innovatorSelect = document.getElementById('innovatorSelect');
+  const innovationSelect = document.getElementById('innovationSelect');
+
+  function setInnovationOptions(innovatorId, selectedInnovationId = null) {
+    if (!innovationSelect) return;
+
+    innovationSelect.innerHTML = '<option value="">-- pilih inovasi --</option>';
+
+    const inv = innovators.find(x => String(x.id) === String(innovatorId));
+    if (!inv) return;
+
+    inv.innovations.forEach(inn => {
+      const opt = document.createElement('option');
+      opt.value = inn.id;
+      opt.textContent = inn.label;
+      if (selectedInnovationId && String(selectedInnovationId) === String(inn.id)) {
+        opt.selected = true;
+      }
+      innovationSelect.appendChild(opt);
+    });
+  }
+
+  if (innovatorSelect) {
+    innovatorSelect.addEventListener('change', (e) => {
+      setInnovationOptions(e.target.value, null);
+    });
+
+    const preSelectedInnovator = innovatorSelect.value;
+    const preSelectedInnovation = "{{ old('innovation_id', $iotm->innovation_id) }}";
+    if (preSelectedInnovator) {
+      setInnovationOptions(preSelectedInnovator, preSelectedInnovation);
+    }
   }
 </script>
 @endsection
