@@ -39,11 +39,11 @@
                 <br><br>
                 Pengajuan inovasi dengan judul
                 <b style="color:#061a4d;">{{ $innovation->title }}</b>
-                saat ini <b>ditolak</b> dan memerlukan perbaikan.
+                saat ini <b>belum dapat disetujui</b> dan memerlukan perbaikan.
               </div>
 
               <div style="font-size:14px;font-weight:800;color:#061a4d;margin-bottom:8px;">
-                Catatan:
+                Catatan Perbaikan:
               </div>
 
               <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;
@@ -57,6 +57,7 @@
                 lalu ajukan kembali inovasi Anda.
                 <br><br>
                 Terima kasih.
+                <p><b>Sistem Inovasi UNDIP</b></p>
               </div>
 
             </td>
