@@ -11,15 +11,52 @@ use App\Models\InnovationPermission;
 
 class AdminInnovationController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $search = trim((string) $request->query('search'));
+        $status = $request->query('status');
+        $year = $request->query('year');
+        $perPage = (int) $request->query('per_page', 20);
+
+        if (!in_array($perPage, [20, 50, 100])) {
+            $perPage = 20;
+        }
+
         $innovations = Innovation::with(['innovators.faculty', 'images', 'primaryImage'])
             ->whereIn('status', ['published', 'draft'])
             ->whereIn('source', ['admin', 'innovator'])
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery->where('title', 'like', '%' . $search . '%')
+                        ->orWhereHas('innovators', function ($innovatorQuery) use ($search) {
+                            $innovatorQuery->where('name', 'like', '%' . $search . '%');
+                        });
+                });
+            })
+            ->when(in_array($status, ['published', 'draft']), function ($query) use ($status) {
+                $query->where('status', $status);
+            })
+            ->when(!empty($year), function ($query) use ($year) {
+                $query->whereYear('created_at', $year);
+            })
             ->orderByDesc('created_at')
-            ->get();
+            ->paginate($perPage)
+            ->withQueryString();
 
-        return view('admin.innovations.index', compact('innovations'));
+        $years = Innovation::query()
+            ->whereIn('status', ['published', 'draft'])
+            ->whereIn('source', ['admin', 'innovator'])
+            ->selectRaw('YEAR(created_at) as year')
+            ->whereNotNull('created_at')
+            ->distinct()
+            ->orderByDesc('year')
+            ->pluck('year');
+
+        return view('admin.innovations.index', compact(
+            'innovations',
+            'years',
+            'perPage'
+        ));
     }
 
     public function create()
