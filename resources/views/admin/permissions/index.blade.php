@@ -13,6 +13,7 @@
         <thead class="custom-thead">
         <tr>
             <th style="width:140px;" class="text-center">Judul Inovasi</th>
+            <th style="width:140px;" class="text-center">Tanggal Upload</th>
             <th style="width:140px;" class="text-center">Detail</th>
             <th style="width:140px;" class="text-center">Status</th>
         </tr>
@@ -25,6 +26,10 @@
 
             <tr>
                 <td>{{ $inv->title }}</td>
+
+                <td class="text-center">
+                    {{ $inv->created_at ? $inv->created_at->translatedFormat('d F Y') : '-' }}
+                </td>
 
                 <td class="text-center">
                     <a class="btn btn-sm btn-outline-dark"
@@ -47,7 +52,7 @@
             </tr>
         @empty
             <tr>
-                <td colspan="3" class="text-center text-muted">Belum ada inovasi.</td>
+                <td colspan="4" class="text-center text-muted">Belum ada inovasi.</td>
             </tr>
         @endforelse
         </tbody>

@@ -19,12 +19,13 @@
     <thead class="custom-thead">
       <tr>
         <th style="width:140px;" class="text-center">Peringkat</th>
-        <th style="width:140px;" class="text-center">Nama Penghargaan</th>
-        <th style="width:140px;" class="text-center">Deskripsi</th>
+        <th style="width:120px;" class="text-center">Tahun</th>
+        <th style="width:180px;" class="text-center">Nama Penghargaan</th>
+        <th style="width:180px;" class="text-center">Deskripsi</th>
         <th style="width:140px;" class="text-center">Sumber</th>
         <th style="width:140px;" class="text-center">Logo</th>
         <th style="width:140px;" class="text-center">Foto</th>
-        <th style="width:180px;" class="text-center">Aksi</th>
+        <th style="width:200px;" class="text-center">Aksi</th>
       </tr>
     </thead>
 
@@ -48,6 +49,10 @@
 
         <tr>
           <td class="text-center fw-bold">#{{ $r->rank }}</td>
+
+          <td class="text-center fw-bold">
+            {{ $r->year ?? '-' }}
+          </td>
 
           <td style="white-space:normal;">
             {{ $r->achievement ?? '-' }}
@@ -117,38 +122,42 @@
           </td>
 
           <td class="text-center">
-            <a class="btn btn-sm btn-outline-dark"
-               href="{{ route('admin.innovation_rankings.edit', $r->id) }}">
-              Edit
-            </a>
+            <div class="action-stack">
+              <div class="action-top">
+                <a class="btn btn-sm btn-edit"
+                  href="{{ route('admin.innovation_rankings.edit', $r->id) }}">
+                  Edit
+                </a>
 
-            <form class="d-inline" method="POST"
-                  action="{{ route('admin.innovation_rankings.destroy', $r->id) }}"
-                  onsubmit="return confirm('Hapus peringkat ini?')">
-              @csrf
-              @method('DELETE')
-              <button class="btn btn-sm btn-outline-danger">Hapus</button>
-            </form>
+                <form method="POST"
+                      action="{{ route('admin.innovation_rankings.destroy', $r->id) }}"
+                      onsubmit="return confirm('Hapus peringkat ini?')">
+                  @csrf
+                  @method('DELETE')
+                  <button type="submit" class="btn btn-sm btn-delete">Hapus</button>
+                </form>
+              </div>
 
-            <form class="d-inline" method="POST"
-                  action="{{ route('admin.innovation_rankings.status', $r->id) }}">
+              <form method="POST"
+                    action="{{ route('admin.innovation_rankings.status', $r->id) }}">
                 @csrf
                 @method('PATCH')
 
-                <div class="status-wrapper ms-2">
-                    <select name="is_active"
-                            class="status-dropdown {{ $r->is_active ? 'status-active' : 'status-inactive' }}"
-                            onchange="this.form.submit()">
-                        <option value="1" {{ $r->is_active ? 'selected' : '' }}>Aktif</option>
-                        <option value="0" {{ !$r->is_active ? 'selected' : '' }}>Nonaktif</option>
-                    </select>
+                <div class="status-wrapper">
+                  <select name="is_active"
+                          class="status-dropdown {{ $r->is_active ? 'status-active' : 'status-inactive' }}"
+                          onchange="this.form.submit()">
+                    <option value="1" {{ $r->is_active ? 'selected' : '' }}>Aktif</option>
+                    <option value="0" {{ !$r->is_active ? 'selected' : '' }}>Nonaktif</option>
+                  </select>
                 </div>
-            </form>
+              </form>
+            </div>
           </td>
         </tr>
       @empty
         <tr>
-          <td colspan="7" class="text-center text-muted">
+          <td colspan="8" class="text-center text-muted">
             Belum ada peringkat.
           </td>
         </tr>
@@ -178,7 +187,6 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  // image
   const modal = document.getElementById('imagePreviewModal');
   if (modal) {
     modal.addEventListener('show.bs.modal', function (event) {
@@ -194,7 +202,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // deskripsi
   document.querySelectorAll('.toggle-desc').forEach(function (btn) {
     btn.addEventListener('click', function () {
       const td = this.closest('td');
@@ -227,46 +234,134 @@ thead.custom-thead th{
   border-color: rgba(6,26,77,.4)!important;
 }
 
+.action-group{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.action-group form{
+  margin:0;
+}
+
+.action-group .btn{
+  margin:0;
+}
+
 .status-wrapper{
-    display:inline-block;
-    position:relative;
+  display:inline-block;
+  position:relative;
+  margin-left:0 !important;
 }
 
 .status-dropdown{
-    appearance:none;
-    -webkit-appearance:none;
-    -moz-appearance:none;
-
-    padding:6px 32px 6px 16px;
-    border-radius:999px;
-    font-size:13px;
-    font-weight:500; 
-    cursor:pointer;
-    border:1px solid;
-    transition:all .2s ease;
+  appearance:none;
+  -webkit-appearance:none;
+  -moz-appearance:none;
+  padding:6px 32px 6px 16px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:500;
+  cursor:pointer;
+  border:1px solid;
+  transition:all .2s ease;
 }
 
 .status-wrapper::after{
-    content:"▼";
-    font-size:10px;
-    position:absolute;
-    right:12px;
-    top:50%;
-    transform:translateY(-50%);
-    pointer-events:none;
-    opacity:.7;
+  content:"▼";
+  font-size:10px;
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  pointer-events:none;
+  opacity:.7;
 }
 
 .status-active{
-    background:#e6f4ea;
-    border-color:#b7ebc6;
-    color:#1e7e34;
+  background:#e6f4ea;
+  border-color:#b7ebc6;
+  color:#1e7e34;
 }
 
 .status-inactive{
-    background:#fdecea;
-    border-color:#f5c2c7;
-    color:#b02a37;
+  background:#fdecea;
+  border-color:#f5c2c7;
+  color:#b02a37;
+}
+
+.action-stack{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+}
+
+.action-top{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.action-top form{
+  margin:0;
+}
+
+.btn-edit{
+  background:#061a4d;
+  color:#fff;
+  border:1px solid #061a4d;
+  font-weight:700;
+  border-radius:10px;
+  padding:6px 14px;
+}
+
+.btn-edit:hover{
+  color:#fff;
+  background:#082766;
+  border-color:#082766;
+}
+
+.btn-delete{
+  background:#fff;
+  color:#ef4444;
+  border:1px solid #f87171;
+  font-weight:700;
+  border-radius:10px;
+  padding:6px 14px;
+}
+
+.btn-delete:hover{
+  background:#fff5f5;
+  color:#dc2626;
+  border-color:#ef4444;
+}
+
+.status-wrapper{
+  display:inline-block;
+  position:relative;
+  margin-left:0 !important;
+}
+
+.status-dropdown{
+  appearance:none;
+  -webkit-appearance:none;
+  -moz-appearance:none;
+  min-width:112px;
+  padding:6px 32px 6px 16px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  border:1px solid;
+  transition:all .2s ease;
+  text-align:center;
+  text-align-last:center;
 }
 </style>
 @endpush

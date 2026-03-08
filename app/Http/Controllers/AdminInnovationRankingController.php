@@ -27,6 +27,7 @@ class AdminInnovationRankingController extends Controller
     {
         $data = $request->validate([
             'rank' => 'required|integer|min:1|max:2000',
+            'year' => 'required|integer|min:2000|max:' . date('Y'),
             'achievement' => 'required|string|max:255',
             'description' => 'required|string',
             'logo' => 'required|image|mimes:jpg,jpeg,png|max:2048',
@@ -39,7 +40,6 @@ class AdminInnovationRankingController extends Controller
             $data['logo'] = $request->file('logo')->store('rankings', 'public');
         }
 
-        // default status aktif
         $data['is_active'] = true;
 
         $ranking = InnovationRanking::create($data);
@@ -70,6 +70,7 @@ class AdminInnovationRankingController extends Controller
     {
         $data = $request->validate([
             'rank' => 'required|integer|min:1|max:2000',
+            'year' => 'required|integer|min:2000|max:' . date('Y'),
             'achievement' => 'required|string|max:255',
             'description' => 'required|string',
             'logo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',

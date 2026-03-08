@@ -69,7 +69,8 @@
             <thead class="custom-thead">
                 <tr>
                     <th class="text-center">Judul Inovasi</th>
-                    <th class="text-center">Inovator</th>
+                    <th class="text-center">Innovator</th>
+                    <th class="text-center" style="min-width:150px;">Tanggal Upload</th>
                     <th class="text-center" style="min-width:160px;">Status</th>
                     <th class="text-center" style="width:120px;">Actions</th>
                 </tr>
@@ -88,6 +89,10 @@
                         <div class="innovator-text">
                             {{ optional($row->innovators->first())->name ?? '-' }}
                         </div>
+                    </td>
+
+                    <td class="text-center">
+                        {{ $row->created_at ? $row->created_at->translatedFormat('d F Y') : '-' }}
                     </td>
 
                     <td class="text-center">
@@ -121,7 +126,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4" class="text-center text-muted py-4">
+                    <td colspan="5" class="text-center text-muted py-4">
                         Belum ada data inovasi
                     </td>
                 </tr>
@@ -522,6 +527,7 @@ table td, table th{
 
     .innovations-table td{
         padding: 12px 10px;
+        font-size: 13px;
     }
 
     .title-text{

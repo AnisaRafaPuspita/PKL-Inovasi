@@ -29,7 +29,18 @@
         @error('rank') <small class="text-danger">{{ $message }}</small> @enderror
       </div>
 
-      <div class="col-12 col-md-10">
+      <div class="col-12 col-md-2">
+        <label class="fw-bold">Tahun</label>
+        <input type="number"
+               name="year"
+               class="form-control"
+               value="{{ old('year', $ranking->year) }}"
+               min="2000"
+               max="{{ date('Y') }}">
+        @error('year') <small class="text-danger">{{ $message }}</small> @enderror
+      </div>
+
+      <div class="col-12 col-md-8">
         <label class="fw-bold">Nama Penghargaan</label>
         <input type="text"
                name="achievement"
@@ -131,9 +142,8 @@
                 </div>
               @endforeach
             </div>
+          </div>
         @endif
-
-
 
     </div>
 
@@ -284,19 +294,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     syncInputFiles();
     render();
-
   });
 
   render();
-
-
 });
 </script>
 
 <style>
   textarea.auto-resize{
-  resize: none;
-  overflow: hidden;
+    resize: none;
+    overflow: hidden;
   }
-</style>  
+</style>
 @endpush

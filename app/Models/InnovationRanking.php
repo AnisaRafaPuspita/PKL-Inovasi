@@ -13,6 +13,7 @@ class InnovationRanking extends Model
 
     protected $fillable = [
         'rank',
+        'year',
         'achievement',
         'description',
         'reference_link',
