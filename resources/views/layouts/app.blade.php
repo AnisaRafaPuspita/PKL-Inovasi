@@ -27,17 +27,18 @@ document.addEventListener("DOMContentLoaded", function () {
     function setActiveFromHash() {
         clearActive();
 
+        const path = window.location.pathname;
         const hash = window.location.hash;
 
-        if (hash === "#inovasi-section") {
+        if (hash === "#inovasi-section" || path.includes("innovations")) {
             navInovasi?.classList.add("border-b-2","border-white","pb-1");
         }
 
-        if (hash === "#innovator-section") {
+        if (hash === "#innovator-section" || path.includes("innovators")) {
             navInnovator?.classList.add("border-b-2","border-white","pb-1");
         }
 
-        if (hash === "#ranking-section") {
+        if (hash === "#ranking-section" || path.includes("rankings")) {
             navRanking?.classList.add("border-b-2","border-white","pb-1");
         }
     }
