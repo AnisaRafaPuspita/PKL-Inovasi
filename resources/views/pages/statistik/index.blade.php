@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
 
-    // 🎨 Gradient Line Chart
+    
     const ctx = document.getElementById('monthlyChart').getContext('2d');
     const gradient = ctx.createLinearGradient(0, 0, 0, 300);
     gradient.addColorStop(0, 'rgba(26,110,206,0.35)');
@@ -121,7 +121,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // 🏫 Bar Chart Fakultas
+    
     new Chart(document.getElementById('facultyChart'), {
         type: 'bar',
         data: {
@@ -138,7 +138,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // 🥧 Pie Chart KI
+    
     new Chart(document.getElementById('kiChart'), {
         type: 'pie',
         data: {

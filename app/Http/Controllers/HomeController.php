@@ -24,8 +24,6 @@ class HomeController extends Controller
             ->get();
 
 
-
-        // most visited
         $mostVisited = Innovation::query()
             ->where('status', 'published')
             ->orderByDesc('views_count')

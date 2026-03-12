@@ -15,7 +15,6 @@ class InnovatorController extends Controller
 
     public function show(Innovator $innovator)
     {
-        // ambil data admin (IoM) BERDASARKAN innovator_id
         $iom = InnovatorOfTheMonth::query()
             ->where('innovator_id', $innovator->id)
             ->latest()

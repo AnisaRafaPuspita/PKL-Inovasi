@@ -124,7 +124,6 @@ class InnovationController extends Controller
 
         ]);
 
-        // Validasi maksimal 200 kata untuk field teks utama
         $fieldsWithWordLimit = [
             'description' => 'Deskripsi produk',
             'advantages'  => 'Keunggulan produk',
@@ -176,12 +175,10 @@ class InnovationController extends Controller
         ]);
 
         foreach ($request->innovators as $item) {
-
-            // existing innovator
             if (!empty($item['innovator_id'])) {
                 $innovator = Innovator::findOrFail($item['innovator_id']);
             }
-            // innovator baru
+           
             else {
                 if (empty($item['name']) || empty($item['faculty_id'])) {
                     return back()

@@ -26,15 +26,13 @@ class InnovatorOfTheMonth extends Model
     ];
 
 
-    /* ================= RELATIONS ================= */
-
-    // relasi utama (dipakai di home & admin)
+   
     public function innovator()
     {
         return $this->belongsTo(Innovator::class);
     }
 
-    // relasi ke inovasi (opsional / legacy)
+
     public function innovation()
     {
         return $this->belongsTo(Innovation::class, 'innovation_id');

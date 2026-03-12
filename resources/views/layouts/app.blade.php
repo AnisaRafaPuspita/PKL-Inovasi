@@ -42,10 +42,10 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Jalankan saat pertama load
+    
     setActiveFromHash();
 
-    // Jalankan saat hash berubah (TANPA refresh)
+    
     window.addEventListener("hashchange", setActiveFromHash);
 
 });

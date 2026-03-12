@@ -15,19 +15,19 @@ class InnovatorOfTheMonthSeeder extends Seeder
      */
     public function run(): void
     {
-        // ambil innovator pertama (atau cari by name kalau mau)
+        
         $innovator = Innovator::query()->first();
 
         if (!$innovator) {
-            // kalau belum ada innovator, stop biar gak error
+            
             $this->command?->warn('Tidak ada data innovators. Jalankan InnovatorSeeder dulu.');
             return;
         }
 
-        $month = (int) now()->format('n');  // 1-12
-        $year  = (int) now()->format('Y');  // 2026, dst
+        $month = (int) now()->format('n');  
+        $year  = (int) now()->format('Y');  
 
-        // "aman": kalau data bulan+tahun itu sudah ada, di-update. Kalau belum ada, dibuat.
+     
         DB::table('innovator_of_the_month')->updateOrInsert(
             ['month' => $month, 'year' => $year],
             [

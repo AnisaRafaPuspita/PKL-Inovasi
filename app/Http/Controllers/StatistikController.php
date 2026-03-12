@@ -11,7 +11,6 @@ class StatistikController extends Controller
     {
         $year = now()->year;
 
-        // 1️⃣ Grafik inovasi per bulan (tahun ini)
         $innovationsPerMonth = Innovation::select(
                 DB::raw('MONTH(created_at) as month'),
                 DB::raw('COUNT(*) as total')
@@ -20,13 +19,11 @@ class StatistikController extends Controller
             ->groupBy(DB::raw('MONTH(created_at)'))
             ->pluck('total', 'month');
 
-        // Lengkapi 12 bulan
         $monthlyData = [];
         for ($i = 1; $i <= 12; $i++) {
             $monthlyData[] = $innovationsPerMonth[$i] ?? 0;
         }
 
-        // 2️⃣ Distribusi per fakultas
         $facultyData = DB::table('innovations')
             ->join('innovation_innovator', 'innovations.id', '=', 'innovation_innovator.innovation_id')
             ->join('innovators', 'innovation_innovator.innovator_id', '=', 'innovators.id')
@@ -44,7 +41,6 @@ class StatistikController extends Controller
             $facultyTotals[] = $total;
         }
 
-        // 3️⃣ Distribusi KI
         $kiData = Innovation::where('status', 'published')
             ->whereHas('permission', function ($q) {
                 $q->where('status', 'accepted');

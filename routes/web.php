@@ -44,7 +44,6 @@ Route::get('/inovator-of-the-month', [InnovatorOfMonthController::class, 'show']
 
 /* ================= ADMIN PLACEHOLDER ================= */
 
-// biar navbar gak error (login dihandle admin team)
 Route::get('/admin/login', fn () => 'Admin login page')
     ->name('admin.login');
 
