@@ -7,6 +7,7 @@ use App\Http\Controllers\InnovatorOfMonthController;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\RankingController;
 use App\Http\Controllers\InnovatorController;
+use App\Http\Controllers\StatistikController;
 
 
 
@@ -43,7 +44,6 @@ Route::get('/inovator-of-the-month', [InnovatorOfMonthController::class, 'show']
 
 /* ================= ADMIN PLACEHOLDER ================= */
 
-// biar navbar gak error (login dihandle admin team)
 Route::get('/admin/login', fn () => 'Admin login page')
     ->name('admin.login');
 
@@ -64,6 +64,20 @@ Route::get('/innovators', [InnovatorController::class, 'index'])
 Route::get('/innovators/{innovator}', [InnovatorController::class, 'show'])
     ->name('innovators.show');
 
+
+/* ==== NAVBAR ROUTES ==== */
+
+Route::get('/inovasi', [InnovationController::class, 'index'])
+    ->name('inovasi.index');
+
+Route::get('/inovator', [InnovatorController::class, 'index'])
+    ->name('inovator.index');
+
+Route::get('/ranking', [RankingController::class, 'index'])
+    ->name('ranking.index');
+
+Route::get('/statistik', [StatistikController::class, 'index'])
+    ->name('statistik.index');
 
 
 

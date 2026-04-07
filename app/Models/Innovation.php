@@ -35,7 +35,7 @@ class Innovation extends Model
         'ki_type',
         'ki_status',
         'ki_number',
-
+        'leader_email',
     ];
 
     protected $casts = [

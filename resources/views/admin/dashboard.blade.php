@@ -44,127 +44,258 @@
     </div>
 
     <div class="panel mb-4">
-        <div class="section-title">Grafik Kunjungan Inovasi</div>
-        <div style="height:360px;">
+        <div class="chart-head">
+            <div class="section-title m-0">Grafik Kunjungan Inovasi</div>
+
+            <form method="GET" action="{{ route('admin.dashboard') }}" class="chart-filter">
+                <select name="month" class="chart-select">
+                    @foreach($months as $monthNumber => $monthLabel)
+                        <option value="{{ $monthNumber }}" {{ (int) $selectedMonth === (int) $monthNumber ? 'selected' : '' }}>
+                            {{ $monthLabel }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <select name="year" class="chart-select">
+                    @foreach($years as $year)
+                        <option value="{{ $year }}" {{ (int) $selectedYear === (int) $year ? 'selected' : '' }}>
+                            {{ $year }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <button type="submit" class="btn btn-navy">Terapkan</button>
+            </form>
+        </div>
+
+        <div class="chart-box-lg">
             <canvas id="viewsChart"
                 data-labels='@json($chartLabels)'
-                data-values='@json($chartData)'></canvas>
+                data-values='@json($chartData)'
+                data-month='{{ $months[$selectedMonth] ?? "" }}'
+                data-year='{{ $selectedYear }}'></canvas>
         </div>
     </div>
 
-    <div class="panel">
-        <div class="section-title">Pamflet Beranda</div>
-
-        @if(session('success'))
-            <div class="alert alert-success mb-3">{{ session('success') }}</div>
-        @endif
-
-        @if(session('error'))
-            <div class="alert alert-danger mb-3">{{ session('error') }}</div>
-        @endif
-
-        @if($errors->any())
-            <div class="alert alert-danger mb-3">
-                <div class="fw-bold mb-1">Gagal menyimpan:</div>
-                <ul class="mb-0">
-                    @foreach($errors->all() as $e)
-                        <li>{{ $e }}</li>
-                    @endforeach
-                </ul>
+    <div class="chart-grid-two mb-4">
+        <div class="panel chart-panel-half">
+            <div class="section-title mb-3">Grafik Jenis KI</div>
+            <div class="chart-box-sm">
+                <canvas id="kiTypeChart"
+                    data-labels='@json($kiChartLabels)'
+                    data-values='@json($kiChartData)'></canvas>
             </div>
-        @endif
+        </div>
 
-        <form action="{{ route('admin.dashboard.home_pamflet.update') }}" method="POST" enctype="multipart/form-data">
-            @csrf
-
-            <div class="row g-3">
-                @foreach ([1,2,3] as $i)
-                    @php $key = "pamflet_{$i}"; @endphp
-
-                    <div class="col-12 col-md-4">
-                        <div style="border:1px solid #e5e7eb;border-radius:12px;padding:14px;">
-                            <div class="d-flex align-items-center justify-content-between" style="margin-bottom:10px;">
-                                <div style="font-weight:800;color:#061a4d;">Pamflet {{ $i }}</div>
-
-                                @if(!empty($homePamflet?->$key))
-                                    <button
-                                        type="submit"
-                                        name="delete_slot"
-                                        value="{{ $i }}"
-                                        class="btn btn-sm btn-outline-danger"
-                                        onclick="return confirm('Hapus Pamflet {{ $i }}?')"
-                                    >
-                                        Hapus
-                                    </button>
-                                @endif
-                            </div>
-
-                            <div style="width:100%;height:180px;border-radius:12px;border:1px dashed #cbd5e1;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#f8fafc;">
-                                @if(!empty($homePamflet?->$key))
-                                    <img src="{{ asset('storage/'.$homePamflet->$key) }}" alt="Pamflet {{ $i }}"
-                                         style="width:100%;height:100%;object-fit:cover;">
-                                @else
-                                    <span style="color:#94a3b8;">Belum ada gambar</span>
-                                @endif
-                            </div>
-
-                            <div class="mt-2">
-                                <input type="file" name="{{ $key }}" class="form-control">
-                                @error($key)
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
+        <div class="panel chart-panel-half">
+            <div class="section-title mb-3">Grafik Kategori Fakultas</div>
+            <div class="chart-box-sm">
+                <canvas id="facultyChart"
+                    data-labels='@json($facultyChartLabels)'
+                    data-values='@json($facultyChartData)'></canvas>
             </div>
-
-            <div class="mt-3 d-flex justify-content-end">
-                <button type="submit" class="btn btn-navy">Simpan Pamflet</button>
-            </div>
-        </form>
+        </div>
     </div>
+
+    <style>
+        .chart-head{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:16px;
+            flex-wrap:wrap;
+            margin-bottom:18px;
+        }
+
+        .chart-filter{
+            display:flex;
+            align-items:center;
+            gap:10px;
+            flex-wrap:wrap;
+        }
+
+        .chart-select{
+            min-width:150px;
+            height:42px;
+            border:1.5px solid rgba(6,26,77,.18);
+            border-radius:12px;
+            padding:0 12px;
+            font-weight:600;
+            color:#0f172a;
+            background:#fff;
+            outline:none;
+            transition:border-color .18s ease, box-shadow .18s ease;
+        }
+
+        .chart-select:focus{
+            border-color:#061a4d;
+            box-shadow:0 0 0 4px rgba(6,26,77,.08);
+        }
+
+        .chart-box-lg{
+            height:360px;
+        }
+
+        .chart-grid-two{
+            display:grid;
+            grid-template-columns: 1fr 1fr;
+            gap:20px;
+        }
+
+        .chart-panel-half{
+            margin-bottom:0;
+        }
+
+        .chart-box-sm{
+            height:360px;
+        }
+
+        @media (max-width: 992px){
+            .chart-grid-two{
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 576px){
+            .chart-filter{
+                width:100%;
+            }
+
+            .chart-select,
+            .chart-filter .btn{
+                width:100%;
+            }
+        }
+    </style>
 @endsection
 
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const canvas = document.getElementById('viewsChart');
-    if (!canvas) return;
+    const viewsCanvas = document.getElementById('viewsChart');
+    const kiCanvas = document.getElementById('kiTypeChart');
+    const facultyCanvas = document.getElementById('facultyChart');
 
     if (typeof Chart === 'undefined') {
         console.error('Chart.js belum ke-load. Cek script CDN di layout.');
         return;
     }
 
-    const labels = JSON.parse(canvas.dataset.labels || '[]');
-    const values = JSON.parse(canvas.dataset.values || '[]');
+    if (viewsCanvas) {
+        const labels = JSON.parse(viewsCanvas.dataset.labels || '[]');
+        const values = JSON.parse(viewsCanvas.dataset.values || '[]');
+        const month = viewsCanvas.dataset.month || '';
+        const year = viewsCanvas.dataset.year || '';
 
-    if (!labels.length || !values.length) {
-        console.error('Data chart kosong. Cek $chartLabels / $chartData dari controller.');
-        return;
+        new Chart(viewsCanvas, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Kunjungan ' + month + ' ' + year,
+                    data: values,
+                    tension: 0.25,
+                    borderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 5,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
     }
 
-    new Chart(canvas, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Views',
-                data: values,
-                tension: 0.25,
-                borderWidth: 2,
-                pointRadius: 4,
-                fill: false
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true } }
-        }
-    });
+    if (kiCanvas) {
+        const kiLabels = JSON.parse(kiCanvas.dataset.labels || '[]');
+        const kiValues = JSON.parse(kiCanvas.dataset.values || '[]');
+
+        new Chart(kiCanvas, {
+            type: 'bar',
+            data: {
+                labels: kiLabels,
+                datasets: [{
+                    label: 'Jumlah Inovasi',
+                    data: kiValues,
+                    borderWidth: 1,
+                    borderRadius: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    if (facultyCanvas) {
+        const facultyLabels = JSON.parse(facultyCanvas.dataset.labels || '[]');
+        const facultyValues = JSON.parse(facultyCanvas.dataset.values || '[]');
+
+        new Chart(facultyCanvas, {
+            type: 'bar',
+            data: {
+                labels: facultyLabels,
+                datasets: [{
+                    label: 'Jumlah Innovator',
+                    data: facultyValues,
+                    borderWidth: 1,
+                    borderRadius: 10
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            autoSkip: false
+                        }
+                    }
+                }
+            }
+        });
+    }
 });
 </script>
 @endpush

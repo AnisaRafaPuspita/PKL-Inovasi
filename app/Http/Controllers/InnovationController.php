@@ -17,6 +17,7 @@ class InnovationController extends Controller
         $category = $request->query('category');
         $facultyId = $request->query('faculty_id');
         $innovatorId = $request->query('innovator_id');
+        $year = request('year');
 
 
         $baseQuery = Innovation::query()
@@ -41,6 +42,9 @@ class InnovationController extends Controller
                 $query->whereHas('innovators', function ($q) use ($innovatorId) {
                     $q->where('innovators.id', $innovatorId);
                 });
+            })
+            ->when($year, function ($query) use ($year) {
+                $query->whereYear('created_at', $year);
             });
 
 
@@ -102,7 +106,7 @@ class InnovationController extends Controller
             'innovators.*.innovator_id' => ['nullable', 'exists:innovators,id'],
             'innovators.*.name' => ['nullable', 'string', 'max:255'],
             'innovators.*.faculty_id' => ['nullable', 'exists:faculties,id'],
-
+            'leader_email' => ['required', 'email'],
             'category' => ['nullable', 'string'],
             'category_other' => ['nullable', 'string', 'max:255'],
             'partner' => ['nullable', 'string'],
@@ -120,7 +124,6 @@ class InnovationController extends Controller
 
         ]);
 
-        // Validasi maksimal 200 kata untuk field teks utama
         $fieldsWithWordLimit = [
             'description' => 'Deskripsi produk',
             'advantages'  => 'Keunggulan produk',
@@ -167,16 +170,15 @@ class InnovationController extends Controller
             'ki_type'   => $validated['ki_type'],
             'ki_status' => $validated['ki_status'],
             'ki_number' => $validated['ki_number'],
+            'leader_email' => $validated['leader_email'],
 
         ]);
 
         foreach ($request->innovators as $item) {
-
-            // existing innovator
             if (!empty($item['innovator_id'])) {
                 $innovator = Innovator::findOrFail($item['innovator_id']);
             }
-            // innovator baru
+           
             else {
                 if (empty($item['name']) || empty($item['faculty_id'])) {
                     return back()

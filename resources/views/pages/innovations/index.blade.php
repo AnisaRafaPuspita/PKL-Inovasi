@@ -54,7 +54,7 @@
                 bg-[#F9F9F9]
                 px-6 py-4">
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
 
             {{-- Kategori --}}
             <select name="category" form="searchForm"
@@ -91,6 +91,19 @@
                     </option>
                 @endforeach
             </select>
+
+            {{---Tahun---}}
+            <select name="year"
+                form="searchForm"
+                class="rounded-full px-5 py-2 outline-none">
+            <option value="">Semua Tahun</option>
+            @for($y = now()->year; $y >= 2018; $y--)
+                <option value="{{ $y }}"
+                    {{ request('year') == $y ? 'selected' : '' }}>
+                    {{ $y }}
+                </option>
+            @endfor
+        </select>
 
         </div>
     </div>

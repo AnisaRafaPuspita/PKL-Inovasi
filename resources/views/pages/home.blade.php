@@ -223,7 +223,7 @@
                     px-4 md:px-6 py-4
                     shadow">
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
 
                 {{-- kategori --}}
                 <select name="category"
@@ -266,6 +266,20 @@
                             {{ $innovator->name }}
                         </option>
                     @endforeach
+                </select>
+
+                {{---Tahun---}}
+                <select name="year"
+                        class="h-[42px] rounded-full px-5
+                            border border-[#001349]/30
+                            outline-none">
+                    <option value="">Semua Tahun</option>
+                    @for($y = now()->year; $y >= 2018; $y--)
+                        <option value="{{ $y }}"
+                            {{ request('year') == $y ? 'selected' : '' }}>
+                            {{ $y }}
+                        </option>
+                    @endfor
                 </select>
 
 
@@ -330,7 +344,7 @@
 @endphp
 
 {{-- INOVASI BERDAMPAK --}}
-<section class="mx-auto max-w-[1320px] px-3 md:px-4 mt-12 md:mt-14">
+<section id="inovasi-section" class="mx-auto max-w-[1320px] px-3 md:px-4 mt-12 md:mt-14">
     <div class="mx-auto max-w-[800px]
                 rounded-[30px] bg-white
                 shadow-[0px_4px_8px_rgba(0,0,0,0.25)]
@@ -453,7 +467,7 @@
 </section>
 
 {{-- DAFTAR INNOVATOR --}}
-<section class="mx-auto max-w-[1320px] px-3 md:px-4 mt-14 md:mt-16">
+<section id="innovator-section" class="mx-auto max-w-[1320px] px-3 md:px-4 mt-14 md:mt-16">
 
     {{-- HEADER --}}
     <div class="inline-flex items-center gap-3 md:gap-4
@@ -543,7 +557,7 @@
 
 
 {{-- NATIONAL INNOVATION RANKING --}}
-<section class="mx-auto max-w-[1320px] px-3 md:px-4 mt-14 md:mt-16">
+<section id="ranking-section" class="mx-auto max-w-[1320px] px-3 md:px-4 mt-14 md:mt-16">
 
     {{-- HEADER --}}
     <div class="inline-flex items-center gap-3 md:gap-4 rounded-[30px] bg-white

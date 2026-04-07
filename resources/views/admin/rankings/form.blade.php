@@ -29,7 +29,18 @@
         @error('rank') <small class="text-danger">{{ $message }}</small> @enderror
       </div>
 
-      <div class="col-12 col-md-10">
+      <div class="col-12 col-md-2">
+        <label class="fw-bold">Tahun</label>
+        <input type="number"
+               name="year"
+               class="form-control"
+               value="{{ old('year', $ranking->year) }}"
+               min="2000"
+               max="{{ date('Y') }}">
+        @error('year') <small class="text-danger">{{ $message }}</small> @enderror
+      </div>
+
+      <div class="col-12 col-md-8">
         <label class="fw-bold">Nama Penghargaan</label>
         <input type="text"
                name="achievement"
@@ -41,8 +52,8 @@
       <div class="col-12">
         <label class="fw-bold">Deskripsi</label>
         <textarea name="description"
-                  class="form-control"
-                  rows="4"
+                  class="form-control auto-resize"
+                  rows="3"
                   placeholder="Tulis deskripsi singkat...">{{ old('description', $ranking->description) }}</textarea>
         @error('description') <small class="text-danger">{{ $message }}</small> @enderror
       </div>
@@ -131,9 +142,8 @@
                 </div>
               @endforeach
             </div>
+          </div>
         @endif
-
-
 
     </div>
 
@@ -148,6 +158,21 @@
 
 @push('scripts')
 <script>
+function autoResizeTextarea(el) {
+  el.style.height = "auto";
+  el.style.height = el.scrollHeight + "px";
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".auto-resize").forEach(function (textarea) {
+    autoResizeTextarea(textarea);
+
+    textarea.addEventListener("input", function () {
+      autoResizeTextarea(this);
+    });
+  });
+});
+
 function previewSingleImage(event, previewId) {
   const img = document.getElementById(previewId);
   const file = event.target.files && event.target.files[0];
@@ -269,10 +294,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     syncInputFiles();
     render();
-
   });
 
   render();
 });
 </script>
+
+<style>
+  textarea.auto-resize{
+    resize: none;
+    overflow: hidden;
+  }
+</style>
 @endpush

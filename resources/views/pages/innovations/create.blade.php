@@ -165,8 +165,15 @@
                 </div>
             </div>
 
-
-
+            {{-- Email --}}
+             <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] items-center gap-4">
+                <label class="text-[#001349] text-[18px] font-bold">Email Ketua Tim</label>
+                <input type="email"
+                    name="leader_email"
+                    required
+                    placeholder="email@contoh.com"
+                    class="h-[46px] w-full rounded-[30px] border border-[#001349] px-6 outline-none">
+            </div>
 
 
             {{-- Mitra --}}

@@ -27,6 +27,7 @@ class AdminInnovationRankingController extends Controller
     {
         $data = $request->validate([
             'rank' => 'required|integer|min:1|max:2000',
+            'year' => 'required|integer|min:2000|max:' . date('Y'),
             'achievement' => 'required|string|max:255',
             'description' => 'required|string',
             'logo' => 'required|image|mimes:jpg,jpeg,png|max:2048',
@@ -38,6 +39,8 @@ class AdminInnovationRankingController extends Controller
         if ($request->hasFile('logo')) {
             $data['logo'] = $request->file('logo')->store('rankings', 'public');
         }
+
+        $data['is_active'] = true;
 
         $ranking = InnovationRanking::create($data);
 
@@ -67,6 +70,7 @@ class AdminInnovationRankingController extends Controller
     {
         $data = $request->validate([
             'rank' => 'required|integer|min:1|max:2000',
+            'year' => 'required|integer|min:2000|max:' . date('Y'),
             'achievement' => 'required|string|max:255',
             'description' => 'required|string',
             'logo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
@@ -107,6 +111,20 @@ class AdminInnovationRankingController extends Controller
         return redirect()
             ->route('admin.innovation_rankings.index')
             ->with('success', 'Peringkat berhasil diperbarui.');
+    }
+
+    public function updateStatus(Request $request, InnovationRanking $ranking)
+    {
+        $data = $request->validate([
+            'is_active' => 'required|in:0,1',
+        ]);
+
+        $ranking->is_active = (bool) $data['is_active'];
+        $ranking->save();
+
+        return redirect()
+            ->back()
+            ->with('success', 'Status peringkat berhasil diperbarui.');
     }
 
     public function destroy(InnovationRanking $ranking)

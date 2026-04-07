@@ -17,6 +17,11 @@ class Innovator extends Model
         'faculty_id',
         'photo',
         'bio',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     /* ================= RELATIONS ================= */

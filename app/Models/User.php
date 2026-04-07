@@ -45,14 +45,13 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    /* ================= RELATIONS ================= */
 
     public function innovator()
     {
         return $this->belongsTo(Innovator::class);
     }
 
-    /* ================= HELPERS ================= */
+
 
     public function isAdmin(): bool
     {

@@ -121,15 +121,19 @@
       <div class="mt-4 d-flex gap-2 align-items-center flex-wrap">
         <a class="btn btn-outline-secondary" href="{{ route('admin.permissions.index') }}">Kembali</a>
 
+        {{-- Terima: tetap tanpa email --}}
         <form method="POST" action="{{ route('admin.permissions.accept', $innovation->id) }}">
           @csrf
           <button type="submit" class="btn btn-success">Terima</button>
         </form>
 
-        <form method="POST" action="{{ route('admin.permissions.decline', $innovation->id) }}">
-          @csrf
-          <button type="submit" class="btn btn-danger">Tolak</button>
-        </form>
+        {{-- Tolak: buka modal isi reason --}}
+        <button type="button"
+                class="btn btn-danger"
+                data-bs-toggle="modal"
+                data-bs-target="#rejectModal">
+          Tolak
+        </button>
 
         <div class="ms-auto">
           @if($permStatus === 'accepted')
@@ -272,4 +276,55 @@
   }
 }
 </style>
+
+{{-- Modal Tolak --}}
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form class="modal-content"
+          method="POST"
+          action="{{ route('admin.permissions.decline', $innovation->id) }}">
+      @csrf
+
+      <div class="modal-header">
+        <h5 class="modal-title">Tolak Inovasi</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="mb-2 fw-bold">Catatan perbaikan</div>
+        <textarea name="reason"
+                  class="form-control"
+                  rows="5"
+                  placeholder="Tulis apa saja yang harus diperbaiki...">{{ old('reason') }}</textarea>
+
+        <small class="text-muted d-block mt-2">
+          Catatan ini akan dikirim ke email: <b>{{ $innovation->leader_email ?? '-' }}</b>
+        </small>
+
+        @if ($errors->has('reason'))
+          <div class="text-danger mt-2">{{ $errors->first('reason') }}</div>
+        @endif
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+        <button type="submit" class="btn btn-danger">Kirim Penolakan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+@if ($errors->has('reason'))
+  @push('scripts')
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const modalEl = document.getElementById('rejectModal');
+        if (modalEl && window.bootstrap) {
+          const modal = new bootstrap.Modal(modalEl);
+          modal.show();
+        }
+      });
+    </script>
+  @endpush
+@endif
 @endsection

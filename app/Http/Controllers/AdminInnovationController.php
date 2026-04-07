@@ -11,15 +11,52 @@ use App\Models\InnovationPermission;
 
 class AdminInnovationController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $search = trim((string) $request->query('search'));
+        $status = $request->query('status');
+        $year = $request->query('year');
+        $perPage = (int) $request->query('per_page', 20);
+
+        if (!in_array($perPage, [20, 50, 100])) {
+            $perPage = 20;
+        }
+
         $innovations = Innovation::with(['innovators.faculty', 'images', 'primaryImage'])
             ->whereIn('status', ['published', 'draft'])
             ->whereIn('source', ['admin', 'innovator'])
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery->where('title', 'like', '%' . $search . '%')
+                        ->orWhereHas('innovators', function ($innovatorQuery) use ($search) {
+                            $innovatorQuery->where('name', 'like', '%' . $search . '%');
+                        });
+                });
+            })
+            ->when(in_array($status, ['published', 'draft']), function ($query) use ($status) {
+                $query->where('status', $status);
+            })
+            ->when(!empty($year), function ($query) use ($year) {
+                $query->whereYear('created_at', $year);
+            })
             ->orderByDesc('created_at')
-            ->get();
+            ->paginate($perPage)
+            ->withQueryString();
 
-        return view('admin.innovations.index', compact('innovations'));
+        $years = Innovation::query()
+            ->whereIn('status', ['published', 'draft'])
+            ->whereIn('source', ['admin', 'innovator'])
+            ->selectRaw('YEAR(created_at) as year')
+            ->whereNotNull('created_at')
+            ->distinct()
+            ->orderByDesc('year')
+            ->pluck('year');
+
+        return view('admin.innovations.index', compact(
+            'innovations',
+            'years',
+            'perPage'
+        ));
     }
 
     public function create()
@@ -32,8 +69,6 @@ class AdminInnovationController extends Controller
             'categories' => config('innovation.categories'),
         ]);
     }
-
-    
 
     public function store(Request $request)
     {
@@ -60,6 +95,10 @@ class AdminInnovationController extends Controller
 
         $data['source'] = 'admin';
         $data['status'] = $data['status'] ?? 'published';
+
+        $data['leader_email'] = isset($data['leader_email']) && trim((string)$data['leader_email']) !== ''
+            ? trim((string)$data['leader_email'])
+            : null;
 
         $innovation = Innovation::create($data);
 
@@ -99,7 +138,6 @@ class AdminInnovationController extends Controller
         ]);
     }
 
-
     public function update(Request $request, Innovation $innovation)
     {
         abort_if(!in_array($innovation->source, ['admin', 'innovator']), 404);
@@ -129,6 +167,10 @@ class AdminInnovationController extends Controller
 
         $data['source'] = 'admin';
         $data['status'] = $data['status'] ?? 'published';
+
+        $data['leader_email'] = isset($data['leader_email']) && trim((string)$data['leader_email']) !== ''
+            ? trim((string)$data['leader_email'])
+            : null;
 
         $innovation->update($data);
 
@@ -191,7 +233,6 @@ class AdminInnovationController extends Controller
         }
 
         $innovation->innovators()->detach();
-
         $innovation->delete();
 
         return redirect()
@@ -209,13 +250,15 @@ class AdminInnovationController extends Controller
             'ki_type' => 'required|string|max:255',
             'ki_status' => 'required|string|max:255',
             'ki_number' => 'required|string|max:255',
+
+            'leader_email' => 'nullable|email|max:255',
+
             'video_url' => 'nullable|url|max:255',
             'description' => [
                 'required',
                 'string',
                 function ($attribute, $value, $fail) {
                     $text = trim(preg_replace('/\s+/', ' ', (string) $value));
-
                     $words = $text === '' ? 0 : count(explode(' ', $text));
 
                     if ($words > 200) {
@@ -228,9 +271,7 @@ class AdminInnovationController extends Controller
             'impact' => 'nullable|string',
             'status' => 'nullable|in:published,draft',
         ]);
-
     }
-
 
     private function collectInnovatorIdsFromPayload(?string $payload, int $fallbackFacultyId): array
     {
@@ -326,5 +367,20 @@ class AdminInnovationController extends Controller
 
         $first = $innovation->images()->orderBy('id')->first();
         if ($first) $first->update(['is_primary' => true]);
+    }
+
+    public function updateStatus(Request $request, Innovation $innovation)
+    {
+        abort_if(!in_array($innovation->source, ['admin', 'innovator']), 404);
+
+        $data = $request->validate([
+            'status' => ['required', 'in:published,draft'],
+        ]);
+
+        $innovation->update([
+            'status' => $data['status'],
+        ]);
+
+        return back()->with('success', 'Status inovasi berhasil diubah.');
     }
 }

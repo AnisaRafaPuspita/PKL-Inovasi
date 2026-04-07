@@ -15,7 +15,6 @@ class InnovatorOfMonthController extends Controller
             ->orderByDesc('month')
             ->firstOrFail();
 
-        // featured innovation: ambil inovasi terbaru dari inovator tsb (published)
         $featuredInnovation = Innovation::query()
             ->where('status', 'published')
             ->whereHas('innovators', fn($q) => $q->where('innovators.id', $iom->innovator_id))

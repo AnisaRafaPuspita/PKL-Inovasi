@@ -13,14 +13,17 @@ class InnovationRanking extends Model
 
     protected $fillable = [
         'rank',
+        'year',
         'achievement',
         'description',
         'reference_link',
         'logo',
+        'is_active',
     ];
 
     protected $casts = [
         'rank' => 'integer',
+        'is_active' => 'boolean',
     ];
 
     public function photos()

@@ -16,7 +16,7 @@ class InnovationSeeder extends Seeder
      */
     public function run(): void
     {
-        //Innovation::truncate(); // opsional, biar bersih saat test (hapus kalau takut data ilang)
+       
 
         Innovation::create([
             'title'       => 'Smart Agriculture Monitoring System',
