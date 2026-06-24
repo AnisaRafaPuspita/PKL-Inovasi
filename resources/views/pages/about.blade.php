@@ -3,7 +3,7 @@
 
 @section('content')
 <section class="relative">
-    <img src="{{ asset('images/muladi.jpg') }}" class="h-[546px] w-full object-cover" alt="">
+    <img src="{{ asset('images/muladi.JPG') }}" class="h-[546px] w-full object-cover" alt="">
     <div class="absolute inset-0 bg-black/30"></div>
 
     <div class="absolute inset-0 flex items-center justify-center">
