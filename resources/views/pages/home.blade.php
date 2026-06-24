@@ -5,7 +5,7 @@
 
 {{-- HERO --}}
 <section class="relative">
-    <img src="{{ asset('images/muladi.JPG') }}"
+    <img src="{{ asset('images/muladi.jpg') }}"
      class="h-[420px] md:h-[560px] w-full object-cover animate-fade"
      alt="">
     <div class="absolute inset-0 bg-black/30"></div>
