@@ -181,9 +181,11 @@
         @if($photos->count())
           <div class="photo-grid">
             @foreach($photos as $img)
-              <a href="{{ asset('storage/'.$img->image_path) }}" target="_blank"
-                 rel="noopener noreferrer" class="photo-item">
-                <img src="{{ asset('storage/'.$img->image_path) }}" alt="Foto inovasi">
+              <a href="{{ Storage::disk('s3')->url($img->image_path) }}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="photo-item">
+                  <img src="{{ Storage::disk('s3')->url($img->image_path) }}" alt="Foto inovasi">
               </a>
             @endforeach
           </div>
@@ -232,7 +234,7 @@
             <div class="d-grid" style="grid-template-columns:repeat(2,1fr);gap:10px;">
               @foreach($photos as $img)
                 <label style="border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;background:#fff;cursor:pointer;">
-                  <img src="{{ asset('storage/'.$img->image_path) }}" style="width:100%;height:110px;object-fit:cover;">
+                  <img src="{{ Storage::disk('s3')->url($img->image_path) }}" style="width:100%;height:110px;object-fit:cover;">
                   <div style="padding:8px;display:flex;align-items:center;gap:8px;">
                     <input type="checkbox" name="delete_image_ids[]" value="{{ $img->id }}">
                     <span style="font-weight:700;color:#061a4d;">Hapus</span>

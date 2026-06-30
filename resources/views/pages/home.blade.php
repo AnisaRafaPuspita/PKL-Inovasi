@@ -92,7 +92,7 @@
                         cursor-pointer">
 
                 @if(!empty($homePamflet?->pamflet_1))
-                    <img src="{{ asset('storage/'.$homePamflet->pamflet_1) }}"
+                    <img src="{{ Storage::disk('s3')->url($homePamflet->pamflet_1) }}"
                         class="w-full h-full object-cover
                                 transition-transform duration-300
                                 group-hover:scale-[1.03]"
@@ -124,7 +124,7 @@
                         cursor-pointer">
 
                 @if(!empty($homePamflet?->pamflet_2))
-                    <img src="{{ asset('storage/'.$homePamflet->pamflet_2) }}"
+                    <img src="{{ Storage::disk('s3')->url($homePamflet->pamflet_2) }}"
                         class="w-full h-full object-cover
                                 transition-transform duration-300
                                 group-hover:scale-[1.03]"
@@ -154,7 +154,7 @@
                         cursor-pointer">
 
                 @if(!empty($homePamflet?->pamflet_3))
-                    <img src="{{ asset('storage/'.$homePamflet->pamflet_3) }}"
+                    <img src="{{ Storage::disk('s3')->url($homePamflet->pamflet_3) }}"
                         class="w-full h-full object-cover
                                 transition-transform duration-300
                                 group-hover:scale-[1.03]"
@@ -328,19 +328,17 @@
 </script>
 
 @php
-    // helper untuk path gambar: bisa dari relasi images atau legacy image_url
-    $resolveImageSrc = function ($imgPathOrUrl) {
-        if (!$imgPathOrUrl) return null;
+$resolveImageSrc = function ($imgPathOrUrl) {
+    if (!$imgPathOrUrl) return null;
 
-        // kalau sudah URL lengkap
-        if (preg_match('/^https?:\/\//i', $imgPathOrUrl)) return $imgPathOrUrl;
+    // Kalau sudah URL lengkap
+    if (preg_match('/^https?:\/\//i', $imgPathOrUrl)) {
+        return $imgPathOrUrl;
+    }
 
-        // kalau sudah diawali storage/
-        if (str_starts_with($imgPathOrUrl, 'storage/')) return asset($imgPathOrUrl);
-
-        // normal case: simpan di storage disk public
-        return asset('storage/' . ltrim($imgPathOrUrl, '/'));
-    };
+    // Semua path relatif dianggap berada di MinIO
+    return Storage::disk('s3')->url(ltrim($imgPathOrUrl, '/'));
+};
 @endphp
 
 {{-- INOVASI BERDAMPAK --}}
@@ -494,7 +492,7 @@
                                 bg-gray-100 flex items-center justify-center">
 
                         <img
-                            src="{{ asset('storage/'.$item->photo) }}"
+                            src="{{ Storage::disk('s3')->url($item->photo) }}"
                             alt="Foto Innovator"
                             class="max-h-full max-w-full object-contain"
                         >
@@ -606,7 +604,7 @@
                                 overflow-hidden bg-gray-100 flex items-center justify-center
                                 flex-shrink-0">
                         @if($rank->logo)
-                            <img src="{{ asset('storage/'.$rank->logo) }}"
+                            <img src="{{ Storage::disk('s3')->url($rank->logo) }}"
                                  class="w-full h-full object-cover"
                                  alt="Logo">
                         @else

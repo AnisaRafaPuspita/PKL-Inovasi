@@ -186,7 +186,7 @@ class AdminInnovationController extends Controller
                 ->whereIn('id', $request->input('delete_image_ids', []))
                 ->get()
                 ->each(function ($img) {
-                    Storage::disk('public')->delete($img->image_path);
+                    Storage::disk('s3')->delete($img->image_path);
                     $img->delete();
                 });
         }
@@ -222,14 +222,14 @@ class AdminInnovationController extends Controller
         if ($innovation->images && $innovation->images->count()) {
             foreach ($innovation->images as $img) {
                 if ($img->image_path) {
-                    Storage::disk('public')->delete($img->image_path);
+                    Storage::disk('s3')->delete($img->image_path);
                 }
                 $img->delete();
             }
         }
 
         if ($innovation->primaryImage?->image_path) {
-            Storage::disk('public')->delete($innovation->primaryImage->image_path);
+            Storage::disk('s3')->delete($innovation->primaryImage->image_path);
         }
 
         $innovation->innovators()->detach();
@@ -351,7 +351,7 @@ class AdminInnovationController extends Controller
         $hasPrimary = $innovation->images()->where('is_primary', true)->exists();
 
         foreach (array_values($files) as $index => $file) {
-            $path = $file->store('innovations', 'public');
+            $path = $file->store('innovations', 's3');
 
             $innovation->images()->create([
                 'image_path' => $path,

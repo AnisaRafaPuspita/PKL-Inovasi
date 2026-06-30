@@ -51,7 +51,7 @@
 
                             <div style="width:100%;height:180px;border-radius:12px;border:1px dashed #cbd5e1;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#f8fafc;">
                                 @if(!empty($homePamflet?->$key))
-                                    <img src="{{ asset('storage/'.$homePamflet->$key) }}" alt="Pamflet {{ $i }}"
+                                    <img src="{{ Storage::disk('s3')->url($homePamflet->$key) }}" alt="Pamflet {{ $i }}"
                                          style="width:100%;height:100%;object-fit:cover;">
                                 @else
                                     <span style="color:#94a3b8;">Belum ada gambar</span>

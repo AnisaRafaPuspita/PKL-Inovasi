@@ -35,14 +35,14 @@
           $photoUrl = null;
 
           if (!empty($r->photo)) {
-            $photoUrl = asset('storage/'.$r->photo);
+            $photoUrl = Storage::disk('s3')->url($r->photo);
           }
 
           if (!$photoUrl && !empty($r->photos) && count($r->photos)) {
             $p0 = $r->photos[0];
             $path = $p0->path ?? $p0->image_path ?? $p0->photo ?? null;
             if (!empty($path)) {
-              $photoUrl = asset('storage/'.$path);
+              $photoUrl = Storage::disk('s3')->url($path);
             }
           }
         @endphp
@@ -97,12 +97,12 @@
 
           <td class="text-center">
             @if(!empty($r->logo))
-              <img src="{{ asset('storage/'.$r->logo) }}"
+              <img src="{{ Storage::disk('s3')->url($r->logo) }}"
                    style="height:42px;border-radius:8px;cursor:pointer;object-fit:contain;"
                    alt="Logo"
                    data-bs-toggle="modal"
                    data-bs-target="#imagePreviewModal"
-                   data-image="{{ asset('storage/'.$r->logo) }}">
+                   data-image="{{ Storage::disk('s3')->url($r->logo) }}">
             @else
               <span class="text-muted">-</span>
             @endif

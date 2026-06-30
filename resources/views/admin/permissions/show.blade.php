@@ -156,11 +156,11 @@
         @if($photos->count())
           <div class="photo-grid">
             @foreach($photos as $p)
-              <a href="{{ asset('storage/'.$p->image_path) }}"
-                 target="_blank"
-                 rel="noopener noreferrer"
-                 class="photo-item">
-                <img src="{{ asset('storage/'.$p->image_path) }}" alt="Foto inovasi">
+              <a href="{{ Storage::disk('s3')->url($p->image_path) }}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="photo-item">
+                  <img src="{{ Storage::disk('s3')->url($p->image_path) }}" alt="Foto inovasi">
               </a>
             @endforeach
           </div>

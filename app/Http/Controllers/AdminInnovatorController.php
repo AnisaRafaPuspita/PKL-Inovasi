@@ -41,7 +41,7 @@ class AdminInnovatorController extends Controller
         );
 
         if ($request->hasFile('photo')) {
-            $validated['photo'] = $request->file('photo')->store('innovator_of_month', 'public');
+            $validated['photo'] = $request->file('photo')->store('innovator_of_month', 's3');
         }
 
         if (!isset($validated['is_active'])) {
@@ -79,9 +79,9 @@ class AdminInnovatorController extends Controller
 
         if ($request->hasFile('photo')) {
             if (!empty($item->photo)) {
-                Storage::disk('public')->delete($item->photo);
+                Storage::disk('s3')->delete($item->photo);
             }
-            $validated['photo'] = $request->file('photo')->store('innovator_of_month', 'public');
+            $validated['photo'] = $request->file('photo')->store('innovator_of_month', 's3');
         } else {
             unset($validated['photo']);
         }
@@ -96,7 +96,7 @@ class AdminInnovatorController extends Controller
     public function destroy(InnovatorOfTheMonth $item)
     {
         if (!empty($item->photo)) {
-            Storage::disk('public')->delete($item->photo);
+            Storage::disk('s3')->delete($item->photo);
         }
 
         $item->delete();

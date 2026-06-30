@@ -135,7 +135,7 @@
                     >
                         @foreach ($images as $img)
                             <img
-                                src="{{ asset('storage/' . $img->image_path) }}"
+                                src="{{ Storage::disk('s3')->url($img->image_path) }}"
                                 class="min-w-full h-full object-cover"
                                 alt="Foto Inovasi"
                             >

@@ -80,7 +80,7 @@
 
         <div class="mt-2">
           <img id="logoPreview"
-               src="{{ !empty($ranking->logo) ? asset('storage/'.$ranking->logo) : '' }}"
+               src="{{ !empty($ranking->logo) ? Storage::disk('s3')->url($ranking->logo) : '' }}"
                class="{{ empty($ranking->logo) ? 'd-none' : '' }}"
                style="max-height:100px;border-radius:8px;"
                alt="Preview Logo">
@@ -124,7 +124,7 @@
                 <div class="saved-photo-card"
                     style="position:relative;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;background:#fff;height:120px;">
 
-                  <img src="{{ asset('storage/'.$p->path) }}"
+                  <img src="{{ Storage::disk('s3')->url($p->path) }}"
                       style="width:100%;height:100%;object-fit:cover;display:block;"
                       alt="Foto tersimpan">
 

@@ -11,7 +11,7 @@
         <div class="w-[72px] h-[72px] rounded-full border border-gray-300
                     overflow-hidden bg-gray-100 flex items-center justify-center">
             @if($ranking->logo)
-                <img src="{{ asset('storage/'.$ranking->logo) }}"
+                <img src="{{ Storage::disk('s3')->url($ranking->logo) }}"
                      class="w-full h-full object-cover"
                      alt="Logo">
             @else
@@ -57,7 +57,7 @@
                     @foreach ($ranking->photos as $img)
                         <div class="w-full flex-shrink-0 flex justify-center items-center bg-gray-50">
                             <img
-                                src="{{ asset('storage/'.$img->path) }}"
+                                src="{{ Storage::disk('s3')->url($img->path) }}"
                                 alt="Pamflet Ranking"
                                 class="max-w-full max-h-[560px] object-contain rounded-[18px] shadow"
                             >

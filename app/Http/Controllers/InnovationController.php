@@ -205,7 +205,7 @@ class InnovationController extends Controller
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $index => $file) {
-                $path = $file->store('innovations', 'public');
+                $path = $file->store('innovations', 's3');
 
                 $innovation->images()->create([
                     'image_path' => $path,

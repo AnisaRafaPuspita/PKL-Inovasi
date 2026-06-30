@@ -42,7 +42,7 @@
           @php
             $photo = old('photo') ? null : ($iotm->photo ?? null);
             $photoUrl = $photo
-              ? (str_starts_with($photo, 'http') ? $photo : asset('storage/'.$photo))
+              ? (str_starts_with($photo, 'http') ? $photo : Storage::disk('s3')->url($photo))
               : null;
           @endphp
 

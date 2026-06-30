@@ -37,7 +37,7 @@ class AdminInnovationRankingController extends Controller
         ]);
 
         if ($request->hasFile('logo')) {
-            $data['logo'] = $request->file('logo')->store('rankings', 'public');
+            $data['logo'] = $request->file('logo')->store('rankings', 's3');
         }
 
         $data['is_active'] = true;
@@ -46,7 +46,7 @@ class AdminInnovationRankingController extends Controller
 
         if ($request->hasFile('photos')) {
             foreach ($request->file('photos') as $file) {
-                $path = $file->store('rankings/photos', 'public');
+                $path = $file->store('rankings/photos', 's3');
                 $ranking->photos()->create(['path' => $path]);
             }
         }
@@ -83,9 +83,9 @@ class AdminInnovationRankingController extends Controller
 
         if ($request->hasFile('logo')) {
             if (!empty($ranking->logo)) {
-                Storage::disk('public')->delete($ranking->logo);
+                Storage::disk('s3')->delete($ranking->logo);
             }
-            $data['logo'] = $request->file('logo')->store('rankings', 'public');
+            $data['logo'] = $request->file('logo')->store('rankings', 's3');
         }
 
         $ranking->update($data);
@@ -96,14 +96,14 @@ class AdminInnovationRankingController extends Controller
                 ->get();
 
             foreach ($photosToDelete as $p) {
-                Storage::disk('public')->delete($p->path);
+                Storage::disk('s3')->delete($p->path);
                 $p->delete();
             }
         }
 
         if ($request->hasFile('photos')) {
             foreach ($request->file('photos') as $file) {
-                $path = $file->store('rankings/photos', 'public');
+                $path = $file->store('rankings/photos', 's3');
                 $ranking->photos()->create(['path' => $path]);
             }
         }
@@ -132,11 +132,11 @@ class AdminInnovationRankingController extends Controller
         $ranking->load('photos');
 
         if (!empty($ranking->logo)) {
-            Storage::disk('public')->delete($ranking->logo);
+            Storage::disk('s3')->delete($ranking->logo);
         }
 
         foreach ($ranking->photos as $p) {
-            Storage::disk('public')->delete($p->path);
+            Storage::disk('s3')->delete($p->path);
         }
 
         $ranking->delete();

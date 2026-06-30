@@ -22,7 +22,7 @@
         <div class="h-[220px] md:h-[260px] rounded-[16px] bg-gray-100 overflow-hidden flex items-center justify-center">
           @if($iom->photo)
             <img
-              src="{{ asset('storage/' . $iom->photo) }}"
+              src="{{ Storage::disk('s3')->url($iom->photo) }}"
               alt="Foto Innovator of the Month"
               class="max-w-full max-h-full object-contain"
             >
@@ -159,7 +159,7 @@
                 >
                   @foreach ($images as $img)
                     <img
-                      src="{{ asset('storage/' . $img->image_path) }}"
+                      src="{{ Storage::disk('s3')->url($img->image_path) }}"
                       class="min-w-full h-full object-cover"
                       alt="Featured Innovation"
                     >

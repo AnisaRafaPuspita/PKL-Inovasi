@@ -27,11 +27,11 @@ class AdminPamfletController extends Controller
 
         foreach (['pamflet_1', 'pamflet_2', 'pamflet_3'] as $key) {
             if ($request->hasFile($key)) {
-                if (!empty($homePamflet->{$key}) && Storage::disk('public')->exists($homePamflet->{$key})) {
-                    Storage::disk('public')->delete($homePamflet->{$key});
+                if (!empty($homePamflet->{$key}) && Storage::disk('s3')->exists($homePamflet->{$key})) {
+                    Storage::disk('s3')->delete($homePamflet->{$key});
                 }
 
-                $path = $request->file($key)->store('home-pamflet', 'public');
+                $path = $request->file($key)->store('home-pamflet', 's3');
                 $homePamflet->{$key} = $path;
             }
         }
@@ -53,7 +53,7 @@ class AdminPamfletController extends Controller
         $key = "pamflet_{$slot}";
 
         if (!empty($homePamflet->{$key})) {
-            Storage::disk('public')->delete($homePamflet->{$key});
+            Storage::disk('s3')->delete($homePamflet->{$key});
         }
 
         $homePamflet->update([$key => null]);

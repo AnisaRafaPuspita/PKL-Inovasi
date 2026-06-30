@@ -47,7 +47,7 @@
                     @foreach ($images as $img)
                         <div class="min-w-full h-full flex items-center justify-center">
                             <img
-                                src="{{ asset('storage/' . $img->image_path) }}"
+                                src="{{ Storage::disk('s3')->url($img->image_path) }}"
                                 class="max-w-full max-h-full object-contain"
                                 alt="Foto Inovasi"
                             >

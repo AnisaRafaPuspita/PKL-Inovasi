@@ -40,7 +40,7 @@
                 @php
                   $src = str_starts_with($row->photo, 'http')
                     ? $row->photo
-                    : asset('storage/'.$row->photo);
+                    : Storage::disk('s3')->url($row->photo);
                 @endphp
                 <img src="{{ $src }}" alt="Foto" class="photo-thumb">
               @else
